@@ -42,7 +42,7 @@ DEBUG = os.environ.get('DEBUG', "False").lower() == "true"
 #ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 # ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(" ")
 
-ALLOWED_HOSTS=['159.89.164.235']
+ALLOWED_HOSTS=['*']
 
 
 # Application definition
