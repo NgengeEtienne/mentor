@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Edit Meal Delivery {% endblock title %}
+
+{% block content %}
+
+
+<div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-title-md2 font-semibold text-black dark:text-white"> Edit Delivery Order</h2>
+        <nav>
+            <ol class="flex items-center gap-2">
+                <li><a class="font-medium" href="{{dashboard}}">Dashboard /</a></li>
+                <li class="font-medium text-primary">Delivery List</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="pb-5"><div class="flex justify-end p-3 container bg-white rounded-lg">
+        <div class="button flex items-center">
+            <a href="{% url 'orders_list'%}" class="inline-flex items-center gap-2 rounded-md bg-primary my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M48 256c0 114.87 93.13 208 208 208s208-93.13 208-208S370.87 48 256 48 48 141.13 48 256zm224-80.09L208.42 240H358v32H208.42L272 336.09l-22.7 22.54L147.46 256 249.3 153.37z"></path></svg>
+                <span>Back to Order List</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<div class="rounded-sm border border-stroke bg-white px-5 py-10 shadow-default dark:border-strokedark dark:bg-boxdark">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Bulk Order Field -->
+            <div>
+                <label for="bulk_order" class="block mb-2 font-medium text-gray-900 dark:text-white">Bulk Order</label>
+                {{ form.bulk_order }}
+            </div>
+
+            <!-- Delivery Address Field -->
+            <div>
+                <label for="delivery_address" class="block mb-2 font-medium text-gray-900 dark:text-white">Delivery Address</label>
+                {{ form.delivery_address }}
+            </div>
+
+            <!-- Meal Type Field -->
+            <div>
+                <label for="meal_type" class="block mb-2 font-medium text-gray-900 dark:text-white">Meal Type</label>
+                {{ form.meal_type }}
+            </div>
+
+            <!-- Quantity Field -->
+            <div>
+                <label for="quantity" class="block mb-2 font-medium text-gray-900 dark:text-white">Quantity</label>
+                {{ form.quantity }}
+            </div>
+
+            <!-- Status Field -->
+            <div>
+                <label for="status" class="block mb-2 font-medium text-gray-900 dark:text-white">Status</label>
+                {{ form.status }}
+            </div>
+            <div>
+                <label for="status" class="block mb-2 font-medium text-gray-900 dark:text-white">Date</label>
+                {{ form.date }}
+            </div>
+            
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end gap-4 mt-6">
+            <a href="{% url 'meal_delivery_list' %}" class="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-700">Cancel</a>
+            <button type="submit" class="px-6 py-2 bg-primary text-white rounded-md hover:bg-opacity-90">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

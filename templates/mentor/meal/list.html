@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Meal Deliveries {% endblock title %}
+
+{% block content %}
+
+<div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-title-md2 font-semibold text-black dark:text-white">Corporate Orders</h2>
+        <nav>
+            <ol class="flex items-center gap-2">
+                <li><a class="font-medium" href="{{dashboard}}">Dashboard /</a></li>
+                <li class="font-medium text-primary">Corporate orders</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="pb-5"><div class="flex justify-end p-3 container bg-white rounded-lg">
+        <div class="button flex items-center">
+            <a href="{% url 'delivery_address_create' %}" class="inline-flex items-center gap-2 rounded-md bg-primary my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm90.5 224H272v74.5c0 8.8-7.2 16-16 16-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3V272h-74.5c-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3 0-8.8 7.2-16 16-16H240v-74.5c0-8.8 7.2-16 16-16s16 7.2 16 16V240h74.5c8.8 0 16 7.2 16 16s-7.2 16-16 16z"></path>
+                </svg>
+                <span>Add Meal Deliveries</span>
+            </a>
+        </div>
+    </div>
+  </div>
+<div class="rounded-sm border border-stroke bg-white px-5 py-10 shadow-default dark:border-strokedark dark:bg-boxdark sm:py-20">
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr class="bg-gray-2 text-left dark:bg-meta-4">
+                    <th scope="col" class="px-6 py-3">ID</th>
+                    <th scope="col" class="px-6 py-3">Meal</th>
+                    <th scope="col" class="px-6 py-3">Kitchen</th>
+                    <th scope="col" class="px-6 py-3">Meal Plan Status</th>
+                    <th scope="col" class="px-6 py-3">Breakfast</th>
+                    <th scope="col" class="px-6 py-3">Lunch</th>
+                    <th scope="col" class="px-6 py-3">Snack</th>
+                    <th scope="col" class="px-6 py-3">Dinner</th>
+                    <th scope="col" class="px-6 py-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for delivery in deliveries %}
+                <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        {{ delivery.bulk_order_id }}
+                    </th>
+                    <td class="px-6 py-4">{{ delivery.bulk_order_name }}</td>
+                    <td class="px-6 py-4">
+                        {% for meal_plan in delivery.kitchen.all %}
+                        {{ meal_plan.kitchenName }}
+                    {% empty %}
+                        No Kitchens
+                    {% endfor %}
+                    </td>
+                    <td class="px-6 py-4">
+                        {% for meal_plan in delivery.MealPlan.all %}
+                        {{ meal_plan.meal_plan_person_status }}
+                    {% empty %}
+                        No Meal Plans
+                    {% endfor %}</td>
+                    <td class="px-6 py-4">{{ delivery.breakfast }}</td>
+                    <td class="px-6 py-4">{{ delivery.lunch }}</td>
+                    <td class="px-6 py-4">{{ delivery.snack }}</td>
+                    <td class="px-6 py-4">{{ delivery.dinner }}</td>
+                    <td class="px-6 py-4 flex items-center gap-2">
+                        {% comment %} <button onclick="openModal('{{ delivery.bulk_order_id }}')" class="bg-warning text-primary px-4 py-2 rounded-md hover:bg-opacity-90">View</button> {% endcomment %}
+                        <a href="{% url 'assign_address' delivery.bulk_order_id %}" class="bg-success text-white px-4 py-2 rounded-md hover:bg-opacity-90">Assign</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+  
+
+{% endblock content %}

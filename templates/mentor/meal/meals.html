@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Delivery Addresses {% endblock title %}
+
+{% block content %}
+<div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-title-md2 font-semibold text-black dark:text-white">Meal</h2>
+        <nav>
+            <ol class="flex items-center gap-2">
+                <li><a class="font-medium" href="{{dashboard}}">Dashboard /</a></li>
+                <li class="font-medium text-primary">Meal</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="pb-5"><div class="flex justify-end p-3 container bg-white rounded-lg">
+        <div class="button flex items-center">
+            {% comment %} <a href="" class="inline-flex items-center gap-2 rounded-md bg-primary my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm90.5 224H272v74.5c0 8.8-7.2 16-16 16-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3V272h-74.5c-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3 0-8.8 7.2-16 16-16H240v-74.5c0-8.8 7.2-16 16-16s16 7.2 16 16V240h74.5c8.8 0 16 7.2 16 16s-7.2 16-16 16z"></path>
+                </svg>
+                <span>Add Meal Plan</span>
+            </a> {% endcomment %}
+        </div>
+    </div>
+</div>
+<div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+    <div class="max-w-full overflow-x-auto">
+        <table class="w-full table-auto">
+            <thead>
+                <tr class="bg-gray-2 text-left dark:bg-meta-4">
+                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
+                        Date
+                    </th>
+                    <th class="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white">
+                        Order Name
+                    </th>
+                    <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
+                        Breakfast Total
+                    </th>
+                    <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
+                        Lunch Total
+                    </th>
+                    <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
+                        Snack Total
+                    </th>
+                    <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
+                        Dinner Total
+                    </th>
+                    <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <td class="border border-gray-300 px-4 py-2">
+                        {{ order.date }}
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        {{ order.bulk_order__bulk_order_name }}
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        {{ order.total_breakfast }}
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        {{ order.total_lunch }}
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        {{ order.total_snack }}
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        {{ order.total_dinner }}
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        <a href="" class="hover:text-primary"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" focusable="false" class="chakra-icon css-1gm3tio" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                            <path d="m7 17.013 4.413-.015 9.632-9.54c.378-.378.586-.88.586-1.414s-.208-1.036-.586-1.414l-1.586-1.586c-.756-.756-2.075-.752-2.825-.003L7 12.583v4.43zM18.045 4.458l1.589 1.583-1.597 1.582-1.586-1.585 1.594-1.58zM9 13.417l6.03-5.973 1.586 1.586-6.029 5.971L9 15.006v-1.589z"></path>
+                            <path d="M5 21h14c1.103 0 2-.897 2-2v-8.668l-2 2V19H8.158c-.026 0-.053.01-.079.01-.033 0-.066-.009-.1-.01H5V5h6.847l2-2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2z"></path></svg>
+                        
+                          </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center p-6 text-gray-500">
+                        No meal data available.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+
+{% endblock content %}
+
+    
+
+    
+      

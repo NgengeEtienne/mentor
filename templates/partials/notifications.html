@@ -1,0 +1,21 @@
+<ul class="flex h-auto flex-col overflow-y-auto">
+    {% for notification in notifications %}
+    <li>
+      <a
+        class="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
+       >
+        <p class="text-sm">
+          <span class="text-black dark:text-white"
+            >{{notification.message}}</span
+          >
+          
+        </p>
+
+        <p class="text-xs">{{notification.created_at}}</p>
+      </a>
+    </li>
+    {% empty %}
+    <li>No notifications available.</li>
+{% endfor %}
+    
+  </ul>

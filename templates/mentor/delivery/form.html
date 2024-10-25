@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} 
+  {% if object %} Edit Delivery Address {% else %} Add Delivery Address {% endif %} 
+{% endblock title %}
+
+{% block content %}
+
+<div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-title-md2 font-semibold text-black dark:text-white">{% if object %} Edit Delivery Address {% else %} Add Delivery Address {% endif %}</h2>
+        <nav>
+            <ol class="flex items-center gap-2">
+                <li><a class="font-medium" href="{{dashboard}}">Dashboard /</a></li>
+                <li class="font-medium text-primary">Delivery List</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="pb-5"><div class="flex justify-end p-3 container bg-white rounded-lg">
+        <div class="button flex items-center">
+            <a href="{% url 'meal_plan_list'%}" class="inline-flex items-center gap-2 rounded-md bg-primary my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M48 256c0 114.87 93.13 208 208 208s208-93.13 208-208S370.87 48 256 48 48 141.13 48 256zm224-80.09L208.42 240H358v32H208.42L272 336.09l-22.7 22.54L147.46 256 249.3 153.37z"></path></svg>
+                <span>Back to Delivery List</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="rounded-sm border border-stroke bg-white px-5 py-10 shadow-default dark:border-strokedark dark:bg-boxdark sm:py-20">
+    <form method="post" 
+          action="{% if object %} {% url 'delivery_address_edit' object.id %} {% else %} {% url 'delivery_address_create' %} {% endif %}">
+        {% csrf_token %}
+        
+        <div class="mx-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Name</label>
+                {{ form.name }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Address Line 1</label>
+                {{ form.address_line_1 }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Address Line 2</label>
+                {{ form.address_line_2 }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-black dark:text-white">City</label>
+                {{ form.city }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-black dark:text-white">State</label>
+                {{ form.state }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Pin Code</label>
+                {{ form.pin_code }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Latitude</label>
+                {{ form.latitude }}
+            </div>
+            <div>
+                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Longitude</label>
+                {{ form.longitude }}
+            </div>
+        </div>
+        <button type="submit" 
+                class="inline-flex items-center justify-center gap-2.5 bg-black px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
+            {% if object %} Update Address {% else %} Add Address {% endif %}
+        </button>
+    </form>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Delivery Addresses {% endblock title %}
+
+{% block content %}
+<div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-title-md2 font-semibold text-black dark:text-white">Meal Plans Overview for {{mealplan}}</h2>
+        <nav>
+            <ol class="flex items-center gap-2">
+                <li><a class="font-medium" href="{{dashboard}}">Dashboard /</a></li>
+                <li class="font-medium text-primary">Meal</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="pb-5"><div class="flex justify-end p-3 container bg-white rounded-lg">
+        <div class="button flex items-center">
+            <a href="{% url 'meal_plan_list'%}" class="inline-flex items-center gap-2 rounded-md bg-primary my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M48 256c0 114.87 93.13 208 208 208s208-93.13 208-208S370.87 48 256 48 48 141.13 48 256zm224-80.09L208.42 240H358v32H208.42L272 336.09l-22.7 22.54L147.46 256 249.3 153.37z"></path></svg>
+                <span>Back to Meal Plan</span>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+    {% comment %} <div class="max-w-full overflow-x-auto">
+        
+    #list these here as details not form
+    <table class="table-auto w-full">
+        <thead>
+            <tr>
+                <th class="px-4 py-2 font-bold text-left">Meal Plan Name</th>
+                <th class="px-4 py-2 font-bold text-left">Meal Plan Image URL</th>
+                <th class="px-4 py-2 font-bold text-left">Meal Plan Description</th>
+                <th class="px-4 py-2 font-bold text-left">Meal Plan Availability Status</th>
+                <th class="px-4 py-2 font-bold text-left">Meal Plan Person Status</th>
+                <th class="px-4 py-2 font-bold text-left">Dietary Choices</th>
+                <th class="px-4 py-2 font-bold text-left">Cuisine Choices</th>
+                <th class="px-4 py-2 font-bold text-left">Daily Price</th>
+                <th class="px-4 py-2 font-bold text-left">Daily Breakfast Price</th>
+                <th class="px-4 py-2 font-bold text-left">Daily Lunch Price</th>
+                <th class="px-4 py-2 font-bold text-left">Daily Dinner Price</th>
+                <th class="px-4 py-2 font-bold text-left">Daily Snack Price</th>
+                <th class="px-4 py-2 font-bold text-left">Weekly Price</th>
+                <th class="px-4 py-2 font-bold text-left">Weekly Breakfast Price</th>
+                <th class="px-4 py-2 font-bold text-left">Weekly Lunch Price</th>
+                <th class="px-4 py-2 font-bold text-left">Weekly Dinner Price</th>
+                <th class="px-4 py-2 font-bold text-left">Weekly Snack Price</th>
+                <th class="px-4 py-2 font-bold text-left">Monthly Price</th>
+                <th class="px-4 py-2 font-bold text-left">Monthly Breakfast Price</th>
+                <th class="px-4 py-2 font-bold text-left">Monthly Lunch Price</th>
+                <th class="px-4 py-2 font-bold text-left">Monthly Dinner Price</th>
+                <th class="px-4 py-2 font-bold text-left">Monthly Snack Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="border px-4 py-2">{{mealplan.meal_plan_name}}</td>
+                <td class="border px-4 py-2">{{mealplan.meal_plan_image_url}}</td>
+                <td class="border px-4 py-2">{{mealplan.meal_plan_description}}</td>
+                <td class="border px-4 py-2">{{mealplan.meal_plan_availability_status}}</td>
+                <td class="border px-4 py-2">{{mealplan.meal_plan_person_status}}</td>
+                <td class="border px-4 py-2">{% for dietary_choice in mealplan.dietary_choices.all %}{{dietary_choice.diet_name}}{% endfor %}</td>
+                <td class="border px-4 py-2">{% for cuisine_choice in mealplan.cuisine_choices.all %}{{cuisine_choice.cuisine_name}}{% endfor %}</td>
+                <td class="border px-4 py-2">{{mealplan.daily_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.daily_breakfast_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.daily_lunch_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.daily_dinner_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.daily_snack_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.weekly_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.weekly_breakfast_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.weekly_lunch_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.weekly_dinner_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.weekly_snack_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.monthly_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.monthly_breakfast_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.monthly_lunch_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.monthly_dinner_price}}</td>
+                <td class="border px-4 py-2">{{mealplan.monthly_snack_price}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div> {% endcomment %}
+<div class="max-w-full overflow-x-auto">
+    
+  
+    <!-- Daily Plans Table -->
+    <h3 class="mt-3 mb-4">Daily Meal Plans</h3>
+    <table class="table-auto w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 font-bold text-left">Meal Plan Name</th>
+          <th class="px-4 py-2 font-bold text-left">Breakfast</th>
+          <th class="px-4 py-2 font-bold text-left">Lunch</th>
+          <th class="px-4 py-2 font-bold text-left">Dinner</th>
+          <th class="px-4 py-2 font-bold text-left">Snacks</th>
+          <th class="px-4 py-2 font-bold text-left">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2">{{ mealplan.meal_plan_name }}</td>
+          <td class="border px-4 py-2">{{ mealplan.daily_breakfast_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.daily_lunch_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.daily_dinner_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.daily_snack_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.meal_plan_availability_status }}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Weekly Plans Table -->
+    <h3 class="mt-3 mb-4">Weekly Meal Plans</h3>
+    <table class="table-auto w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 font-bold text-left">Meal Plan Name</th>
+          <th class="px-4 py-2 font-bold text-left">Breakfast</th>
+          <th class="px-4 py-2 font-bold text-left">Lunch</th>
+          <th class="px-4 py-2 font-bold text-left">Dinner</th>
+          <th class="px-4 py-2 font-bold text-left">Snacks</th>
+          <th class="px-4 py-2 font-bold text-left">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2">{{ mealplan.meal_plan_name }}</td>
+          <td class="border px-4 py-2">{{ mealplan.weekly_breakfast_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.weekly_lunch_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.weekly_dinner_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.weekly_snack_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.meal_plan_availability_status }}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Monthly Plans Table -->
+    <h3 class="mt-3 mb-4">Monthly Meal Plans</h3>
+    <table class="table-auto w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 font-bold text-left">Meal Plan Name</th>
+          <th class="px-4 py-2 font-bold text-left">Breakfast</th>
+          <th class="px-4 py-2 font-bold text-left">Lunch</th>
+          <th class="px-4 py-2 font-bold text-left">Dinner</th>
+          <th class="px-4 py-2 font-bold text-left">Snacks</th>
+          <th class="px-4 py-2 font-bold text-left">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2">{{ mealplan.meal_plan_name }}</td>
+          <td class="border px-4 py-2">{{ mealplan.monthly_breakfast_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.monthly_lunch_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.monthly_dinner_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.monthly_snack_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.meal_plan_availability_status }}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Weekly Availability Tables by Day -->
+    {% for day in days %}
+    <h3 class="mt-3 mb-4">{{ day|capfirst }}'s Meals</h3>
+    <table class="table-auto w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 font-bold text-left">Meal Type</th>
+          <th class="px-4 py-2 font-bold text-left">Dishes</th>
+          <th class="px-4 py-2 font-bold text-left">Meals</th>
+          <th class="px-4 py-2 font-bold text-left">Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2">Breakfast</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.day_breakfast_dish.all %}{{ dish.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.day_breakfast_meal.all %}{{ meal.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.day_breakfast_dish_option.all %}{{ option.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Lunch</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.day_lunch_dish.all %}{{ dish.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.day_lunch_meal.all %}{{ meal.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.day_lunch_dish_option.all %}{{ option.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Dinner</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.day_dinner_dish.all %}{{ dish.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.day_dinner_meal.all %}{{ meal.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.day_dinner_dish_option.all %}{{ option.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% endfor %}
+  </div>
+  
+</div>
+</div>
+
+{% endblock content %}
+
+    
+
+    
+      
