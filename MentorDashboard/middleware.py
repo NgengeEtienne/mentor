@@ -11,5 +11,5 @@ class BranchCompanyMiddleware(MiddlewareMixin):
             # request.company= Company.objects.get(id=1)
             # request.branch = Branch.objects.get(id=1)
         else:
-            request.branch = Branch.objects.get(id=1)
-            request.company = Company.objects.get(id=1)
+            request.branch = Branch.objects.get(id=request.user.branch.id)
+            request.company = Company.objects.get(id=request.user.branch.company_id)
