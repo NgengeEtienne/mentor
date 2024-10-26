@@ -200,113 +200,97 @@
               <!-- Card Item End -->
             </div>
 
-            <div
-              class="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5"
-            >
-              
-
+   
               <!-- ====== Table One Start -->
-              <div class="col-span-12 xl:col-span-8">
-                <div
-  class="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1"
->
-<h4 class="mb-6 text-xl font-bold text-black dark:text-white">
-    Active  Subscriptions
-</h4>
+              <div class="mt-4 col-span-12 xl:col-span-8">
+                <div class="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+                  <h4 class="mb-6 text-xl font-bold text-black dark:text-white">
+                    Upcoming Deliveries
+                  </h4>
+                  <div class="max-w-full overflow-x-auto">
+                      <table class="w-full table-auto">
+                          <thead>
+                              <tr class="bg-gray-2 text-left dark:bg-meta-4">
+                                  <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
+                                      Day
+                                  </th>
+                                  <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
+                                      Date
+                                  </th>
+                                  <th class="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white">
+                                      Status
+                                  </th>
+                                  <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
+                                      Delivery Assignment
+                                  </th>
+                                  
+                                  <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
+                                      Actions
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
 
-<table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-        <tr>
-            <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Order Name</th>
-            <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Kitchen</th>
-            <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Meal Plan</th>
-            <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Quantity</th>
-            <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Start Date</th>
-            <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">End Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for delivery in active_subscriptions %}
-        <tr>
-            <td class="px-6 py-4">{{ delivery.bulk_order_name }}</td>
-            <td class="px-6 py-4">{{ delivery.kitchen.all|join:", " }}</td>
-            <td class="px-6 py-4">{{ delivery.MealPlan.all|join:", " }}</td>
-            <td class="px-8 py-4 text-xs">
-                Breakfast: {{ delivery.breakfast }}<br>
-                Lunch: {{ delivery.lunch }}<br>
-                Snack: {{ delivery.snack }}<br>
-                Dinner: {{ delivery.dinner }}<br>
-            </td>
-            <td class="px-6 py-4">{{ delivery.bulk_order_start_date }}</td>
-            <td class="px-6 py-4">{{ delivery.bulk_order_end_date }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="6" class="px-6 py-4 text-center font-medium text-meta-5">No delivered meals</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-</div>
-
-              </div>
-              <!-- ====== Table One End -->
-
-              <!-- ====== Chat Card Start -->
-              <div
-                class="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4"
-              >
-                <h4
-                  class="mb-6 px-7.5 text-xl font-bold text-black dark:text-white"
-                >
-                  Delivery Addresses
-                </h4>
-
-                <div>
-                    {% for item in addresses%}
-                    <a class="flex items-center gap-5 px-7.5 py-3 hover:bg-gray-3 dark:hover:bg-meta-4">
-                        <div class="relative p-2">
-                            <svg
-                            class="fill-current"
-                            width="15"
-                            height="15"
-                            viewBox="0 0 15 15"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M13.3503 14.6504H10.2162C9.51976 14.6504 8.93937 14.0698 8.93937 13.373V10.8183C8.93937 10.5629 8.73043 10.3538 8.47505 10.3538H6.54816C6.29279 10.3538 6.08385 10.5629 6.08385 10.8183V13.3498C6.08385 14.0465 5.50346 14.6272 4.80699 14.6272H1.62646C0.929989 14.6272 0.349599 14.0465 0.349599 13.3498V5.24444C0.349599 4.89607 0.535324 4.57092 0.837127 4.38513L6.96604 0.506623C7.29106 0.297602 7.73216 0.297602 8.05717 0.506623L14.1861 4.38513C14.4879 4.57092 14.6504 4.89607 14.6504 5.24444V13.3266C14.6504 14.0698 14.07 14.6504 13.3503 14.6504ZM6.52495 9.54098H8.45184C9.14831 9.54098 9.7287 10.1216 9.7287 10.8183V13.3498C9.7287 13.6053 9.93764 13.8143 10.193 13.8143H13.3503C13.6057 13.8143 13.8146 13.6053 13.8146 13.3498V5.26766C13.8146 5.19799 13.7682 5.12831 13.7218 5.08186L7.61608 1.20336C7.54643 1.15691 7.45357 1.15691 7.40714 1.20336L1.27822 5.08186C1.20858 5.12831 1.18536 5.19799 1.18536 5.26766V13.373C1.18536 13.6285 1.3943 13.8375 1.64967 13.8375H4.80699C5.06236 13.8375 5.2713 13.6285 5.2713 13.373V10.8183C5.24809 10.1216 5.82848 9.54098 6.52495 9.54098Z"
-                              fill=""
-                            />
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M7.51145 1.55118L13.465 5.33306V13.3498C13.465 13.4121 13.4126 13.4646 13.3503 13.4646H10.193C10.1307 13.4646 10.0783 13.4121 10.0783 13.3498V10.8183C10.0783 9.92844 9.34138 9.19125 8.45184 9.19125H6.52495C5.63986 9.19125 4.89529 9.92534 4.9217 10.8238V13.373C4.9217 13.4354 4.86929 13.4878 4.80699 13.4878H1.64967C1.58738 13.4878 1.53496 13.4354 1.53496 13.373V5.33323L7.51145 1.55118ZM1.27822 5.08186L7.40714 1.20336C7.45357 1.15691 7.54643 1.15691 7.61608 1.20336L13.7218 5.08186C13.7682 5.12831 13.8146 5.19799 13.8146 5.26766V13.3498C13.8146 13.6053 13.6057 13.8143 13.3503 13.8143H10.193C9.93764 13.8143 9.7287 13.6053 9.7287 13.3498V10.8183C9.7287 10.1216 9.14831 9.54098 8.45184 9.54098H6.52495C5.82848 9.54098 5.24809 10.1216 5.2713 10.8183V13.373C5.2713 13.6285 5.06236 13.8375 4.80699 13.8375H1.64967C1.3943 13.8375 1.18536 13.6285 1.18536 13.373V5.26766C1.18536 5.19799 1.20858 5.12831 1.27822 5.08186ZM13.3503 15.0001H10.2162C9.32668 15.0001 8.58977 14.2629 8.58977 13.373V10.8183C8.58977 10.756 8.53735 10.7036 8.47505 10.7036H6.54816C6.48587 10.7036 6.43345 10.756 6.43345 10.8183V13.3498C6.43345 14.2397 5.69654 14.9769 4.80699 14.9769H1.62646C0.736911 14.9769 0 14.2397 0 13.3498V5.24444C0 4.77143 0.251303 4.33603 0.651944 4.08848L6.77814 0.211698C7.21781 -0.0704034 7.80541 -0.0704031 8.24508 0.211698C8.24546 0.211943 8.24584 0.212188 8.24622 0.212433L14.3713 4.08851C14.7853 4.34436 15 4.78771 15 5.24444V13.3266C15 14.2589 14.2671 15.0001 13.3503 15.0001ZM14.1861 4.38513L8.05717 0.506623C7.73216 0.297602 7.29106 0.297602 6.96604 0.506623L0.837127 4.38513C0.535324 4.57092 0.349599 4.89607 0.349599 5.24444V13.3498C0.349599 14.0465 0.929989 14.6272 1.62646 14.6272H4.80699C5.50346 14.6272 6.08385 14.0465 6.08385 13.3498V10.8183C6.08385 10.5629 6.29279 10.3538 6.54816 10.3538H8.47505C8.73043 10.3538 8.93937 10.5629 8.93937 10.8183V13.373C8.93937 14.0698 9.51976 14.6504 10.2162 14.6504H13.3503C14.07 14.6504 14.6504 14.0698 14.6504 13.3266V5.24444C14.6504 4.89607 14.4879 4.57092 14.1861 4.38513Z"
-                              fill=""
-                            />
-                          </svg>
-                        </div>
-    
-                        <div class="flex flex-1 items-center justify-between">
-                          <div>
-                            <h5 class="font-medium">{{item.name}}</h5>
-                            <p>
-                              <span class="text-sm font-medium"
-                                >{{item.city}}</span
-                              >
-                              <span class="text-xs"></span>
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                      {%empty%}
-                      <a class="flex items-center gap-5 px-7.5 py-3 hover:bg-gray-3 dark:hover:bg-meta-4">
-                        No Addresses</a>
-                      {%endfor%}
+                              {% for order in orders %}
+                              <tr>
+                                  <!-- Day -->
+                                  <td class="border border-gray-300 px-4 py-2">{{ order.day_name }}</td>
+                  
+                                  <!-- Date -->
+                                  <td class="border border-gray-300 px-4 py-2">{{ order.date }}</td>
+                  
+                                  <!-- Status -->
+                                  <td class="border border-gray-300 px-4 py-2">
+                                      {% if order.has_values %}
+                                          Assigned
+                                      {% else %}
+                                          Not Assigned
+                                      {% endif %}
+                                  </td>
+                  
+                                  <!-- Delivery Assignment -->
+                                  <td class="border border-gray-300 px-4 py-2">
+                                      {% if order.has_values %}
+                                          {% for address, totals in order.delivery_data.items %}
+                                              <div>
+                                                  {{ address }} - {{ totals.total_sum }}
+                                                  ({{ totals.total_breakfast }}, {{ totals.total_lunch }}, 
+                                                  {{ totals.total_snack }}, {{ totals.total_dinner }})
+                                              </div>
+                                          {% endfor %}
+                                      {% else %}
+                                          Not Assigned
+                                      {% endif %}
+                                  </td>
+                  
+                                  <!-- Actions -->
+                                  <td class="border border-gray-300 px-4 py-2">
+                                      {% if order.has_values %}
+                                          {%if order.is_future == "No" %}
+                                          <a class="bg-danger text-white px-4 py-2 rounded text-sm" readonly>Blocked</a>
+                                          {% else %}
+                                              <a href="{% url 'edit_assign_address' order.date %}" class="bg-primary text-white px-4 py-2 rounded text-sm">Edit</a>
+                                          {%endif%}
+                                      {% else %}
+                                          {%if order.is_future == "No" %}
+                                          <a  href=""  class="bg-danger text-white px-4 py-2 rounded text-sm">Blocked</a>
+                                          {% else %}
+                                          <a  href="{% url 'edit_assign_address' order.date %}"  class="bg-success text-white px-4 py-2 rounded text-sm">Assign</a>
+                                          {%endif%}
+                                          
+                                      {% endif %}
+                                  </td>
+                              </tr>
+                          {% endfor %}
+                            
+                          </tbody>
+                          
+                      </tbody>
+                  </table>
                 </div>
-              </div>
-              <!-- ====== Chat Card End -->
+                </div>
+
+              
             </div>
 
 {% endblock content %}

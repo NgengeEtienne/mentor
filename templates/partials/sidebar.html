@@ -43,7 +43,7 @@ class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hid
   >
     <!-- Menu Group -->
     <div>
-      <h3 class="mb-4 ml-4 text-sm font-medium text-bodydark2">MENU</h3>
+      <h3 class="mb-4 ml-4 text-sm font-medium text-bodydark2"></h3>
 
       <ul class="mb-6 flex flex-col gap-1.5">
         <!-- Menu Item Dashboard -->
@@ -78,7 +78,7 @@ class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hid
               />
             </svg>
 
-            Dashboard
+            Overview
 
           </a>
         </li>
@@ -93,6 +93,18 @@ class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hid
 
           </a>
         </li> 
+        
+        <li>
+          <a
+            class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+            href="{% url 'meal_ordered'%}"
+          >
+          <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" focusable="false" class="chakra-icon css-18176s2" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3 2h2v20H3zm16 0H6v20h13c1.103 0 2-.897 2-2V4c0-1.103-.897-2-2-2zm-1 10H9v-2h9v2zm0-4H9V6h9v2z"></path></svg>
+
+           Delivery Assignment
+
+          </a>
+        </li> 
         <li>
           <a
             class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
@@ -103,29 +115,18 @@ class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hid
             Delivery Addresses
 
           </a>
-        </li>
-        <li>
+        </li> 
+         {% comment %} <li>
           <a
             class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
             href="{% url 'meal_delivery_list'%}"
-          >
-          <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" focusable="false" class="chakra-icon css-18176s2" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3 2h2v20H3zm16 0H6v20h13c1.103 0 2-.897 2-2V4c0-1.103-.897-2-2-2zm-1 10H9v-2h9v2zm0-4H9V6h9v2z"></path></svg>
-
-            Assign Meals
-
-          </a>
-        </li>  
-         <li>
-          <a
-            class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
-            href="{% url 'meal_ordered'%}"
           >
           <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 576 512" focusable="false" class="chakra-icon css-18176s2" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M240 144A96 96 0 1 0 48 144a96 96 0 1 0 192 0zm44.4 32C269.9 240.1 212.5 288 144 288C64.5 288 0 223.5 0 144S64.5 0 144 0c68.5 0 125.9 47.9 140.4 112h71.8c8.8-9.8 21.6-16 35.8-16H496c26.5 0 48 21.5 48 48s-21.5 48-48 48H392c-14.2 0-27-6.2-35.8-16H284.4zM144 80a64 64 0 1 1 0 128 64 64 0 1 1 0-128zM400 240c13.3 0 24 10.7 24 24v8h96c13.3 0 24 10.7 24 24s-10.7 24-24 24H280c-13.3 0-24-10.7-24-24s10.7-24 24-24h96v-8c0-13.3 10.7-24 24-24zM288 464V352H512V464c0 26.5-21.5 48-48 48H336c-26.5 0-48-21.5-48-48zM48 320h80 16 32c26.5 0 48 21.5 48 48s-21.5 48-48 48H160c0 17.7-14.3 32-32 32H64c-17.7 0-32-14.3-32-32V336c0-8.8 7.2-16 16-16zm128 64c8.8 0 16-7.2 16-16s-7.2-16-16-16H160v32h16zM24 464H200c13.3 0 24 10.7 24 24s-10.7 24-24 24H24c-13.3 0-24-10.7-24-24s10.7-24 24-24z"></path></svg>
 
           Meal Deliveries
 
           </a>
-        </li> 
+        </li>  {% endcomment %}
         <li>
           <a
             class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
@@ -133,7 +134,7 @@ class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hid
           >
           <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-18176s2" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M267.2 25.08l-70 70.16c-7.7 7.66-7.3 16.86-2.4 26.96l2 4.3-3.1 2.9-23.6 22.3 21.7 21.6 22.2-23.7 2.9-3 4.2 1.9c10.7 5.3 20.6 5.7 27.7-1.4L319 76.85l-10.2-10.18-45.7 45.63-9.6-9.8L299 56.97l-10.9-11.03-45.5 45.7-9.7-9.7 45.5-45.69zM28.97 27.84c-5.73 9.12-6.61 20.83-3.32 34.58 3.87 16.32 13.68 35.22 27.41 53.08 27.35 35.8 50.04 48.1 86.84 54.8l2.4.4c13.6 16.1 27.2 32.1 40.8 48.2h37.1zM137 183.2l-37.74 35.7h49.64l9.7-10.3zM26.25 232.9v63.5l16.51-49.5H279.8l16.5 49.5v-63.5zm29.49 32l-10 30h45.04l10.02-30zm63.96 0l-10 30h42.6v-30zm50.6 0v30h42.6l-10-30zm51.4 0l10 30h45.1l-10-30zm92.6 1.8v188.2h79c4.2-18.2 20.6-32 40-32s35.8 13.8 40 32h15v-64l-56.2-14H328.3v-82H390l-6.9-15zM26.25 312.9v114.2l42.17 27.8h14.85c4.14-18.2 20.53-32 40.03-32 19.4 0 35.8 13.8 40 32h133v-142h-14v80H40.25v-80zm320.05 0v46h72.4l-23-46zm-281.05 19l16 16h16l16.05-16zm-8 27v18H265.3v-18zm66.05 82c-12.9 0-23.1 10.2-23.1 23s10.2 23 23.1 23c12.8 0 23-10.2 23-23s-10.2-23-23-23zm310 0c-12.8 0-23 10.2-23 23s10.2 23 23 23 23-10.2 23-23-10.2-23-23-23z"></path></svg>
 
-            Orders
+            Delivery Status
 
           </a>
         </li>

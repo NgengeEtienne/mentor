@@ -36,7 +36,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY="django-insecure-p07mtuuqn&30g@)e6*r&fpkdl_i5^y4*=3#d57ka66b$6jx==e"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', "False").lower() == "true"
+DEBUG = "true"#os.environ.get('DEBUG', "False").lower() == "true"
 
 
 #ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
@@ -105,27 +105,27 @@ AUTH_USER_MODEL = 'account.CustomUser'
 
 import os
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('DB_NAME', 'cb'),
-#         'USER': os.environ.get('DB_USER', 'postgres'),
-#         'PASSWORD': os.environ.get('DB_PASSWORD', 'root'),
-#         'HOST': os.environ.get('DB_HOST', 'db'),
-#         'PORT': os.environ.get('DB_PORT', '5432'),
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'cabriot',
-        'USER': 'etech',
-        'PASSWORD': 'nandi1234$',
-        'HOST': 'localhost',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'cb'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'root'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'cabriot',
+#         'USER': 'etech',
+#         'PASSWORD': 'nandi1234$',
+#         'HOST': 'localhost',
+#         'PORT': '',
+#     }
+# }
 
 # DB_NAME=cabriot
 # DB_USER=etech

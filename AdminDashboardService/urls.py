@@ -23,7 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("AdminDashboard.urls")),
     path('api/', include('account.urls')),
-    path('mentor/', include('MentorDashboard.urls')),  # include the URL from your app
+    path('mentor/', include('MentorDashboard.urls')),  # include the URL from your 
+    path('', include('MentorDashboard.urls')),
 
     path("__reload__/", include("django_browser_reload.urls")),
 ]

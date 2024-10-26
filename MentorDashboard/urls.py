@@ -26,7 +26,8 @@ urlpatterns = [
     path('meal-deliveries/list/', views.meal_delivered, name='meal_delivered'),
     path('meal-deliveries/<int:id>/edit/', views.meal_delivery_edit, name='meal_delivery_edit'),
     path('meal-deliveries/<int:id>/assign-address/', views.assign_meal, name='assign_address'),
-
+    path('meal-deliveries/assign-address/', views.assign_meal, name='assign_address'),
+    path('meal-deliveries/edit-assigned-address/<str:date>/', views.edit_assign_meal, name='edit_assign_address'),
     path('meals_ordered', views.meal_ordered, name='meal_ordered'),
     path('orders/', views.orders_list, name='orders_list'),  # List of all orders
     # path('orders/<int:id>/', views.order_detail, name='order_detail'),  # Order detail by ID

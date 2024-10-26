@@ -23,82 +23,61 @@
     </div>
 </div>
 <div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-    {% comment %} <div class="max-w-full overflow-x-auto">
-        
-    #list these here as details not form
-    <table class="table-auto w-full">
-        <thead>
-            <tr>
-                <th class="px-4 py-2 font-bold text-left">Meal Plan Name</th>
-                <th class="px-4 py-2 font-bold text-left">Meal Plan Image URL</th>
-                <th class="px-4 py-2 font-bold text-left">Meal Plan Description</th>
-                <th class="px-4 py-2 font-bold text-left">Meal Plan Availability Status</th>
-                <th class="px-4 py-2 font-bold text-left">Meal Plan Person Status</th>
-                <th class="px-4 py-2 font-bold text-left">Dietary Choices</th>
-                <th class="px-4 py-2 font-bold text-left">Cuisine Choices</th>
-                <th class="px-4 py-2 font-bold text-left">Daily Price</th>
-                <th class="px-4 py-2 font-bold text-left">Daily Breakfast Price</th>
-                <th class="px-4 py-2 font-bold text-left">Daily Lunch Price</th>
-                <th class="px-4 py-2 font-bold text-left">Daily Dinner Price</th>
-                <th class="px-4 py-2 font-bold text-left">Daily Snack Price</th>
-                <th class="px-4 py-2 font-bold text-left">Weekly Price</th>
-                <th class="px-4 py-2 font-bold text-left">Weekly Breakfast Price</th>
-                <th class="px-4 py-2 font-bold text-left">Weekly Lunch Price</th>
-                <th class="px-4 py-2 font-bold text-left">Weekly Dinner Price</th>
-                <th class="px-4 py-2 font-bold text-left">Weekly Snack Price</th>
-                <th class="px-4 py-2 font-bold text-left">Monthly Price</th>
-                <th class="px-4 py-2 font-bold text-left">Monthly Breakfast Price</th>
-                <th class="px-4 py-2 font-bold text-left">Monthly Lunch Price</th>
-                <th class="px-4 py-2 font-bold text-left">Monthly Dinner Price</th>
-                <th class="px-4 py-2 font-bold text-left">Monthly Snack Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td class="border px-4 py-2">{{mealplan.meal_plan_name}}</td>
-                <td class="border px-4 py-2">{{mealplan.meal_plan_image_url}}</td>
-                <td class="border px-4 py-2">{{mealplan.meal_plan_description}}</td>
-                <td class="border px-4 py-2">{{mealplan.meal_plan_availability_status}}</td>
-                <td class="border px-4 py-2">{{mealplan.meal_plan_person_status}}</td>
-                <td class="border px-4 py-2">{% for dietary_choice in mealplan.dietary_choices.all %}{{dietary_choice.diet_name}}{% endfor %}</td>
-                <td class="border px-4 py-2">{% for cuisine_choice in mealplan.cuisine_choices.all %}{{cuisine_choice.cuisine_name}}{% endfor %}</td>
-                <td class="border px-4 py-2">{{mealplan.daily_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.daily_breakfast_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.daily_lunch_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.daily_dinner_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.daily_snack_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.weekly_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.weekly_breakfast_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.weekly_lunch_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.weekly_dinner_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.weekly_snack_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.monthly_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.monthly_breakfast_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.monthly_lunch_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.monthly_dinner_price}}</td>
-                <td class="border px-4 py-2">{{mealplan.monthly_snack_price}}</td>
-            </tr>
-        </tbody>
-    </table>
-</div> {% endcomment %}
+   
 <div class="max-w-full overflow-x-auto">
     
   
     <!-- Daily Plans Table -->
-    <h3 class="mt-3 mb-4">Daily Meal Plans</h3>
+    <h3 class="text-xl font-bold text-blue-600 mb-4 text-black dark:text-white">Meal Plans</h3>
+    
+  <div class="p-4 rounded-lg bg-white shadow border border-[#3CA745] mb-4">
+      <!-- Header with Title and Code -->
+      <div class="flex justify-between items-center mb-2">
+          <div>
+              <h2 class="text-xl font-semibold">{{ mealplan.meal_plan_name }}</h2>
+              <p class="text-gray-700">{{ mealplan.meal_plan_name }}</p>
+          </div>
+          <div class="text-right">
+              {% if mealplan.meal_plan_availability_status == "Availability" %}
+              <p class="text-success font-bold">● Active</p>
+              <p class="text-gray-500">Expires on {{ order.bulk_order_end_date }}</p>
+              {%else%}
+              <p class="text-info font-bold">● Inactive</p>
+              <p class="text-gray-500">Expired on {{ order.bulk_order_end_date }}</p>
+              {%endif%}
+          </div>
+      </div>
+  
+      <!-- Meals per Day -->
+      <p class="text-gray-700 mb-1">
+          <span>Meals per day: <span class="font-bold">{{ sum }}</span></span>
+      </p>
+      
+      <!-- Meal Breakdown -->
+      <div class="flex text-gray-700">
+        <span class="mr-20">Breakfast: <span class="font-bold">{{ order.breakfast }}</span></span>
+        <span class="mr-20">Lunch: <span class="font-bold">{{ order.lunch }}</span></span>
+        <span class="mr-20">Tea & Snacks: <span class="font-bold">{{ order.snack }}</span></span>
+        <span>Dinner: <span class="font-bold">{{ order.dinner }}</span></span>
+    </div>
+  </div>
+  
+
     <table class="table-auto w-full">
       <thead>
-        <tr>
+        <tr class="bg-gray-2 text-left dark:bg-meta-4">
+          <th class="px-4 py-2 font-bold text-left">Period</th>
           <th class="px-4 py-2 font-bold text-left">Meal Plan Name</th>
           <th class="px-4 py-2 font-bold text-left">Breakfast</th>
           <th class="px-4 py-2 font-bold text-left">Lunch</th>
           <th class="px-4 py-2 font-bold text-left">Dinner</th>
-          <th class="px-4 py-2 font-bold text-left">Snacks</th>
+          <th class="px-4 py-2 font-bold text-left">Tea & Snacks</th>
           <th class="px-4 py-2 font-bold text-left">Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
+          <td class="border px-4 py-2">Daily</td>
           <td class="border px-4 py-2">{{ mealplan.meal_plan_name }}</td>
           <td class="border px-4 py-2">{{ mealplan.daily_breakfast_price }}</td>
           <td class="border px-4 py-2">{{ mealplan.daily_lunch_price }}</td>
@@ -106,24 +85,17 @@
           <td class="border px-4 py-2">{{ mealplan.daily_snack_price }}</td>
           <td class="border px-4 py-2">{{ mealplan.meal_plan_availability_status }}</td>
         </tr>
-      </tbody>
-    </table>
-  
-    <!-- Weekly Plans Table -->
-    <h3 class="mt-3 mb-4">Weekly Meal Plans</h3>
-    <table class="table-auto w-full">
-      <thead>
         <tr>
-          <th class="px-4 py-2 font-bold text-left">Meal Plan Name</th>
-          <th class="px-4 py-2 font-bold text-left">Breakfast</th>
-          <th class="px-4 py-2 font-bold text-left">Lunch</th>
-          <th class="px-4 py-2 font-bold text-left">Dinner</th>
-          <th class="px-4 py-2 font-bold text-left">Snacks</th>
-          <th class="px-4 py-2 font-bold text-left">Status</th>
+          <td class="border px-4 py-2">Weekly</td>
+          <td class="border px-4 py-2">{{ mealplan.meal_plan_name }}</td>
+          <td class="border px-4 py-2">{{ mealplan.monthly_breakfast_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.monthly_lunch_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.monthly_dinner_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.monthly_snack_price }}</td>
+          <td class="border px-4 py-2">{{ mealplan.meal_plan_availability_status }}</td>
         </tr>
-      </thead>
-      <tbody>
         <tr>
+          <td class="border px-4 py-2">Monthly</td>
           <td class="border px-4 py-2">{{ mealplan.meal_plan_name }}</td>
           <td class="border px-4 py-2">{{ mealplan.weekly_breakfast_price }}</td>
           <td class="border px-4 py-2">{{ mealplan.weekly_lunch_price }}</td>
@@ -134,34 +106,11 @@
       </tbody>
     </table>
   
-    <!-- Monthly Plans Table -->
-    <h3 class="mt-3 mb-4">Monthly Meal Plans</h3>
-    <table class="table-auto w-full">
-      <thead>
-        <tr>
-          <th class="px-4 py-2 font-bold text-left">Meal Plan Name</th>
-          <th class="px-4 py-2 font-bold text-left">Breakfast</th>
-          <th class="px-4 py-2 font-bold text-left">Lunch</th>
-          <th class="px-4 py-2 font-bold text-left">Dinner</th>
-          <th class="px-4 py-2 font-bold text-left">Snacks</th>
-          <th class="px-4 py-2 font-bold text-left">Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="border px-4 py-2">{{ mealplan.meal_plan_name }}</td>
-          <td class="border px-4 py-2">{{ mealplan.monthly_breakfast_price }}</td>
-          <td class="border px-4 py-2">{{ mealplan.monthly_lunch_price }}</td>
-          <td class="border px-4 py-2">{{ mealplan.monthly_dinner_price }}</td>
-          <td class="border px-4 py-2">{{ mealplan.monthly_snack_price }}</td>
-          <td class="border px-4 py-2">{{ mealplan.meal_plan_availability_status }}</td>
-        </tr>
-      </tbody>
-    </table>
-  
+    
     <!-- Weekly Availability Tables by Day -->
-    {% for day in days %}
-    <h3 class="mt-3 mb-4">{{ day|capfirst }}'s Meals</h3>
+
+    <h3 class="mt-3 mb-4 my-2 py-2" style="font-weight: bold; font-size: 1.2em;">Monday's Meals</h3>
+    <p> Monday is {% if not mealplan.is_monday_available %} not{%endif%} available.</p>{{mealplan.is_monday_available}}
     <table class="table-auto w-full">
       <thead>
         <tr>
@@ -174,25 +123,267 @@
       <tbody>
         <tr>
           <td class="border px-4 py-2">Breakfast</td>
-          <td class="border px-4 py-2">{% for dish in mealplan.day_breakfast_dish.all %}{{ dish.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.day_breakfast_meal.all %}{{ meal.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for option in mealplan.day_breakfast_dish_option.all %}{{ option.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.monday_breakfast_dish.all %}{{ dish}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.monday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.monday_breakfast_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
         </tr>
         <tr>
           <td class="border px-4 py-2">Lunch</td>
-          <td class="border px-4 py-2">{% for dish in mealplan.day_lunch_dish.all %}{{ dish.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.day_lunch_meal.all %}{{ meal.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for option in mealplan.day_lunch_dish_option.all %}{{ option.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.monday_lunch_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.monday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.monday_lunch_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
         </tr>
         <tr>
           <td class="border px-4 py-2">Dinner</td>
-          <td class="border px-4 py-2">{% for dish in mealplan.day_dinner_dish.all %}{{ dish.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.day_dinner_meal.all %}{{ meal.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for option in mealplan.day_dinner_dish_option.all %}{{ option.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.monday_dinner_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.monday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.monday_dinner_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Snack</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.monday_snack_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.monday_snack_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.monday_snack_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
         </tr>
       </tbody>
     </table>
-    {% endfor %}
+
+
+    <h3 class="mt-3 mb-4 my-2 py-2" style="font-weight: bold; font-size: 1.2em;">Tuesday's Meals</h3>
+    <p> Tuesday is {% if not mealplan.is_tuesday_available %} not{%endif%} available.</p>
+    <table class="table-auto w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 font-bold text-left">Meal Type</th>
+          <th class="px-4 py-2 font-bold text-left">Dishes</th>
+          <th class="px-4 py-2 font-bold text-left">Meals</th>
+          <th class="px-4 py-2 font-bold text-left">Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2">Breakfast</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.tuesday_breakfast_dish.all %}{{ dish}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.tuesday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.tuesday_breakfast_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Lunch</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.tuesday_lunch_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.tuesday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.tuesday_lunch_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Dinner</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.tuesday_dinner_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.tuesday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.tuesday_dinner_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Snack</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.tuesday_snack_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.tuesday_snack_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.tuesday_snack_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+
+    <h3 class="mt-3 mb-4 my-2 py-2" style="font-weight: bold; font-size: 1.2em;">wednesday's Meals</h3>
+    <p>Wednesday is {% if not mealplan.is_wednesday_available %}not {% endif %}available.</p>
+    <table class="table-auto w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 font-bold text-left">Meal Type</th>
+          <th class="px-4 py-2 font-bold text-left">Dishes</th>
+          <th class="px-4 py-2 font-bold text-left">Meals</th>
+          <th class="px-4 py-2 font-bold text-left">Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2">Breakfast</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.wednesday_breakfast_dish.all %}{{ dish}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.wednesday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.wednesday_breakfast_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Lunch</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.wednesday_lunch_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.wednesday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.wednesday_lunch_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Dinner</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.wednesday_dinner_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.wednesday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.wednesday_dinner_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Snack</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.wednesday_snack_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.wednesday_snack_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.wednesday_snack_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <h3 class="mt-3 mb-4 my-2 py-2" style="font-weight: bold; font-size: 1.2em;">Thursday's Meals</h3>
+    <p> Thursday is {% if not mealplan.is_thursday_available %} not{%endif%} available.</p>
+    <table class="table-auto w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 font-bold text-left">Meal Type</th>
+          <th class="px-4 py-2 font-bold text-left">Dishes</th>
+          <th class="px-4 py-2 font-bold text-left">Meals</th>
+          <th class="px-4 py-2 font-bold text-left">Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2">Breakfast</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.thursday_breakfast_dish.all %}{{ dish}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.thursday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.thursday_breakfast_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Lunch</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.thursday_lunch_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.thursday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.thursday_lunch_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Dinner</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.thursday_dinner_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.thursday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.thursday_dinner_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Snack</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.thursday_snack_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.thursday_snack_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.thursday_snack_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="mt-3 mb-4 my-2 py-2" style="font-weight: bold; font-size: 1.2em;">Friday's Meals</h3>
+    <p> Friday is {% if not mealplan.is_friday_available %} not{%endif%} available.</p>
+    <table class="table-auto w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 font-bold text-left">Meal Type</th>
+          <th class="px-4 py-2 font-bold text-left">Dishes</th>
+          <th class="px-4 py-2 font-bold text-left">Meals</th>
+          <th class="px-4 py-2 font-bold text-left">Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2">Breakfast</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.friday_breakfast_dish.all %}{{ dish}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.friday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.friday_breakfast_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Lunch</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.friday_lunch_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.friday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.friday_lunch_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Dinner</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.friday_dinner_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.friday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.friday_dinner_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Snack</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.friday_snack_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.friday_snack_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.friday_snack_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="mt-3 mb-4 my-2 py-2" style="font-weight: bold; font-size: 1.2em;">Saturday's Meals</h3>
+    <p> Saturday is {% if not mealplan.is_saturday_available %} not{%endif%} available.</p>
+    <table class="table-auto w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 font-bold text-left">Meal Type</th>
+          <th class="px-4 py-2 font-bold text-left">Dishes</th>
+          <th class="px-4 py-2 font-bold text-left">Meals</th>
+          <th class="px-4 py-2 font-bold text-left">Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2">Breakfast</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.saturday_breakfast_dish.all %}{{ dish}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.saturday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.saturday_breakfast_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Lunch</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.saturday_lunch_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.saturday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.saturday_lunch_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Dinner</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.saturday_dinner_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.saturday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.saturday_dinner_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Snack</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.saturday_snack_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.saturday_snack_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.saturday_snack_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="mt-3 mb-4 my-2 py-2" style="font-weight: bold; font-size: 1.2em;">Sunday's Meals</h3>
+    <p> Sunday is {% if not mealplan.is_sunday_available %} not{%endif%} available.</p>
+    <table class="table-auto w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 font-bold text-left">Meal Type</th>
+          <th class="px-4 py-2 font-bold text-left">Dishes</th>
+          <th class="px-4 py-2 font-bold text-left">Meals</th>
+          <th class="px-4 py-2 font-bold text-left">Options</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="border px-4 py-2">Breakfast</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.sunday_breakfast_dish.all %}{{ dish}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.sunday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.sunday_breakfast_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Lunch</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.sunday_lunch_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.sunday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.sunday_lunch_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Dinner</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.sunday_dinner_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.sunday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.sunday_dinner_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+        <tr>
+          <td class="border px-4 py-2">Snack</td>
+          <td class="border px-4 py-2">{% for dish in mealplan.sunday_snack_dish.all %}{{ dish }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.sunday_snack_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for option in mealplan.sunday_snack_dish_option.all %}{{ option }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   
 </div>
