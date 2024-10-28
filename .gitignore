@@ -10,3 +10,10 @@ __pycache__/
 !**/migrations/__init__.py  # Keep the __init__.py to maintain package structure
 # Ignore all __pycache__ files
 **/__pycache__/
+# Ignore Python bytecode and cache folders
+**/__pycache__/
+**/*.pyc
+
+# Ignore migration files
+*/migrations/*.py
+*/migrations/*.pyc
