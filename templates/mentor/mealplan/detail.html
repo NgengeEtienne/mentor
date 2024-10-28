@@ -413,7 +413,7 @@
         </tr>
         <tr>
           <td class="border px-4 py-2">{% for meal in mealplan.saturday_dinner_meal_option.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.sartuday_dinner_meal_option.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.saturday_dinner_meal_option.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
         
         </tr>
       </tbody>
