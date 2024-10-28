@@ -66,7 +66,7 @@
                     <td class="px-6 py-4">{{ delivery.dinner }}</td>
                     <td class="px-6 py-4 flex items-center gap-2">
                         {% comment %} <button onclick="openModal('{{ delivery.bulk_order_id }}')" class="bg-warning text-primary px-4 py-2 rounded-md hover:bg-opacity-90">View</button> {% endcomment %}
-                        <a href="{% url 'assign_address'%}" class="bg-success text-white px-4 py-2 rounded-md hover:bg-opacity-90">Assign</a>
+                        <a href="{% url 'assign_address' %}" class="bg-success text-white px-4 py-2 rounded-md hover:bg-opacity-90">Assign</a>
                     </td>
                 </tr>
                 {% endfor %}

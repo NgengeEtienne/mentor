@@ -5,16 +5,18 @@ from .models import DeliveryAddress, MealDelivery, Notification,MealPlan
 
 class LoginForm(forms.Form):
     email = forms.EmailField(
-        widget=forms.TextInput(attrs={
+        widget=forms.EmailInput(attrs={
             'class': 'w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary',
-            'placeholder': 'Enter email'
+            'placeholder': 'Enter email',
+            'required':True
         }),
         label='Email'
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary',
-            'placeholder': 'Enter password'
+            'placeholder': 'Enter password',
+            'required': True
         }),
         label='Password'
     )

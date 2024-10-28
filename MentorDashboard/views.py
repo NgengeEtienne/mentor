@@ -290,16 +290,67 @@ def orders_list(request):
 
 
 from django.http import JsonResponse
+from datetime import datetime
 
 
 @login_required
-def assign_meal(request):
+def assign_meal(request,date):
     order_id = id
     order = BulkOrders.objects.all().first()
     sum = order.breakfast + order.lunch + order.snack + order.dinner
     addresses = DeliveryAddress.objects.all()
     notifications = get_notifications(request)  # Fetch notifications
+    meal_plans = order.MealPlan.all() if order else []
+
+    date_str= date#request.GET.get('date', '2024-10-27')
+    try:
+        date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+        day_name = date_obj.strftime('%A').lower()  # Convert to lowercase (e.g., 'monday')
+    except ValueError:
+        # Handle invalid date format
+        return render(request, 'your_template.html', {'error': 'Invalid date format'})
+
+    # Get the first BulkOrder (or handle if no order exists)
+    order = BulkOrders.objects.first()
+
+    # Get all MealPlans related to the order
+    meal_plans = order.MealPlan.all() if order else []
+
+    # Meal types for iteration (e.g., breakfast, lunch, etc.)
+    meals = ['breakfast', 'lunch', 'dinner', 'snack']
+
+    # Prepare a dictionary to store dishes for the selected day
+    dishes_for_day = {}
+
+    # Loop through each meal type and get the related dishes for the specific day
+    for meal in meals:
+        field_name = f"{day_name}_{meal}_dish"  # e.g., 'monday_breakfast_dish'
+        dishes_for_day[meal] = [
+            dish for meal_plan in meal_plans for dish in getattr(meal_plan, field_name).all()
+        ]
+    day_meals = {}
+    meal_types = ['breakfast', 'lunch', 'dinner', 'snack']
     
+    breakfast= order.breakfast
+    lunch= order.lunch
+    dinner= order.dinner
+    snack= order.snack
+   
+    for meal_plan in meal_plans:
+        for meal_type in meal_types:
+            # Dynamically generate the attribute name (e.g., "monday_breakfast_dish")
+            dish_attr = f"{day_name}_{meal_type}_dish"
+            dishes = getattr(meal_plan, dish_attr).all()  # Fetch the dishes
+
+            # Store dishes under the appropriate meal type
+            if meal_type not in day_meals:
+                day_meals[meal_type] = dishes
+            else:
+                # Append dishes if there are multiple meal plans
+                day_meals[meal_type] |= dishes  # Merge QuerySets
+
+
+
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -339,11 +390,20 @@ def assign_meal(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
-    return render(request, 'mentor/meal/assign1.html', {
+    return render(request, 'mentor/meal/assign.html', {
         'order': order,
         'addresses': addresses,
         'notifications': notifications,
-        'sum': sum
+        'sum': sum,
+        'dishes_for_day': dishes_for_day,
+        'day_name': day_name.capitalize(),
+        'day_meals': day_meals, 
+        'meals': meals,  # Pass prepared meal counts
+        'breakfast': breakfast,
+        'lunch': lunch,
+        'dinner': dinner,
+        'snack': snack,
+        'date': date_str
     })
 
 def edit_assign_meal(request, date):  # Include the date parameter here
@@ -430,33 +490,45 @@ def edit_assign_meal(request, date):  # Include the date parameter here
 
 def meal_plan_list(request):
     notifications = get_notifications(request)  # Fetch notifications
-    orders = BulkOrders.objects.filter(branch=request.branch).prefetch_related('MealPlan')  # Optimize with prefetch
+    orders = BulkOrders.objects.filter(branch=request.branch) # Optimize with prefetch
     mealplans = [mealplan for order in orders for mealplan in order.MealPlan.all()]  # Extract all meal plans
-    print(orders)
+     # Check the status of each order's `bulk_order_end_date`
+    for order in orders:
+        print(order.bulk_order_end_date)  # Access individual order attributes
+        status = 1 if order.bulk_order_end_date > now().date() else 0
+        end= order.bulk_order_end_date
+        start= order.bulk_order_start_date
+        print(f"Order {order.bulk_order_name} status: {status}")
     return render(request, 'mentor/mealplan/list.html', {
         'notifications': notifications,
         'mealplans': mealplans,
-        'orders': orders
+        'orders': orders,
+        'status': status,
+        'start': start,
+        'end': end
     })
 
 def meal_plan_detail(request, id):
     notifications = get_notifications(request)  # Fetch notifications
     mealplan = get_object_or_404(MealPlan, pk=id)
     order= get_object_or_404(BulkOrders, MealPlan=mealplan)
+    status = 1 if order.bulk_order_end_date > now().date() else 0
     sum = order.breakfast + order.lunch + order.snack + order.dinner
-    days = ['monday', 'tuesday', 'wednesday', 'thursday', 
-            'friday', 'saturday', 'sunday']
+    days = [ 'sunday','monday', 'tuesday', 'wednesday', 'thursday', 
+            'friday', 'saturday']
     print(order)
     for day in days :
         print(day)
         for dish in mealplan.monday_breakfast_dish.all():
-            print(dish)
+            print(status)
+    
     return render(request, 'mentor/mealplan/detail.html', {
         'notifications': notifications,
         'mealplan': mealplan,
         'days': days,
         'order': order,
-        'sum': sum
+        'sum': sum,
+        'status': status
     })
 
 def meal_ordered(request):
@@ -469,7 +541,7 @@ def meal_ordered(request):
     current_time = now().time()  # Current time for comparison
     six_pm = datetime.time(18, 0)  # 6:00 PM time object
     print("current time", current_time, "six pm", six_pm)
-    start_of_week = today - datetime.timedelta(days=today.weekday())  # Get Monday of the current week
+    start_of_week = today# - datetime.timedelta(days=today.weekday())  # Get Monday of the current week
     end_of_week = start_of_week + datetime.timedelta(days=6)  # Get Sunday of the current week
 
     # Fetch all orders within the week, grouped by date
@@ -538,3 +610,53 @@ def meal_ordered(request):
         'notifications': notifications,
         'orders': week_days  # Full week of orders including placeholders
     })
+
+
+
+@login_required
+def assign_meal_post(request):
+    
+    order = BulkOrders.objects.all().first()
+   
+
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            meal_assignments = data.get('mealData', [])
+            meal_data = [item for item in meal_assignments if 'meal_plan' in item]
+
+            for assignment in meal_data:
+                meal_type = assignment.get('meal_plan')
+                address_id = assignment.get('address')
+                date = assignment.get('date')
+                quantity = int(assignment.get('quantity', 0))
+                
+                delivery_address = get_object_or_404(DeliveryAddress, pk=address_id)
+                if quantity == 0:
+                    continue
+                # Save the meal assignment
+                deliver = MealDelivery.objects.create(
+                    bulk_order=order,
+                    meal_type=meal_type,
+                    quantity=quantity,
+                    date=date,
+                    delivery_address=delivery_address,
+                    branch=request.branch,
+                    company=request.company
+                )
+                message = f"{quantity} {meal_type} assigned to {delivery_address} by {request.branch}"
+                Notification.objects.create(
+                    delivery=deliver,
+                    message=message,
+                    
+                    branch=request.branch,
+                    company=request.company
+                )
+
+            return JsonResponse({'success': True, 'message': 'Meal assigned successfully.'})
+        except json.JSONDecodeError as e:
+            return JsonResponse({'success': False, 'error': f'JSON decode error: {str(e)}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+

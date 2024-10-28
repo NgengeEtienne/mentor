@@ -29,12 +29,20 @@
 
     <!-- ===== Preloader End ===== --> {% endcomment %}
     {% if messages %}
-    <ul>
-    {% for message in messages %}
-        <li>{{ message }}</li>
-    {% endfor %}
+    <ul class="w-full max-w-2xl mx-auto border-l-4 border-[#F87171] bg-[#F87171]/10 px-6 py-6 rounded-lg shadow-md dark:bg-[#1B1B24]/40 md:px-8 md:py-7">
+      {% for message in messages %}
+        <li class="flex items-center gap-4 mb-4 last:mb-0">
+          <div class="h-9 w-9 flex items-center justify-center rounded-full bg-[#F87171] font-bold text-white">
+            !
+          </div>
+          <span class="text-[#B45454] font-medium">
+            {{ message }}
+          </span>
+        </li>
+      {% endfor %}
     </ul>
-{% endif %}
+  {% endif %}
+  
     <!-- ===== Page Wrapper Start ===== -->
     <div class="flex h-screen overflow-hidden">
       <!-- ===== Sidebar Start ===== -->
@@ -51,62 +59,40 @@
       <div
         class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
       >
-        <h2 class="text-title-md2 font-bold text-black dark:text-white">
-          Sign In
-        </h2>
-
-        {% comment %} <nav>
-          <ol class="flex items-center gap-2">
-            <li>
-              <a class="font-medium" href="index.html">Dashboard /</a>
-            </li>
-            <li class="font-medium text-primary">Sign In</li>
-          </ol>
-        </nav> {% endcomment %}
-      </div>
-      <!-- Breadcrumb End -->
+        
 
       <!-- ====== Forms Section Start -->
-      <div
-        class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark"
-      >
-        <div class="flex flex-wrap items-center">
+      {% comment %} <div
+        class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark items-center"
+      > {% endcomment %}
+      <div class="flex flex-wrap items-center justify-center w-full xl:w-3/4 mx-auto rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark items-center">
+        <div class="flex flex-wrap items-center ">
           <div class="hidden w-full xl:block xl:w-1/2">
             <div class="px-26 py-17.5 text-center">
-              <a class="mb-5.5 inline-block" href="index.html">
+              <a class="inline-block mb-8 mr-40" href="" style="width: 200px; height: 200px;">
                 <img
-                  class="hidden dark:block"
-                  src="{% static '' %}eat.svg"
+                  class="hidden dark:block w-full h-full object-contain"
+                  src="{% static 'eat.svg' %}"
                   alt="Logo"
-                />
+                  style="width: 300px; height: 300px;">
                 <img
-                  class="dark:hidden"
-                  src="{% static '' %}eat.svg"
+                  class="dark:hidden w-full h-full object-contain"
+                  src="{% static 'eat.svg' %}"
                   alt="Logo"
-                />
+                  style="width: 300px; height: 300px;">
               </a>
-
-              <p class="font-medium 2xl:px-20">
-               Welcome to Cabriot Corperate Dashboard, login to do tasks
-              </p>
-
-              <span class="mt-15 inline-block">
-                <img
-                  src="{% static '' %}favicon.ico"
-                  alt="illustration"
-                />
-              </span>
             </div>
           </div>
+          
           <div
             class="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2"
           >
             <div class="w-full p-4 sm:p-12.5 xl:p-17.5">
-              <span class="mb-1.5 block font-medium">Welcome!</span>
+             
               <h2
                 class="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2"
               >
-                Sign In to Corperate Dashboard
+                Login
               </h2>
 
               <form method="POST" action="{% url 'mentor_login' %}">
@@ -174,7 +160,7 @@
                 <div class="mb-5">
                   <input
                     type="submit"
-                    value="Sign In"
+                    value="Login"
                     class="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 font-medium text-white transition hover:bg-opacity-90"
                   />
                 </div>
@@ -183,7 +169,7 @@
 
                 <div class="mt-6 text-center">
                   <p class="font-medium">
-                    Don’t have any account? contact your company
+                    
                     {% comment %} <a href="signup.html" class="text-primary">Sign Up</a> {% endcomment %}
                   </p>
                 </div>

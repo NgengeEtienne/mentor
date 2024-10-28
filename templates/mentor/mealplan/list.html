@@ -28,10 +28,10 @@
         <table class="w-full table-auto">
             <thead>
                 <tr class="bg-gray-2 text-left dark:bg-meta-4">
-                    <th class="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white xl:pl-11">Meal Plan Name</th>
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Client Type</th>
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Dietary Type</th>
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Cuisine Type</th>
+                    <th class="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white xl:pl-11">Subscription Plan</th>
+                    {% comment %} <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Client Type</th> {% endcomment %}
+                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Start date</th>
+                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">End date</th>
                     <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">Status</th>
                     <th class="py-4 px-4 font-medium text-black dark:text-white">Actions</th>
                 </tr>
@@ -40,19 +40,21 @@
                 {% for item in mealplans %}
                 <tr class="border-b border-[#eee] dark:border-strokedark">
                     <td class="border-[#eee] py-5 px-4 pt-6 dark:border-strokedark flex items-center">
-                        <img src="{{item.MealPlanImgUrl}}" class="h-12 w-12 mr-2 rounded-full" alt="User"><span>{{item.meal_plan_name}}</span>
+                        <span class="inline-flex rounded-full bg-opacity-10 py-1 px-3 mr-2 mt-1 text-sm font-medium bg-primary text-primary">{{item.meal_plan_name}}</span>
                     </td>
-                    <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark ">{{item.meal_plan_person_status}}</td>
+                   
                     <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                        <span class="inline-flex rounded-full bg-opacity-10 py-1 px-3 mt-1 text-sm font-medium bg-primary text-primary">{{ item.dietary_choices|default:"None" }}
+                        <span class="inline-flex rounded-full bg-opacity-10 py-1 px-3 mt-1 text-sm font-medium bg-primary text-primary">{{ start }}
                         </span>
                     </td>
                     <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                        <span class="inline-flex rounded-full bg-opacity-10 py-1 px-3 mt-1 text-sm font-medium bg-primary text-primary">{{item.cousine_choices|default:"None"}}</span>
+                        <span class="inline-flex rounded-full bg-opacity-10 py-1 px-3 mt-1 text-sm font-medium bg-primary text-primary">{{ end }}
+                        </span>
                     
-                    </td>
                     <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                        <p class="inline-flex rounded-full capitalize bg-opacity-10 py-1 px-3 text-sm font-medium {% if item.meal_plan_availability_status == 'unavailable' %} bg-danger text-danger{%  else %} bg-success text-success {% endif %}">{{item.meal_plan_availability_status}}</p>
+                        <p class="inline-flex rounded-full capitalize bg-opacity-10 py-1 px-3 text-sm font-medium {% if status == 0 %} bg-danger text-danger{%  else %} bg-success text-success {% endif %}">
+                            {% if status == 0 %} Inactive{%  else %} Active {% endif %}
+                        </p>
                     </td>
                     <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <div class="flex items-center space-x-3.5">
