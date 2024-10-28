@@ -368,30 +368,36 @@ def orders_list(request):
 from django.http import JsonResponse
 from datetime import datetime
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.decorators import login_required
+from datetime import datetime
+import json
+from .models import BulkOrders, DeliveryAddress, MealDelivery, Notification  # Ensure to import your models
 
 @login_required
-def assign_meal(request,date):
-    order_id = id
-    order = BulkOrders.objects.all().first()
-    sum = order.breakfast + order.lunch + order.snack + order.dinner
+def assign_meal(request, date):
+    # Get the first order
+    order = BulkOrders.objects.first()
+    if order:
+        # Calculate total for meals
+        total_sum = order.breakfast + order.lunch + order.snack + order.dinner + order.dinner2
+    else:
+        total_sum = 0
+
     addresses = DeliveryAddress.objects.all()
     notifications = get_notifications(request)  # Fetch notifications
-    meal_plans = order.MealPlan.all() if order else []
 
-    date_str= date#request.GET.get('date', '2024-10-27')
+    # Parse the date to get the day of the week
     try:
-        date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-        day_name = date_obj.strftime('%A').lower()  # Convert to lowercase (e.g., 'monday')
+        date_obj = datetime.strptime(date, '%Y-%m-%d')
+        day_name = date_obj.strftime('%A').lower()  # e.g., 'monday'
     except ValueError:
-        # Handle invalid date format
         return render(request, 'your_template.html', {'error': 'Invalid date format'})
-
-    # Get the first BulkOrder (or handle if no order exists)
-    order = BulkOrders.objects.first()
-
+    print(day_name)
     # Get all MealPlans related to the order
     meal_plans = order.MealPlan.all() if order else []
-
+    
     # Meal types for iteration (e.g., breakfast, lunch, etc.)
     meals = ['breakfast', 'lunch', 'snack', 'dinner', 'dinner2']
 
@@ -401,64 +407,56 @@ def assign_meal(request,date):
     # Loop through each meal type and get the related dishes for the specific day
     for meal in meals:
         if meal == 'dinner2':
-            field_name = f"{day_name}_dinner_dish_option"  # e.g., 'monday_breakfast_dish'
-            dishes_for_day[meal] = [
-                dish for meal_plan in meal_plans for dish in getattr(meal_plan, field_name).all()
-            ]
+            field_name = f"{day_name}_dinner_dish_option"  # e.g., 'monday_dinner_dish_option'
         else:
             field_name = f"{day_name}_{meal}_dish"  # e.g., 'monday_breakfast_dish'
-            dishes_for_day[meal] = [
-                dish for meal_plan in meal_plans for dish in getattr(meal_plan, field_name).all()
-            ]
+
+        # Get dishes for the current meal type and day
+        dishes_for_day[meal] = [
+            dish for meal_plan in meal_plans for dish in getattr(meal_plan, field_name).all()
+        ]
+    print(dishes_for_day)
+    # Prepare data for rendering
     day_meals = {}
-    meal_types = ['breakfast', 'lunch', 'snack','dinner','dinner2']
-    
-    breakfast= order.breakfast
-    lunch= order.lunch
-    dinner= order.dinner
-    dinner2=order.dinner2
-    snack= order.snack
-   
+    meal_types = ['breakfast', 'lunch', 'snack', 'dinner', 'dinner2']
+
     for meal_plan in meal_plans:
         for meal_type in meal_types:
-            # Dynamically generate the attribute name (e.g., "monday_breakfast_dish")
+            # Dynamically generate the attribute name
             if meal_type == 'dinner2':
                 dish_attr = f"{day_name}_dinner_dish_option"
-                dishes = getattr(meal_plan, dish_attr).all()
-                print('if dinner 2 day meals',dishes)
             else:
                 dish_attr = f"{day_name}_{meal_type}_dish"
-                dishes = getattr(meal_plan, dish_attr).all()  # Fetch the dishes
-                print('else day meals',dishes)
+
+            dishes = getattr(meal_plan, dish_attr).all()  # Fetch the dishes
+            
             # Store dishes under the appropriate meal type
             if meal_type not in day_meals:
                 day_meals[meal_type] = dishes
             else:
                 # Append dishes if there are multiple meal plans
                 day_meals[meal_type] |= dishes  # Merge QuerySets
-    print('day meals',day_meals)
-
-    print('date',date)
+            print(day_meals)
+    # Handle POST request for meal assignments
     if request.method == "POST":
         try:
             data = json.loads(request.body)
             meal_assignments = data.get('mealData', [])
-            meal_data = [item for item in meal_assignments if 'meal_plan' in item]
 
-            for assignment in meal_data:
+            for assignment in meal_assignments:
                 meal_type = assignment.get('meal_plan')
                 address_id = assignment.get('address')
-                date = assignment.get('date')
+                delivery_date = assignment.get('date')
                 quantity = int(assignment.get('quantity', 0))
                 
                 delivery_address = get_object_or_404(DeliveryAddress, pk=address_id)
-                
+
                 # Save the meal assignment
                 deliver = MealDelivery.objects.create(
                     bulk_order=order,
                     meal_type=meal_type,
                     quantity=quantity,
-                    date=date,
+                    date=delivery_date,
                     delivery_address=delivery_address,
                     branch=request.branch,
                     company=request.company
@@ -467,7 +465,6 @@ def assign_meal(request,date):
                 Notification.objects.create(
                     delivery=deliver,
                     message=message,
-                    
                     branch=request.branch,
                     company=request.company
                 )
@@ -478,22 +475,19 @@ def assign_meal(request,date):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
+    # Render the template with context data
     return render(request, 'mentor/meal/assign.html', {
         'order': order,
         'addresses': addresses,
         'notifications': notifications,
-        'sum': sum,
+        'total_sum': total_sum,
         'dishes_for_day': dishes_for_day,
         'day_name': day_name.capitalize(),
         'day_meals': day_meals, 
-        'meals': meals,  # Pass prepared meal counts
-        'breakfast': breakfast,
-        'lunch': lunch,
-        'dinner': dinner,
-        'dinner2': dinner2,
-        'snack': snack,
+        'meals': meals,
         'date': date
     })
+
 @login_required
 def edit_assign_meal(request, date):  # Include the date parameter here
     order_id = 1
