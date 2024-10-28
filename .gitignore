@@ -1,2 +1,7 @@
 venv/
 AdminDashboardService/settings.py
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
