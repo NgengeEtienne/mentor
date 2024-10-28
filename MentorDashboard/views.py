@@ -381,7 +381,7 @@ def assign_meal(request, date):
     order = BulkOrders.objects.first()
     if order:
         # Calculate total for meals
-        total_sum = order.breakfast + order.lunch + order.snack + order.dinner + order.dinner2
+        total_sum = (order.breakfast or 0) + (order.lunch or 0) + (order.snack or 0) + (order.dinner or 0) + (order.dinner2 or 0)
     else:
         total_sum = 0
 
