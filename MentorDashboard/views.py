@@ -145,9 +145,12 @@ def dashboard_overview(request):
         # Add delivery data for each address
         address = order['delivery_address__name']
         total_sum = (
-            order['total_breakfast'] + order['total_lunch'] +
-            order['total_snack'] + order['total_dinner']+order['total_dinner2']
-        )
+                (order['total_breakfast'] or 0) +
+                (order['total_lunch'] or 0) +
+                (order['total_snack'] or 0) +
+                (order['total_dinner'] or 0) +
+                (order['total_dinner2'] or 0)
+            )
         order_dict[date]['delivery_data'][address] = {
             'total_sum': total_sum,
             'total_breakfast': order['total_breakfast'],
@@ -692,8 +695,11 @@ def meal_ordered(request):
         # Add delivery data for each address
         address = order['delivery_address__name']
         total_sum = (
-            order['total_breakfast'] + order['total_lunch'] +
-            order['total_snack'] + order['total_dinner']+order['total_dinner2']
+            (order['total_breakfast'] or 0) +
+            (order['total_lunch'] or 0) +
+            (order['total_snack'] or 0) +
+            (order['total_dinner'] or 0) +
+            (order['total_dinner2'] or 0)
         )
         order_dict[date]['delivery_data'][address] = {
             'total_sum': total_sum,
