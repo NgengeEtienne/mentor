@@ -34,9 +34,9 @@
                     <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
                         Date
                     </th>
-                    <th class="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white">
-                        Status
-                    </th>
+                    {% comment %} <th class="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white">
+                        Orde count
+                    </th> {% endcomment %}
                     <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
                         Delivery Assignment
                     </th>
@@ -57,13 +57,13 @@
                     <td class="border border-gray-300 px-4 py-2">{{ order.date }}</td>
     
                     <!-- Status -->
-                    <td class="border border-gray-300 px-4 py-2">
+                    {% comment %} <td class="border border-gray-300 px-4 py-2">
                         {% if order.has_values %}
                             Assigned
                         {% else %}
                             Not Assigned
                         {% endif %}
-                    </td>
+                    </td> {% endcomment %}
     
                     <!-- Delivery Assignment -->
                     <td class="border border-gray-300 px-4 py-2">
@@ -72,7 +72,7 @@
                                 <div>
                                     {{ address }} - {{ totals.total_sum }}
                                     ({{ totals.total_breakfast }}, {{ totals.total_lunch }}, 
-                                    {{ totals.total_snack }}, {{ totals.total_dinner }})
+                                    {{ totals.total_snack }}, {{ totals.total_dinner }},{{totals.total_dinner2}})
                                 </div>
                             {% endfor %}
                         {% else %}
@@ -90,9 +90,9 @@
                             {%endif%}
                         {% else %}
                             {%if order.is_future == "No" %}
-                            <a  href=""  class="bg-danger text-white px-4 py-2 rounded text-sm">Blocked</a>
+                            <a  class="bg-primary text-white px-4 py-2 rounded text-sm" readonly>Edit</a>
                             {% else %}
-                            <a  href="{% url 'assign_address' order.date %}"  class="bg-success text-white px-4 py-2 rounded text-sm">Assign</a>
+                            <a  href="{% url 'assign_address' order.date %}"  class="bg-success text-white px-4 py-2 rounded text-sm">Edit</a>
                             {%endif%}
                             
                         {% endif %}

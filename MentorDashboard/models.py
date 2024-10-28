@@ -29,7 +29,8 @@ class MealDelivery(models.Model):
         ('breakfast', 'Breakfast'),
         ('lunch', 'Lunch'),
         ('snack', 'Snack'),
-        ('dinner', 'Dinner')
+        ('dinner', 'Dinner'),
+        ('dinner2', 'Dinner2')
     ])
     quantity = models.PositiveIntegerField()
     date=models.CharField(max_length=100)

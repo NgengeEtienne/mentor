@@ -273,9 +273,9 @@
                                           {%endif%}
                                       {% else %}
                                           {%if order.is_future == "No" %}
-                                          <a  href=""  class="bg-danger text-white px-4 py-2 rounded text-sm">Blocked</a>
+                                          <a    class="bg-primary text-white px-4 py-2 rounded text-sm" readonly>Edit</a>
                                           {% else %}
-                                          <a  href="{% url 'edit_assign_address' order.date %}"  class="bg-success text-white px-4 py-2 rounded text-sm">Assign</a>
+                                          <a  href="{% url 'edit_assign_address' order.date %}"  class="bg-success text-white px-4 py-2 rounded text-sm">Edit</a>
                                           {%endif%}
                                           
                                       {% endif %}

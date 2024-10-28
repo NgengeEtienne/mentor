@@ -285,7 +285,7 @@ def orders_list(request):
     today = date.today()
     
     # Fetch today's deliveries
-    todays_deliveries = MealDelivery.objects.filter(branch=request.branch, date=today)
+    todays_deliveries = MealDelivery.objects.filter(branch=request.branch)[:5]
     print(todays_deliveries)
     # Fetch past deliveries
     past_deliveries = MealDelivery.objects.filter(branch=request.branch, date__lt=today)
@@ -579,24 +579,89 @@ def meal_ordered(request):
     six_pm = time(18, 0)  # 6:00 PM time object
 
     # Define the start and end of the current week
-    start_of_week = today  # Start of the week (could use Monday logic if needed)
-    end_of_week = start_of_week + timedelta(days=6)  # End of the week (Sunday)
-    # print(current_time)
-    # Fetch all meal deliveries within the week, grouped by date
+    start_of_week = today
+    end_of_week = start_of_week + timedelta(days=6)
+
+    # Fetch all meal deliveries within the week, grouped by date and address
+    from django.db.models import Sum, Case, When, IntegerField
+
     orders = (
         MealDelivery.objects.filter(branch=request.branch, date__range=[start_of_week, end_of_week])
         .values('date', 'bulk_order__bulk_order_name', 'delivery_address__name')
         .annotate(
-            total_breakfast=Sum('bulk_order__breakfast'),
-            total_lunch=Sum('bulk_order__lunch'),
-            total_snack=Sum('bulk_order__snack'),
-            total_dinner=Sum('bulk_order__dinner'),
+            total_breakfast=Sum(
+                Case(
+                    When(meal_type='breakfast', then='quantity'),
+                    output_field=IntegerField(),
+                )
+            ),
+            total_lunch=Sum(
+                Case(
+                    When(meal_type='lunch', then='quantity'),
+                    output_field=IntegerField(),
+                )
+            ),
+            total_snack=Sum(
+                Case(
+                    When(meal_type='snack', then='quantity'),
+                    output_field=IntegerField(),
+                )
+            ),
+            total_dinner=Sum(
+                Case(
+                    When(meal_type='dinner', then='quantity'),
+                    output_field=IntegerField(),
+                )
+            ),
+             total_dinner2=Sum(
+                Case(
+                    When(meal_type='dinner2', then='quantity'),
+                    output_field=IntegerField(),
+                )
+            ),
         )
-        .order_by('date')
+        .order_by('date', 'delivery_address__name')
     )
 
-    # Convert query results into a dictionary with dates as keys
-    order_dict = {order['date']: order for order in orders}
+    # Convert query results into a dictionary by date
+    order_dict = {}
+    for order in orders:
+        date = order['date']
+
+        # Initialize the day's entry if not already in the dictionary
+        if date not in order_dict:
+            order_dict[date] = {
+                'date': date,
+                'bulk_order__bulk_order_name': order['bulk_order__bulk_order_name'],
+                'delivery_data': {},  # Store all addresses and totals
+                'total_breakfast': 0,
+                'total_lunch': 0,
+                'total_snack': 0,
+                'total_dinner': 0,
+                'total_dinner2': 0,
+            }
+
+        # Add delivery data for each address
+        address = order['delivery_address__name']
+        total_sum = (
+            order['total_breakfast'] + order['total_lunch'] +
+            order['total_snack'] + order['total_dinner']+order['total_dinner2']
+        )
+        order_dict[date]['delivery_data'][address] = {
+            'total_sum': total_sum,
+            'total_breakfast': order['total_breakfast'],
+            'total_lunch': order['total_lunch'],
+            'total_snack': order['total_snack'],
+            'total_dinner': order['total_dinner'],
+            'total_dinner2': order['total_dinner2'],
+        }
+
+        # Accumulate totals for the day
+        order_dict[date]['total_breakfast'] = order['total_breakfast']
+        order_dict[date]['total_lunch'] = order['total_lunch']
+        order_dict[date]['total_snack'] = order['total_snack']
+        order_dict[date]['total_dinner'] = order['total_dinner']
+        order_dict[date]['total_dinner2'] = order['total_dinner2']
 
     # Prepare the full week data, including placeholders for missing days
     week_days = []
@@ -613,6 +678,7 @@ def meal_ordered(request):
             'total_lunch': 0,
             'total_snack': 0,
             'total_dinner': 0,
+            'total_dinner2': 0,
         })
 
         order['day_name'] = day_name
@@ -627,36 +693,20 @@ def meal_ordered(request):
             # For future days beyond tomorrow
             order['is_future'] = "Yes"
 
-        # Check if the order has valid data (a bulk order name)
+        # Check if the order has valid data
         order['has_values'] = bool(order.get('bulk_order__bulk_order_name'))
-
-        # Calculate total sums and organize delivery data by address
-        delivery_data = {}
-        if order['has_values']:
-            address = order['delivery_address__name']
-            total_sum = (
-                order['total_breakfast'] + order['total_lunch'] +
-                order['total_snack'] + order['total_dinner']
-            )
-            delivery_data[address] = {
-                'total_sum': total_sum,
-                'total_breakfast': order['total_breakfast'],
-                'total_lunch': order['total_lunch'],
-                'total_snack': order['total_snack'],
-                'total_dinner': order['total_dinner'],
-            }
-        order['delivery_data'] = delivery_data
 
         # Add the order to the week days list
         week_days.append(order)
 
-    # print(week_days)  # Debugging output to verify results
+    print(week_days)  # Debugging output
 
     # Render the template with the week data and notifications
     return render(request, 'mentor/meal/meals.html', {
         'notifications': notifications,
         'orders': week_days  # Full week of orders, including placeholders
     })
+
 
 
 @login_required
