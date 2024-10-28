@@ -5,3 +5,8 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+# Ignore all migration files
+**/migrations/
+!**/migrations/__init__.py  # Keep the __init__.py to maintain package structure
+# Ignore all __pycache__ files
+**/__pycache__/
