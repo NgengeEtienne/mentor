@@ -217,9 +217,9 @@
                                   <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
                                       Date
                                   </th>
-                                  <th class="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white">
+                                  {% comment %} <th class="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white">
                                       Status
-                                  </th>
+                                  </th> {% endcomment %}
                                   <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
                                       Delivery Assignment
                                   </th>
@@ -240,14 +240,14 @@
                                   <td class="border border-gray-300 px-4 py-2">{{ order.date }}</td>
                   
                                   <!-- Status -->
-                                  <td class="border border-gray-300 px-4 py-2">
+                                  {% comment %} <td class="border border-gray-300 px-4 py-2">
                                       {% if order.has_values %}
                                           Assigned
                                       {% else %}
                                           Not Assigned
                                       {% endif %}
                                   </td>
-                  
+                   {% endcomment %}
                                   <!-- Delivery Assignment -->
                                   <td class="border border-gray-300 px-4 py-2">
                                       {% if order.has_values %}
