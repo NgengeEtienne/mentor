@@ -167,13 +167,13 @@
         <tr>
           <td class="border px-4 py-2">Breakfast</td>
           <td class="border px-4 py-2">{% for meal in mealplan.monday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.monday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.monday_breakfast_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
 
         </tr>
         <tr>
           <td class="border px-4 py-2">Lunch</td>
           <td class="border px-4 py-2">{% for meal in mealplan.monday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.monday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.monday_lunch_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
  
         </tr>
         <tr>
@@ -185,7 +185,7 @@
         <tr>
           <td class="border px-4 py-2" rowspan="2">Dinner</td>
           <td class="border px-4 py-2">{% for meal in mealplan.monday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.monday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.monday_dinner_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
 
         </tr>
         <tr>
@@ -212,13 +212,13 @@
         <tr>
           <td class="border px-4 py-2">Breakfast</td>
           <td class="border px-4 py-2">{% for meal in mealplan.tuesday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.tuesday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.tuesday_breakfast_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
  
         </tr>
         <tr>
           <td class="border px-4 py-2">Lunch</td>
           <td class="border px-4 py-2">{% for meal in mealplan.tuesday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.tuesday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.tuesday_lunch_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr> 
         <tr>
@@ -230,7 +230,7 @@
         <tr>
           <td class="border px-4 py-2" rowspan="2">Dinner</td>
           <td class="border px-4 py-2">{% for meal in mealplan.tuesday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.tuesday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.tuesday_dinner_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
    
         </tr>
         <tr>
@@ -257,13 +257,13 @@
         <tr>
           <td class="border px-4 py-2">Breakfast</td>
           <td class="border px-4 py-2">{% for meal in mealplan.wednesday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.wednesday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.wednesday_breakfast_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr>
         <tr>
           <td class="border px-4 py-2">Lunch</td>
           <td class="border px-4 py-2">{% for meal in mealplan.wednesday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.wednesday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.wednesday_lunch_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
    
         </tr>        
         <tr>
@@ -275,7 +275,7 @@
         <tr>
           <td class="border px-4 py-2" rowspan="2">Dinner</td>
           <td class="border px-4 py-2">{% for meal in mealplan.wednesday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.wednesday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.wednesday_dinner_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr>
         <tr>
@@ -302,13 +302,13 @@
         <tr>
           <td class="border px-4 py-2">Breakfast</td>
           <td class="border px-4 py-2">{% for meal in mealplan.thursday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.thursday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.thursday_breakfast_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr>
         <tr>
           <td class="border px-4 py-2">Lunch</td>
           <td class="border px-4 py-2">{% for meal in mealplan.thursday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.thursday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.thursday_lunch_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr>
         <tr>
@@ -320,7 +320,7 @@
         <tr>
           <td class="border px-4 py-2"  rowspan="2">Dinner</td>
           <td class="border px-4 py-2">{% for meal in mealplan.thursday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.thursday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.thursday_dinner_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr>
         <tr>
@@ -346,13 +346,13 @@
         <tr>
           <td class="border px-4 py-2">Breakfast</td>
           <td class="border px-4 py-2">{% for meal in mealplan.friday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.friday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.friday_breakfast_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr>
         <tr>
           <td class="border px-4 py-2">Lunch</td>
           <td class="border px-4 py-2">{% for meal in mealplan.friday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.friday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.friday_lunch_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr>
         <tr>
@@ -364,7 +364,7 @@
         <tr>
           <td class="border px-4 py-2" rowspan="2">Dinner</td>
           <td class="border px-4 py-2">{% for meal in mealplan.friday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.friday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.friday_dinner_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr>
         <tr>
@@ -390,13 +390,13 @@
         <tr>
           <td class="border px-4 py-2">Breakfast</td>
           <td class="border px-4 py-2">{% for meal in mealplan.saturday_breakfast_meal.all %}{{ meal}}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.saturday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.saturday_breakfast_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr>
         <tr>
           <td class="border px-4 py-2">Lunch</td>
           <td class="border px-4 py-2">{% for meal in mealplan.saturday_lunch_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.saturday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.saturday_lunch_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr>
         <tr>
@@ -408,7 +408,7 @@
         <tr>
           <td class="border px-4 py-2" rowspan="2">Dinner</td>
           <td class="border px-4 py-2">{% for meal in mealplan.saturday_dinner_meal.all %}{{ meal }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-          <td class="border px-4 py-2">{% for meal in mealplan.saturday_snack_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
+          <td class="border px-4 py-2">{% for meal in mealplan.saturday_dinner_meal.all %}{% for dish in meal.selected_dishes.all %}{{ dish.dish_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not forloop.parentloop.last %} {% endif %}{% endfor %}</td>
   
         </tr>
         <tr>
