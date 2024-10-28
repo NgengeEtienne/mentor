@@ -14,6 +14,9 @@ from django.utils.timezone import now
 import datetime
 from datetime import time 
 from datetime import timedelta
+from django.db.models import Sum
+from django.utils.timezone import now
+import datetime
 
 
 
@@ -72,28 +75,38 @@ def dashboard_overview(request):
     notifications = get_notifications(request)  # Fetch notifications
 
 
-    # Fetch all orders within the week, grouped by date
+    # Current date and time
+    today = now().date()
+    current_time = now().time()  # Current time for comparison
+    six_pm = time(18, 0)  # 6:00 PM time object
+
+    # Define the start and end of the current week
+    start_of_week = today  # Start of the week (could use Monday logic if needed)
+    end_of_week = start_of_week + timedelta(days=6)  # End of the week (Sunday)
+
+    # Fetch all meal deliveries within the week, grouped by date
     orders = (
         MealDelivery.objects.filter(branch=request.branch, date__range=[start_of_week, end_of_week])
-        .values('date', 'bulk_order__bulk_order_name', 'delivery_address__name')  # Group by date
+        .values('date', 'bulk_order__bulk_order_name', 'delivery_address__name')
         .annotate(
             total_breakfast=Sum('bulk_order__breakfast'),
             total_lunch=Sum('bulk_order__lunch'),
             total_snack=Sum('bulk_order__snack'),
             total_dinner=Sum('bulk_order__dinner'),
         )
-        .order_by('date')  # Sort by date
+        .order_by('date')
     )
 
     # Convert query results into a dictionary with dates as keys
-    order_dict = {order['date']: order for order in orders}  # Store by date for quick lookup
+    order_dict = {order['date']: order for order in orders}
 
-    # Prepare the full week data, including missing days with placeholders
+    # Prepare the full week data, including placeholders for missing days
     week_days = []
     for i in range(7):
         day = start_of_week + timedelta(days=i)
         day_name = day.strftime("%A")
 
+        # Get the order for the current day or use placeholders
         order = order_dict.get(day, {
             'date': day,
             'bulk_order__bulk_order_name': None,
@@ -106,20 +119,27 @@ def dashboard_overview(request):
 
         order['day_name'] = day_name
 
-        # Adjust is_future logic to check for 6 PM condition
-        if day > today or (day == today and current_time < six_pm):
-            order['is_future'] = "Yes"
+        # Adjust is_future logic based on the 6 PM cutoff condition
+        if day == today:
+            order['is_future'] = "No"  # Today is "No" since yesterday's 6 PM has passed
+        elif day == today + timedelta(days=1):
+            # Tomorrow depends on today's 6 PM cutoff
+            order['is_future'] = "Yes" if current_time < six_pm else "No"
         else:
-            order['is_future'] = "No"
+            # For future days beyond tomorrow
+            order['is_future'] = "Yes"
 
+        # Check if the order has valid data (a bulk order name)
         order['has_values'] = bool(order.get('bulk_order__bulk_order_name'))
 
-        # Calculate total sum and organize delivery data
+        # Calculate total sums and organize delivery data by address
         delivery_data = {}
         if order['has_values']:
             address = order['delivery_address__name']
-            total_sum = (order['total_breakfast'] + order['total_lunch'] +
-                         order['total_snack'] + order['total_dinner'])
+            total_sum = (
+                order['total_breakfast'] + order['total_lunch'] +
+                order['total_snack'] + order['total_dinner']
+            )
             delivery_data[address] = {
                 'total_sum': total_sum,
                 'total_breakfast': order['total_breakfast'],
@@ -129,7 +149,10 @@ def dashboard_overview(request):
             }
         order['delivery_data'] = delivery_data
 
+        # Add the order to the week days list
         week_days.append(order)
+
+    print(week_days)  # Debugging output to verify results
 
     # print(week_days)  # Debug print to verify output
 
@@ -535,39 +558,39 @@ def meal_plan_detail(request, id):
 @login_required
 def meal_ordered(request):
     notifications = get_notifications(request)  # Fetch notifications
-    from django.db.models import Sum
-    from django.utils.timezone import now
-    import datetime
 
+    # Current date and time
     today = now().date()
     current_time = now().time()  # Current time for comparison
-    six_pm = datetime.time(18, 0)  # 6:00 PM time object
-    print("current time", current_time, "six pm", six_pm)
-    start_of_week = today# - datetime.timedelta(days=today.weekday())  # Get Monday of the current week
-    end_of_week = start_of_week + datetime.timedelta(days=6)  # Get Sunday of the current week
+    six_pm = time(18, 0)  # 6:00 PM time object
 
-    # Fetch all orders within the week, grouped by date
+    # Define the start and end of the current week
+    start_of_week = today  # Start of the week (could use Monday logic if needed)
+    end_of_week = start_of_week + timedelta(days=6)  # End of the week (Sunday)
+    print(current_time)
+    # Fetch all meal deliveries within the week, grouped by date
     orders = (
         MealDelivery.objects.filter(branch=request.branch, date__range=[start_of_week, end_of_week])
-        .values('date', 'bulk_order__bulk_order_name', 'delivery_address__name')  # Group by date
+        .values('date', 'bulk_order__bulk_order_name', 'delivery_address__name')
         .annotate(
             total_breakfast=Sum('bulk_order__breakfast'),
             total_lunch=Sum('bulk_order__lunch'),
             total_snack=Sum('bulk_order__snack'),
             total_dinner=Sum('bulk_order__dinner'),
         )
-        .order_by('date')  # Sort by date
+        .order_by('date')
     )
 
     # Convert query results into a dictionary with dates as keys
-    order_dict = {order['date']: order for order in orders}  # Store by date for quick lookup
+    order_dict = {order['date']: order for order in orders}
 
-    # Prepare the full week data, including missing days with placeholders
+    # Prepare the full week data, including placeholders for missing days
     week_days = []
     for i in range(7):
-        day = start_of_week + datetime.timedelta(days=i)
+        day = start_of_week + timedelta(days=i)
         day_name = day.strftime("%A")
 
+        # Get the order for the current day or use placeholders
         order = order_dict.get(day, {
             'date': day,
             'bulk_order__bulk_order_name': None,
@@ -580,20 +603,27 @@ def meal_ordered(request):
 
         order['day_name'] = day_name
 
-        # Adjust is_future logic to check for 6 PM condition
-        if day > today or (day == today and current_time < six_pm):
-            order['is_future'] = "Yes"
+        # Adjust is_future logic based on the 6 PM cutoff condition
+        if day == today:
+            order['is_future'] = "No"  # Today is "No" since yesterday's 6 PM has passed
+        elif day == today + timedelta(days=1):
+            # Tomorrow depends on today's 6 PM cutoff
+            order['is_future'] = "Yes" if current_time < six_pm else "No"
         else:
-            order['is_future'] = "No"
+            # For future days beyond tomorrow
+            order['is_future'] = "Yes"
 
+        # Check if the order has valid data (a bulk order name)
         order['has_values'] = bool(order.get('bulk_order__bulk_order_name'))
 
-        # Calculate total sum and organize delivery data
+        # Calculate total sums and organize delivery data by address
         delivery_data = {}
         if order['has_values']:
             address = order['delivery_address__name']
-            total_sum = (order['total_breakfast'] + order['total_lunch'] +
-                         order['total_snack'] + order['total_dinner'])
+            total_sum = (
+                order['total_breakfast'] + order['total_lunch'] +
+                order['total_snack'] + order['total_dinner']
+            )
             delivery_data[address] = {
                 'total_sum': total_sum,
                 'total_breakfast': order['total_breakfast'],
@@ -603,16 +633,16 @@ def meal_ordered(request):
             }
         order['delivery_data'] = delivery_data
 
+        # Add the order to the week days list
         week_days.append(order)
 
-    print(week_days)  # Debug print to verify output
+    print(week_days)  # Debugging output to verify results
 
-    # Render the template with notifications and the complete week data
+    # Render the template with the week data and notifications
     return render(request, 'mentor/meal/meals.html', {
         'notifications': notifications,
-        'orders': week_days  # Full week of orders including placeholders
+        'orders': week_days  # Full week of orders, including placeholders
     })
-
 
 
 @login_required
