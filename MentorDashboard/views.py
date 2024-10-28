@@ -513,7 +513,7 @@ def meal_plan_list(request):
 def meal_plan_detail(request, id):
     notifications = get_notifications(request)  # Fetch notifications
     mealplan = get_object_or_404(MealPlan, pk=id)
-    order= get_object_or_404(BulkOrders, MealPlan=mealplan)
+    order= get_object_or_404(BulkOrders, MealPlan=mealplan, branch=request.branch)
     status = 1 if order.bulk_order_end_date > now().date() else 0
     sum = order.breakfast + order.lunch + order.snack + order.dinner
     days = [ 'sunday','monday', 'tuesday', 'wednesday', 'thursday', 
