@@ -14,44 +14,134 @@
             </ol>
         </nav>
     </div>
-    <div class="pb-5"><div class="flex justify-end p-3 container bg-white rounded-lg">
-        <div class="button flex items-center">
-            <a href="{% url 'dashboard'%}" class="inline-flex items-center gap-2 rounded-md bg-primary my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90">
-                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M48 256c0 114.87 93.13 208 208 208s208-93.13 208-208S370.87 48 256 48 48 141.13 48 256zm224-80.09L208.42 240H358v32H208.42L272 336.09l-22.7 22.54L147.46 256 249.3 153.37z"></path></svg>
-                <span>Back to Homepage</span>
+    <div class="pb-5">
+        <div class="flex justify-between p-3 container bg-white rounded-lg">
+          <!-- Left Side (Date and Total Meals) -->
+          <div class="left flex items-center">
+            <div class="inline-flex items-center gap-2">
+              <div class="inline-flex bg-primary text-white font-bold p-2 gap-2 items-center shadow-md">
+                Date: {{ date }}
+              </div>
+              <div class="inline-flex bg-meta-3 text-white font-bold p-2 gap-2 items-center shadow-md">
+                Total Meals: {{ sum }}
+              </div>
+            </div>
+          </div>
+      
+          <!-- Right Side (Back to Homepage Button) -->
+          <div>
+            <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 rounded-md bg-primary my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90">
+              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                <path d="M48 256c0 114.87 93.13 208 208 208s208-93.13 208-208S370.87 48 256 48 48 141.13 48 256zm224-80.09L208.42 240H358v32H208.42L272 336.09l-22.7 22.54L147.46 256 249.3 153.37z"></path>
+              </svg>
+              <span>Back to Homepage</span>
             </a>
+          </div>
         </div>
-    </div>
+      </div>
+      
 </div>
 <div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
     
     <!-- Date Picker and Total Meals Button -->
-    {% comment %} <td class="w-20 px-6 py-3 flex items-center justify-between mb-2">
-        <input
-            id="date"
-            class="form-datepicker bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-200 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-            placeholder="Select date"
-            data-class="flatpickr-right"
-        />
-        <div class="flex justify-end">
-            <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 rounded-md bg-primary my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90">
-                <span>Back to Homepage</span>
-            </a>
+    <td class="w-20 px-6 py-3 flex items-center justify-between mb-2">
+        <div
+        class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark"
+      >
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+          <div
+            class="flex justify-between border-b border-r border-stroke px-7.5 py-7 dark:border-strokedark xl:border-b-0"
+          >
+            <div class="flex items-center gap-5.5">
+              
+    
+              <div>
+                <p class="text-lg font-medium text-[#9B51E0]">Breakfast</p>
+                <span class="font-medium">Quantity: <span id="breakfast">{{order.breakfast}}</span></span>
+              </div>
+            </div>
+    
+            <div>
+              <p class="mt-1.5 font-medium text-black dark:text-white">
+                {% comment %} <span id="breakfastassigned">0</span> assigned {% endcomment %}
+              </p>
+            </div>
+          </div>
+    
+          <div
+            class="flex justify-between border-b border-r border-stroke px-7.5 py-7 dark:border-strokedark xl:border-b-0"
+          >
+            <div class="flex items-center gap-5.5">
+              
+    
+              <div>
+                <p class="text-lg font-medium text-[#219653]">Lunch</p>
+                <span class="font-medium">Quantity: <span id="breakfast">{{order.lunch}}</span></span>
+              </div>
+            </div>
+    
+            <div>
+              <p class="mt-1.5 font-medium text-black dark:text-white">
+                {% comment %} <span id="lunchassigned">0</span> assigned {% endcomment %}
+              </p>
+            </div>
+          </div>
+    
+          <div
+            class="flex justify-between border-b border-r border-stroke px-7.5 py-7 dark:border-strokedark sm:border-b-0"
+          >
+            <div class="flex items-center gap-5.5">
+              
+    
+              <div>
+                <p class="text-lg font-medium text-[#2F80ED]">Tea & Snack</p>
+                <span class="font-medium">Quantity: <span id="breakfast">{{order.snack}}</span></span>
+              </div>
+            </div>
+    
+            <div>
+              <p class="mt-1.5 font-medium text-black dark:text-white">
+                {% comment %} <span id="snackassigned">0</span> assigned {% endcomment %}
+              </p>
+            </div>
+          </div>
+    
+              <!-- Tea & Snack Section -->
+    <div
+    class="flex justify-between border-b border-r border-stroke px-7.5 py-7 dark:border-strokedark sm:border-b-0"
+  >
+    <div class="flex items-center gap-5.5">
+      <div>
+        <p class="text-lg font-medium text-[#2F80ED]">Dinner</p>
+        <span class="font-medium">Dinner 1 Quantity: <span id="snack">{{ order.dinner }}</span></span>
+        <hr>
+        <span class="font-medium">Dinner 2 Quantity: <span id="snack">{{ order.dinner2 }}</span></span>
+      </div>
+    </div>
+    <div>
+      <p class="mt-1.5 font-medium text-black dark:text-white">
+        {% comment %} <span id="snackassigned">0</span> assigned {% endcomment %}
+      </p>
+    </div>
+  </div>
+
+      
+
         </div>
+      </div>
+      <!-- File Details List End -->
     </td>
-     {% endcomment %}
+   
 
     <!-- Addresses Section -->
 <div class="mb-6">
     {% for address in addresses %}
     <div class="flex items-center mb-1 mt-4"> <!-- Added mt-4 here -->
 
-        <div class="inline-flex bg-primary text-white font-bold p-2 gap-2 items-center  shadow-md" style="width: 380px;">
+        <div class="inline-flex bg-primary text-white font-bold p-2 gap-2 items-center  shadow-md" style="width: 400px;">
             {{ address }}
         </div>
-        <div class="inline-flex bg-meta-3 text-white font-bold p-2 gap-2 items-center  shadow-md">
-            Total Meals {{ sum }}
-        </div>
+        
     </div>
 
     <div class="overflow-x-auto">
@@ -60,7 +150,7 @@
                 <tr>
                     <th class="border border-gray-300 p-3 text-left">Meal Type</th>
                     <th class="border border-gray-300 p-3 text-left">Items</th>
-                    <th class="border border-gray-300 p-3 text-left">Quantity</th>
+                    
                     <th class="border border-gray-300 p-3 text-left">Assign</th>
                 </tr>
             </thead>
@@ -76,19 +166,22 @@
                     </td>
                     <input type="hidden" id="address" value="{{address.id}}">
                     <input type="hidden" id="date" value="{{date}}">
-                    <td class="border border-gray-300 p-3">
+                    {% comment %} <td class="border border-gray-300 p-3">
                         {% if meal_type == "breakfast" %}
                             {{ breakfast }}
                         {% elif meal_type == "lunch" %}
                             {{ lunch }}
-                        {% elif meal_type == "dinner" %}
-                            {{ dinner }}
                         {% elif meal_type == "snack" %}
                             {{ snack }}
+                        {% elif meal_type == "dinner" %}
+                            {{ dinner }}
+                        {% elif meal_type == "dinner2" %}
+                            {{ dinner2 }}
+                        
                         {% else %}
                             0
                         {% endif %}
-                    </td>
+                    </td> {% endcomment %}
                     <!-- Display the number of dishes -->
                     <td class="border border-gray-300 p-3">
                         <input type="number" id="quantity" min="0" class="w-20 border border-gray rounded-lg px-2 py-1" placeholder="0"  required>

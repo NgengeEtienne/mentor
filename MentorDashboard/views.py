@@ -342,40 +342,52 @@ def assign_meal(request,date):
     meal_plans = order.MealPlan.all() if order else []
 
     # Meal types for iteration (e.g., breakfast, lunch, etc.)
-    meals = ['breakfast', 'lunch', 'dinner', 'snack']
+    meals = ['breakfast', 'lunch', 'snack', 'dinner', 'dinner2']
 
     # Prepare a dictionary to store dishes for the selected day
     dishes_for_day = {}
 
     # Loop through each meal type and get the related dishes for the specific day
     for meal in meals:
-        field_name = f"{day_name}_{meal}_dish"  # e.g., 'monday_breakfast_dish'
-        dishes_for_day[meal] = [
-            dish for meal_plan in meal_plans for dish in getattr(meal_plan, field_name).all()
-        ]
+        if meal == 'dinner2':
+            field_name = f"{day_name}_dinner_dish_option"  # e.g., 'monday_breakfast_dish'
+            dishes_for_day[meal] = [
+                dish for meal_plan in meal_plans for dish in getattr(meal_plan, field_name).all()
+            ]
+        else:
+            field_name = f"{day_name}_{meal}_dish"  # e.g., 'monday_breakfast_dish'
+            dishes_for_day[meal] = [
+                dish for meal_plan in meal_plans for dish in getattr(meal_plan, field_name).all()
+            ]
     day_meals = {}
-    meal_types = ['breakfast', 'lunch', 'dinner', 'snack']
+    meal_types = ['breakfast', 'lunch', 'snack','dinner','dinner2']
     
     breakfast= order.breakfast
     lunch= order.lunch
     dinner= order.dinner
+    dinner2=order.dinner2
     snack= order.snack
    
     for meal_plan in meal_plans:
         for meal_type in meal_types:
             # Dynamically generate the attribute name (e.g., "monday_breakfast_dish")
-            dish_attr = f"{day_name}_{meal_type}_dish"
-            dishes = getattr(meal_plan, dish_attr).all()  # Fetch the dishes
-
+            if meal_type == 'dinner2':
+                dish_attr = f"{day_name}_dinner_dish_option"
+                dishes = getattr(meal_plan, dish_attr).all()
+                print('if dinner 2 day meals',dishes)
+            else:
+                dish_attr = f"{day_name}_{meal_type}_dish"
+                dishes = getattr(meal_plan, dish_attr).all()  # Fetch the dishes
+                print('else day meals',dishes)
             # Store dishes under the appropriate meal type
             if meal_type not in day_meals:
                 day_meals[meal_type] = dishes
             else:
                 # Append dishes if there are multiple meal plans
                 day_meals[meal_type] |= dishes  # Merge QuerySets
+    print('day meals',day_meals)
 
-
-
+    print('date',date)
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -427,8 +439,9 @@ def assign_meal(request,date):
         'breakfast': breakfast,
         'lunch': lunch,
         'dinner': dinner,
+        'dinner2': dinner2,
         'snack': snack,
-        'date': date_str
+        'date': date
     })
 @login_required
 def edit_assign_meal(request, date):  # Include the date parameter here
@@ -541,11 +554,12 @@ def meal_plan_detail(request, id):
     sum = order.breakfast + order.lunch + order.snack + order.dinner
     days = [ 'sunday','monday', 'tuesday', 'wednesday', 'thursday', 
             'friday', 'saturday']
-    print(order)
-    for day in days :
-        print(day)
-        for dish in mealplan.monday_breakfast_dish.all():
-            print(status)
+    
+    # print(order)
+    # for day in days :
+    #     print(day)
+    #     for dish in mealplan.monday_breakfast_dish.all():
+    #         print(status)
     
     return render(request, 'mentor/mealplan/detail.html', {
         'notifications': notifications,
@@ -553,7 +567,7 @@ def meal_plan_detail(request, id):
         'days': days,
         'order': order,
         'sum': sum,
-        'status': status
+        'status': status,
     })
 @login_required
 def meal_ordered(request):
@@ -567,7 +581,7 @@ def meal_ordered(request):
     # Define the start and end of the current week
     start_of_week = today  # Start of the week (could use Monday logic if needed)
     end_of_week = start_of_week + timedelta(days=6)  # End of the week (Sunday)
-    print(current_time)
+    # print(current_time)
     # Fetch all meal deliveries within the week, grouped by date
     orders = (
         MealDelivery.objects.filter(branch=request.branch, date__range=[start_of_week, end_of_week])
@@ -636,7 +650,7 @@ def meal_ordered(request):
         # Add the order to the week days list
         week_days.append(order)
 
-    print(week_days)  # Debugging output to verify results
+    # print(week_days)  # Debugging output to verify results
 
     # Render the template with the week data and notifications
     return render(request, 'mentor/meal/meals.html', {

@@ -336,6 +336,7 @@ class BulkOrders(models.Model):
     lunch = models.IntegerField()
     snack = models.IntegerField()
     dinner = models.IntegerField()
+    dinner2=models.IntegerField()
     bulk_order_start_date=models.DateField()
     bulk_order_end_date=models.DateField()
 
