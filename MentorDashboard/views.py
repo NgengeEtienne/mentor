@@ -407,7 +407,7 @@ def assign_meal(request,date):
         'snack': snack,
         'date': date_str
     })
-
+@login_required
 def edit_assign_meal(request, date):  # Include the date parameter here
     order_id = 1
     order = get_object_or_404(BulkOrders, pk=order_id)
@@ -489,7 +489,7 @@ def edit_assign_meal(request, date):  # Include the date parameter here
         'meal_deliveries': meal_deliveries,  # Pass existing meal deliveries filtered by date
         'selected_date': date  # Pass the selected date to the template if needed
     })
-
+@login_required
 def meal_plan_list(request):
     notifications = get_notifications(request)  # Fetch notifications
     orders = BulkOrders.objects.filter(branch=request.branch) # Optimize with prefetch
@@ -509,7 +509,7 @@ def meal_plan_list(request):
         'start': start,
         'end': end
     })
-
+@login_required
 def meal_plan_detail(request, id):
     notifications = get_notifications(request)  # Fetch notifications
     mealplan = get_object_or_404(MealPlan, pk=id)
@@ -532,7 +532,7 @@ def meal_plan_detail(request, id):
         'sum': sum,
         'status': status
     })
-
+@login_required
 def meal_ordered(request):
     notifications = get_notifications(request)  # Fetch notifications
     from django.db.models import Sum
