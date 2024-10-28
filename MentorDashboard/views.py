@@ -12,6 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.utils.timezone import now
 import datetime
+from datetime import time 
+from datetime import timedelta
 
 
 
@@ -53,10 +55,10 @@ def dashboard_overview(request):
     
     today = now().date()
     current_time = now().time()  # Current time for comparison
-    six_pm = datetime.time(18, 0)  # 6:00 PM time object
+    six_pm = time(18, 0)  # 6:00 PM time object
     print("current time", current_time, "six pm", six_pm)
-    start_of_week = today - datetime.timedelta(days=today.weekday())  # Get Monday of the current week
-    end_of_week = start_of_week + datetime.timedelta(days=6)  # Get Sunday of the current week
+    start_of_week = today - timedelta(days=today.weekday())  # Get Monday of the current week
+    end_of_week = start_of_week + timedelta(days=6)  # Get Sunday of the current week
 
     active_subscriptions = BulkOrders.objects.filter(branch=request.branch)
     dispatched = MealDelivery.objects.filter(status='DISPATCHED', branch=request.branch,created_at__range=[start_of_week, end_of_week]).count() or 0
@@ -89,7 +91,7 @@ def dashboard_overview(request):
     # Prepare the full week data, including missing days with placeholders
     week_days = []
     for i in range(7):
-        day = start_of_week + datetime.timedelta(days=i)
+        day = start_of_week + timedelta(days=i)
         day_name = day.strftime("%A")
 
         order = order_dict.get(day, {
