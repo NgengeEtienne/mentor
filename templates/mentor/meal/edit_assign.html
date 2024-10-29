@@ -168,9 +168,16 @@
   
           <div class="col-span-4">
             <p class="text-[#637381] dark:text-bodydark">
-              {% for dish in dishes %}
-                {{ dish }}{% if not forloop.last %}, {% endif %}
-              {% endfor %}
+              <div>
+                {% for dish in dishes %}
+                    <span>
+                        {% for selected_dish in dish.selected_dishes.all %}
+                            {{ selected_dish.dish_name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </span>{% if not forloop.last %} | {% endif %}
+                {% endfor %}
+            </div>
+            
             </p>
             <input type="hidden" id="address" value="{{ address.id }}">
             <input type="hidden" id="date" value="{{ date }}">

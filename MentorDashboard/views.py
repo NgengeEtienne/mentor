@@ -513,17 +513,17 @@ def edit_assign_meal(request, date):
     # Loop through each meal type and get the related dishes for the specific day
     for meal in meals:
         if meal == 'dinner2':
-            field_name = f"{day_name}_dinner_dish_option"
+            field_name = f"{day_name}_dinner_meal_option"
             meal_field = f"{day_name}_dinner_meal_option"  # Optional meal field for dinner2
         else:
-            field_name = f"{day_name}_{meal}_dish"
+            field_name = f"{day_name}_{meal}_meal"
             meal_field = f"{day_name}_{meal}_meal"  # Optional meal field for other meals
 
         # Get dishes for the current meal type and day
         dishes = []
         for meal_plan in meal_plans:
             # Fetch dishes
-            dishes += list(getattr(meal_plan, field_name).all())
+            # dishes += list(getattr(meal_plan, field_name).all())
             # Optional: Fetch meals if needed
             selected_meals = getattr(meal_plan, meal_field).all()
             for meal in selected_meals:
@@ -538,9 +538,9 @@ def edit_assign_meal(request, date):
         for meal_type in meals:
             # Dynamically generate the attribute name
             if meal_type == 'dinner2':
-                dish_attr = f"{day_name}_dinner_dish_option"
+                dish_attr = f"{day_name}_dinner_meal_option"
             else:
-                dish_attr = f"{day_name}_{meal_type}_dish"
+                dish_attr = f"{day_name}_{meal_type}_meal"
 
             # Fetch the dishes
             dishes = getattr(meal_plan, dish_attr).all()
