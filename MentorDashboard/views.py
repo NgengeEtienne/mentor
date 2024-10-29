@@ -789,7 +789,7 @@ def assign_meal_post(request):
                     branch=request.branch,
                     company=request.company
                 )
-                print("saved "deliver)
+                print("saved ",deliver)
                 message = f"{quantity} {meal_type} assigned to {delivery_address} by {request.branch}"
                 Notification.objects.create(
                     delivery=deliver,
