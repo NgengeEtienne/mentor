@@ -708,7 +708,7 @@ def meal_ordered(request):
             'total_dinner': order['total_dinner'],
             'total_dinner2': order['total_dinner2'],
         }
-        print("order_dict", order_dict)
+        # print("order_dict", order_dict)
         # Accumulate totals for the day
         order_dict[date]['total_breakfast'] = order['total_breakfast']
         order_dict[date]['total_lunch'] = order['total_lunch']
@@ -721,7 +721,7 @@ def meal_ordered(request):
     for i in range(7):
         day = start_of_week + timedelta(days=i)
         day_name = day.strftime("%A")
-
+        print(f"Day in weekdays: {day_name}")
         # Get the order for the current day or use placeholders
         order = order_dict.get(day, {
             'date': day,
@@ -736,20 +736,23 @@ def meal_ordered(request):
 
         order['day_name'] = day_name
         # print("next line")
-        print(f"Order Result:\n{orders}\n")
+        # print(f"Order Result:\n{orders}\n")
         # Adjust is_future logic based on the 6 PM cutoff condition
         if day == today:
             order['is_future'] = "No"  # Today is "No" since yesterday's 6 PM has passed
+            print(f"Is future , day == today: {order['is_future']}")
         elif day == today + timedelta(days=1):
             # Tomorrow depends on today's 6 PM cutoff
             order['is_future'] = "Yes" if current_time < six_pm else "No"
+            print(f"Is future , day == today + 1: {order['is_future']}")
         else:
             # For future days beyond tomorrow
             order['is_future'] = "Yes"
+            print(f"Is future , day > today + 1: {order['is_future']}")
 
         # Check if the order has valid data
         order['has_values'] = bool(order.get('bulk_order__bulk_order_name'))
-
+        print(f"order has values: {order['has_values']}")
         # Add the order to the week days list
         week_days.append(order)
         print(f"Weekdays Result:\n{week_days}\n")
