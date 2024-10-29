@@ -705,11 +705,11 @@ def meal_ordered(request):
             # If a default address is found, populate order data
             # Calculate total sums with 0 as default for missing values
             total_sum = BulkOrders.objects.aggregate(
-                total_sum=Sum('breakfast') or 0 + 
-                        Sum('lunch') or 0 + 
-                        Sum('snack') or 0 + 
-                        Sum('dinner') or 0 + 
-                        Sum('dinner2') or 0
+                total_sum=Sum('breakfast')  + 
+                        Sum('lunch')  + 
+                        Sum('snack')  + 
+                        Sum('dinner')  + 
+                        Sum('dinner2') 
             )
 
             if default_address:
