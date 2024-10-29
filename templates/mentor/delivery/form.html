@@ -66,9 +66,17 @@
                 <label class="mb-1 block text-sm font-medium text-black dark:text-white">Longitude</label>
                 {{ form.longitude }}
             </div>
+            <div>
+
+                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Default Address: </label>
+                <div class="flex items-center ps-4 border border-gray-200 rounded dark:border-gray-700">
+                {{form.default_address}}    
+                <label for="bordered-checkbox-1" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Default radio</label>
+                </div>
+                   
         </div>
         <button type="submit" 
-                class="inline-flex items-center justify-center gap-2.5 bg-black px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
+                class="inline-flex items-center justify-center mt-4 gap-2.5 bg-black px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
             {% if object %} Update Address {% else %} Add Address {% endif %}
         </button>
     </form>

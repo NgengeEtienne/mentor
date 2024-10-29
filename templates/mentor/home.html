@@ -267,13 +267,13 @@
                                   <td class="border border-gray-300 px-4 py-2">
                                     {% if order.has_values %}
                                         {%if order.is_future == "No" %}
-                                        <a class="bg-primary text-white px-4 py-2 rounded text-sm" readonly>Edit</a>
+                                        <a class="bg-gray text-black px-4 py-2 rounded text-sm" readonly style="cursor: not-allowed">Edit</a>
                                         {% else %}
                                             <a href="{% url 'edit_assign_address' order.date %}" class="bg-primary text-white px-4 py-2 rounded text-sm">Edit</a>
                                         {%endif%}
                                     {% else %}
                                         {%if order.is_future == "No" %}
-                                        <a  class="bg-primary text-white px-4 py-2 rounded text-sm" readonly>Edit</a>
+                                        <a  class="bg-gray text-black px-4 py-2 rounded text-sm" readonly style="cursor: not-allowed">Edit</a>
                                         {% else %}
                                         <a  href="{% url 'assign_address' order.date %}"  class="bg-success text-white px-4 py-2 rounded text-sm">Edit</a>
                                         {%endif%}

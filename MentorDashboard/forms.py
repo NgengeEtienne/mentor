@@ -23,7 +23,7 @@ class LoginForm(forms.Form):
 class DeliveryAddressForm(forms.ModelForm):
     class Meta:
         model = DeliveryAddress
-        fields = ['name', 'address_line_1', 'address_line_2','city','state','pin_code','latitude','longitude']
+        fields = ['name', 'address_line_1', 'address_line_2','city','state','pin_code','latitude','longitude','default_address']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'w-3/4 rounded-lg border-[1.5px] border-primary bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white', 'placeholder': 'Enter name'}),
             'address_line_1': forms.TextInput(attrs={'class': 'w-3/4 rounded-lg border-[1.5px] border-primary bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white', 'placeholder': 'Enter Address Line 1'}),
@@ -33,7 +33,11 @@ class DeliveryAddressForm(forms.ModelForm):
             'pin_code': forms.TextInput(attrs={'class': 'w-3/4 rounded-lg border-[1.5px] border-primary bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white', 'placeholder': 'Enter Pin Code'}),
             'latitude': forms.TextInput(attrs={'class': 'w-3/4 rounded-lg border-[1.5px] border-primary bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white', 'placeholder': 'Enter Latitude'}),
             'longitude': forms.TextInput(attrs={'class': 'w-3/4 rounded-lg border-[1.5px] border-primary bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white', 'placeholder': 'Enter Longitude'}),
-        }
+            'default_address': forms.CheckboxInput(attrs={
+                'class': "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
+                'name': 'default_address',
+                'id': 'default_address',
+            }),        }
 
 # class MealDeliveryForm(forms.ModelForm):
 #     class Meta:

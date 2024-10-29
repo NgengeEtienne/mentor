@@ -3,6 +3,7 @@
 {% block title %} Assign Meals {% endblock title %}
 
 {% block content %}
+{% load custom_filters %}
 
 <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -113,7 +114,7 @@
     <div class="flex items-center gap-5.5">
       <div>
         <p class="text-lg font-medium text-[#2F80ED]">Dinner</p>
-        <span class="font-medium">Dinner  Quantity: <span id="snack">{{ order.dinner }}</span></span>
+        <span class="font-medium">Dinner  Quantity: <span id="snack">{{ dinner }}</span></span>
       </div>
     </div>
     <div>
@@ -148,7 +149,7 @@
       <h5 class="text-sm font-medium uppercase xsm:text-base">Items</h5>
     </div>
     <div class="p-2.5 text-center xl:p-5">
-      <h5 class="text-sm font-medium uppercase xsm:text-base">Assign</h5>
+      <h5 class="text-sm font-medium uppercase xsm:text-base">Quantity</h5>
     </div>
   </div>
 
@@ -167,7 +168,7 @@
 
       <!-- Items Column -->
       <div class="flex items-center justify-center p-2.5 xl:p-5">
-        <p class="font-medium text-black dark:text-white text-center">
+        <p class="font-medium text-black dark:text-white">
           {% for dish in dishes %}
             <span>
               {% for selected_dish in dish.selected_dishes.all %}
@@ -180,7 +181,7 @@
       </div>
 
       <!-- Assign Column -->
-      <div class="flex items-center justify-center p-2.5 xl:p-5 text-center" >
+      <div class="flex items-center justify-center  ml-4 p-2.5 xl:p-5 text-center" >
         <input 
           type="number" 
           id="quantity" 
@@ -188,7 +189,8 @@
           class="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           placeholder="0"
           required 
-          value="">
+          value="{% if meal_delivery_data|get_item:address and meal_delivery_data|get_item:address|get_item:meal_type %}{{ meal_delivery_data|get_item:address|get_item:meal_type }}{% else %}0{% endif %}">
+
         <input type="hidden" id="address" value="{{ address.id }}">
         <input type="hidden" id="date" value="{{ date }}">
       </div>

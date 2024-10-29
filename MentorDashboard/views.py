@@ -81,68 +81,43 @@ def dashboard_overview(request):
     delivered = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch,created_at__range=[start_of_week, end_of_week])
 
     notifications = get_notifications(request)  # Fetch notifications
+    today = now().date()  # Current date (already timezone-aware)
+    current_time = now().time()  # Current time (for 6 PM comparison)
+    six_pm = time(18, 0)  # 6:00 PM
 
+    print(f"Branch ID: {request.branch.id}\nToday: {today}\nCurrent Time: {current_time}")
 
-    # Current date and time
-    today = now().date()
-    current_time = now().time()  # Current time for comparison
-    six_pm = time(18, 0)  # 6:00 PM time object
+    # Start and end of the current week
+    start_of_week = make_aware(datetime.combine(today, time.min))
+    end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max))
 
-    # Define the start and end of the current week
-    start_of_week = today  # Start of the week (could use Monday logic if needed)
-    end_of_week = start_of_week + timedelta(days=6)  # End of the week (Sunday)
-    
-    from django.db.models import Sum, Case, When, IntegerField
+    print(f"Start of Week: {start_of_week}, End of Week: {end_of_week}")
 
+    # Query the orders within the week
     orders = (
         MealDelivery.objects.filter(branch=request.branch, date__range=[start_of_week, end_of_week])
         .values('date', 'bulk_order__bulk_order_name', 'delivery_address__name')
         .annotate(
-            total_breakfast=Sum(
-                Case(
-                    When(meal_type='breakfast', then='quantity'),
-                    output_field=IntegerField(),
-                )
-            ),
-            total_lunch=Sum(
-                Case(
-                    When(meal_type='lunch', then='quantity'),
-                    output_field=IntegerField(),
-                )
-            ),
-            total_snack=Sum(
-                Case(
-                    When(meal_type='snack', then='quantity'),
-                    output_field=IntegerField(),
-                )
-            ),
-            total_dinner=Sum(
-                Case(
-                    When(meal_type='dinner', then='quantity'),
-                    output_field=IntegerField(),
-                )
-            ),
-            total_dinner2=Sum(
-                Case(
-                    When(meal_type='dinner2', then='quantity'),
-                    output_field=IntegerField(),
-                )
-            ),
+            total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
+            total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
+            total_snack=Sum(Case(When(meal_type='snack', then='quantity'), output_field=IntegerField())),
+            total_dinner=Sum(Case(When(meal_type='dinner', then='quantity'), output_field=IntegerField())),
+            total_dinner2=Sum(Case(When(meal_type='dinner2', then='quantity'), output_field=IntegerField())),
         )
         .order_by('date', 'delivery_address__name')
     )
 
-    # Convert query results into a dictionary by date
+    print(f"Orders Query:\n{list(orders)}\n")
+
+    # Prepare order_dict as before
     order_dict = {}
     for order in orders:
-        date = order['date']
-
-        # Initialize the day's entry if not already in the dictionary
-        if date not in order_dict:
-            order_dict[date] = {
-                'date': date,
+        date_str = str(order['date'])  # Ensure consistent date formatting
+        if date_str not in order_dict:
+            order_dict[date_str] = {
+                'date': order['date'],
                 'bulk_order__bulk_order_name': order['bulk_order__bulk_order_name'],
-                'delivery_data': {},  # Store all addresses and totals
+                'delivery_data': {},
                 'total_breakfast': 0,
                 'total_lunch': 0,
                 'total_snack': 0,
@@ -150,16 +125,10 @@ def dashboard_overview(request):
                 'total_dinner2': 0,
             }
 
-        # Add delivery data for each address
         address = order['delivery_address__name']
-        total_sum = (
-                (order['total_breakfast'] or 0) +
-                (order['total_lunch'] or 0) +
-                (order['total_snack'] or 0) +
-                (order['total_dinner'] or 0) +
-                (order['total_dinner2'] or 0)
-            )
-        order_dict[date]['delivery_data'][address] = {
+        total_sum = sum(order.get(f'total_{meal}', 0) or 0 for meal in ['breakfast', 'lunch', 'snack', 'dinner', 'dinner2'])
+
+        order_dict[date_str]['delivery_data'][address] = {
             'total_sum': total_sum,
             'total_breakfast': order['total_breakfast'],
             'total_lunch': order['total_lunch'],
@@ -168,21 +137,16 @@ def dashboard_overview(request):
             'total_dinner2': order['total_dinner2'],
         }
 
-        # Accumulate totals for the day
-        order_dict[date]['total_breakfast'] = order['total_breakfast']
-        order_dict[date]['total_lunch'] = order['total_lunch']
-        order_dict[date]['total_snack'] = order['total_snack']
-        order_dict[date]['total_dinner'] = order['total_dinner']
-        order_dict[date]['total_dinner2'] = order['total_dinner2']
-
-    # Prepare the full week data, including placeholders for missing days
+    # Prepare the full week data with placeholders
     week_days = []
     for i in range(7):
-        day = start_of_week + timedelta(days=i)
+        day = today + timedelta(days=i)
         day_name = day.strftime("%A")
+        day_str = str(day)
 
-        # Get the order for the current day or use placeholders
-        order = order_dict.get(day, {
+        print(f"Processing Day: {day_name} ({day_str})")
+
+        order = order_dict.get(day_str, {
             'date': day,
             'bulk_order__bulk_order_name': None,
             'delivery_data': {},
@@ -193,25 +157,42 @@ def dashboard_overview(request):
             'total_dinner2': 0,
         })
 
+        # Check if there are no orders for that day
+        if not order['delivery_data']:
+            # Try to get the default address
+            default_address = DeliveryAddress.objects.filter(branch=request.branch, default_address=True).first()
+            if not default_address:
+                default_address = DeliveryAddress.objects.filter(branch=request.branch).first()
+
+            # If a default address is found, populate order data
+            # Calculate total sums with 0 as default for missing values
+            bulk=BulkOrders.objects.get(branch=request.branch)
+            total_sum = (
+                (int(bulk.breakfast) if bulk.breakfast is not None else 0) +
+                (int(bulk.lunch) if bulk.lunch is not None else 0) +
+                (int(bulk.snack) if bulk.snack is not None else 0) +
+                (int(bulk.dinner) if bulk.dinner is not None else 0) +
+                (int(bulk.dinner2) if bulk.dinner2 is not None else 0)
+            )
+            if default_address:
+                order['delivery_data'][default_address.name] = {
+                    'total_sum': total_sum if total_sum is not None else 0,
+                    'total_breakfast': BulkOrders.objects.aggregate(total=Sum('breakfast'))['total'] or 0,
+                    'total_lunch': BulkOrders.objects.aggregate(total=Sum('lunch'))['total'] or 0,
+                    'total_snack': BulkOrders.objects.aggregate(total=Sum('snack'))['total'] or 0,
+                    'total_dinner': BulkOrders.objects.aggregate(total=Sum('dinner'))['total'] or 0,
+                    'total_dinner2': BulkOrders.objects.aggregate(total=Sum('dinner2'))['total'] or 0,
+                }
+            order['bulk_order__bulk_order_name'] = BulkOrders.objects.first().bulk_order_name if BulkOrders.objects.exists() else None
+
         order['day_name'] = day_name
-
-        # Adjust is_future logic based on the 6 PM cutoff condition
-        if day == today:
-            order['is_future'] = "No"  # Today is "No" since yesterday's 6 PM has passed
-        elif day == today + timedelta(days=1):
-            # Tomorrow depends on today's 6 PM cutoff
-            order['is_future'] = "Yes" if current_time < six_pm else "No"
-        else:
-            # For future days beyond tomorrow
-            order['is_future'] = "Yes"
-
-        # Check if the order has valid data
+        order['is_future'] = (
+            "Yes" if day > today or (day != today and current_time < six_pm) else "No"
+        )
         order['has_values'] = bool(order.get('bulk_order__bulk_order_name'))
 
-        # Add the order to the week days list
         week_days.append(order)
-
-    print(week_days)  # Debugging output to verify results
+        print(f"Added Order for {day_name}: {order}")
 
     # print(week_days)  # Debug print to verify output
 
@@ -250,9 +231,10 @@ def delivery_address_create(request):
         pin_code = request.POST['pin_code']
         latitude = request.POST['latitude']
         longitude = request.POST['longitude']
+        default_address = request.POST.get('default_address')
         branch = request.branch
         company = request.company
-        DeliveryAddress.objects.create(name=name, address_line_1=address_line_1, address_line_2=address_line_2, city=city, state=state, pin_code=pin_code, latitude=latitude, longitude=longitude, branch_id=branch.id, company=company)
+        DeliveryAddress.objects.create(name=name, address_line_1=address_line_1, address_line_2=address_line_2, default_address=default_address, city=city, state=state, pin_code=pin_code, latitude=latitude, longitude=longitude, branch_id=branch.id, company=company)
         return redirect('delivery_address_list')
 
     return render(request, 'mentor/delivery/form.html', {'form': form, 'notifications': notifications})
@@ -522,9 +504,6 @@ def edit_assign_meal(request, date):
         # Get dishes for the current meal type and day
         dishes = []
         for meal_plan in meal_plans:
-            # Fetch dishes
-            # dishes += list(getattr(meal_plan, field_name).all())
-            # Optional: Fetch meals if needed
             selected_meals = getattr(meal_plan, meal_field).all()
             for meal in selected_meals:
                 dishes += list(meal.selected_dishes.all())
@@ -536,101 +515,51 @@ def edit_assign_meal(request, date):
     
     for meal_plan in meal_plans:
         for meal_type in meals:
-            # Dynamically generate the attribute name
             if meal_type == 'dinner2':
                 dish_attr = f"{day_name}_dinner_meal_option"
             else:
                 dish_attr = f"{day_name}_{meal_type}_meal"
 
-            # Fetch the dishes
             dishes = getattr(meal_plan, dish_attr).all()
             
-            # Store dishes under the appropriate meal type
             if meal_type not in day_meals:
                 day_meals[meal_type] = dishes
             else:
-                # Merge QuerySets without duplicates
                 day_meals[meal_type] |= dishes
-    if request.method == "POST":
-        try:
-            # print(request.body)
-            data = json.loads(request.body)
-            meal_assignments = data.get('mealData', [])
-            meal_data = [item for item in meal_assignments if 'meal_plan' in item]
-            print(meal_data)
-            for assignment in meal_data:
-                meal_type = assignment.get('meal_plan')
-                address_id = assignment.get('address')
-                date = assignment.get('date')  # Capture updated date
-                quantity = int(assignment.get('quantity', 0))
-                meal_id = assignment.get('id')
-                print("in for")
-                delivery_address = get_object_or_404(DeliveryAddress, pk=address_id)
-                print("meal id", meal_id)
-                # Update or create meal assignment
-                if meal_id not in [None, '','null']:
-                # Try to update the existing MealDelivery
-                    meal_delivery = MealDelivery.objects.filter(id=meal_id, bulk_order=order).first()
-                    if meal_delivery:
-                        # Update existing record
-                        meal_delivery.quantity = quantity
-                        meal_delivery.date = date
-                        meal_delivery.branch = request.branch
-                        meal_delivery.company = request.company
-                        meal_delivery.save()
-                        print("meal_delivery updated", meal_delivery)
-                    else:
-                        # If no record is found for the given ID, create a new one
-                        MealDelivery.objects.create(
-                            bulk_order=order,
-                            meal_type=meal_type,
-                            quantity=quantity,
-                            date=date,
-                            delivery_address=delivery_address,
-                            branch=request.branch,
-                            company=request.company
-                        )
-                        print("meal_delivery created", meal_delivery)
-                else:
-                    # If no ID is provided, create a new MealDelivery
-                    MealDelivery.objects.create(
-                        bulk_order=order,
-                        meal_type=meal_type,
-                        quantity=quantity,
-                        date=date,
-                        delivery_address=delivery_address,
-                        branch=request.branch,
-                        company=request.company
-                    )
-                    print("meal_delivery created  out", meal_delivery)
-                message = f"{quantity} {meal_type} assigned to {delivery_address} by {request.branch}"
-                print("message", message)
-                Notification.objects.create(
-                    delivery=meal_delivery,
-                    message=message,
-                    branch=request.branch,
-                    company=request.company
-                )
 
-            return JsonResponse({'success': True, 'message': 'Meal assignment updated successfully.'})
-        except json.JSONDecodeError as e:
-            return JsonResponse({'success': False, 'error': f'JSON decode error: {str(e)}'}, status=400)
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    # Prepare meal delivery data
+    meal_delivery_data = {}
+    for address in addresses:
+        meal_delivery_data[address] = {}
+        for meal_type in meals:
+            # Fetch the quantity for this address, meal type, and date
+            meal_delivery = MealDelivery.objects.filter(
+                delivery_address=address,
+                date=date,
+                meal_type=meal_type,
+                branch=request.branch,
+                company=request.company,
+                bulk_order=order
+            ).first()
+            meal_delivery_data[address][meal_type] = meal_delivery.quantity if meal_delivery else 0
+    print(meal_delivery_data)
 
     return render(request, 'mentor/meal/edit_assign.html', {
         'order': order,
         'addresses': addresses,
         'notifications': notifications,
-        'selected_date': date,  # Pass the selected date to the template if needed
+        'selected_date': date,
         'dishes_for_day': dishes_for_day,
         'day_name': day_name.capitalize(),
         'day_meals': day_meals, 
         'meals': meals,
         'date': date,
-        'selected_dishes': dishes_for_day,  # Include selected dishes
-        'total_sum': sum((order.breakfast or 0, order.lunch or 0, order.snack or 0, order.dinner or 0, order.dinner2 or 0))
+        'dinner': sum((order.dinner or 0, order.dinner2 or 0)),
+        'selected_dishes': dishes_for_day,
+        'total_sum': sum((order.breakfast or 0, order.lunch or 0, order.snack or 0, order.dinner or 0, order.dinner2 or 0)),
+        'meal_delivery_data': meal_delivery_data  # Pass the meal delivery data to the template
     })
+
 @login_required
 def meal_plan_list(request):
     notifications = get_notifications(request)  # Fetch notifications
