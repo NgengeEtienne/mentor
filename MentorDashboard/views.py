@@ -442,7 +442,7 @@ def assign_meal(request, date):
         try:
             data = json.loads(request.body)
             meal_assignments = data.get('mealData', [])
-
+            print
             for assignment in meal_assignments:
                 meal_type = assignment.get('meal_plan')
                 address_id = assignment.get('address')
@@ -768,13 +768,14 @@ def assign_meal_post(request):
             data = json.loads(request.body)
             meal_assignments = data.get('mealData', [])
             meal_data = [item for item in meal_assignments if 'meal_plan' in item]
-
+            print("in post")
             for assignment in meal_data:
+                print("in for loop")
                 meal_type = assignment.get('meal_plan')
                 address_id = assignment.get('address')
                 date = assignment.get('date')
                 quantity = int(assignment.get('quantity', 0))
-                
+                print(meal_type, address_id, date, quantity)
                 delivery_address = get_object_or_404(DeliveryAddress, pk=address_id)
                 if quantity == 0:
                     continue
@@ -788,6 +789,7 @@ def assign_meal_post(request):
                     branch=request.branch,
                     company=request.company
                 )
+                print("saved "deliver)
                 message = f"{quantity} {meal_type} assigned to {delivery_address} by {request.branch}"
                 Notification.objects.create(
                     delivery=deliver,
@@ -796,7 +798,7 @@ def assign_meal_post(request):
                     branch=request.branch,
                     company=request.company
                 )
-
+                print(message)
             return JsonResponse({'success': True, 'message': 'Meal assigned successfully.'})
         except json.JSONDecodeError as e:
             return JsonResponse({'success': False, 'error': f'JSON decode error: {str(e)}'}, status=400)
