@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import DeliveryAddress, MealDelivery, Notification
 from AdminDashboard.models import Meal, Branch, Company, BulkOrders, MealPlan
 from .forms import MealDeliveryForm
-from django.utils.timezone import now
+from django.db.models import Sum, Case, When, IntegerField
 import json
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
@@ -10,13 +10,12 @@ from django.shortcuts import render, redirect
 from .forms import LoginForm,DeliveryAddressForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
-from django.utils.timezone import now
 import datetime
 from datetime import time 
 from datetime import timedelta
 from django.db.models import Sum
-from django.utils.timezone import now
-import datetime
+from django.utils.timezone import make_aware, now
+
 
 
 
@@ -614,94 +613,59 @@ def meal_plan_detail(request, id):
         'sum': sum,
         'status': status,
     })
+
 @login_required
 def meal_ordered(request):
     notifications = get_notifications(request)  # Fetch notifications
 
-    # Current date and time
-    today = now().date()
-    current_time = now().time()  # Current time for comparison
-    six_pm = time(18, 0)  # 6:00 PM time object
-    print("request.branch.id", request.branch.id)
+    today = now().date()  # Current date (already timezone-aware)
+    current_time = now().time()  # Current time (for 6 PM comparison)
+    six_pm = time(18, 0)  # 6:00 PM
 
-    # Define the start and end of the current week
-    start_of_week = today
-    end_of_week = start_of_week + timedelta(days=6)
-    print("today", today)
-    print("start_of_week, end_of_week", start_of_week, end_of_week)
-    print("MealDelivery.objects: ",MealDelivery.objects.filter(branch=request.branch, date__range=[start_of_week, end_of_week]).query)
-    print("Orders",MealDelivery.objects.filter(branch=request.branch))
-    # Fetch all meal deliveries within the week, grouped by date and address
-    from django.db.models import Sum, Case, When, IntegerField
+    print(f"Branch ID: {request.branch.id}\nToday: {today}\nCurrent Time: {current_time}")
 
+    # Start and end of the current week
+    start_of_week = make_aware(datetime.combine(today, time.min))
+    end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max))
+
+    print(f"Start of Week: {start_of_week}, End of Week: {end_of_week}")
+
+    # Query the orders within the week
     orders = (
         MealDelivery.objects.filter(branch=request.branch, date__range=[start_of_week, end_of_week])
         .values('date', 'bulk_order__bulk_order_name', 'delivery_address__name')
         .annotate(
-            total_breakfast=Sum(
-                Case(
-                    When(meal_type='breakfast', then='quantity'),
-                    output_field=IntegerField(),
-                )
-            ),
-            total_lunch=Sum(
-                Case(
-                    When(meal_type='lunch', then='quantity'),
-                    output_field=IntegerField(),
-                )
-            ),
-            total_snack=Sum(
-                Case(
-                    When(meal_type='snack', then='quantity'),
-                    output_field=IntegerField(),
-                )
-            ),
-            total_dinner=Sum(
-                Case(
-                    When(meal_type='dinner', then='quantity'),
-                    output_field=IntegerField(),
-                )
-            ),
-             total_dinner2=Sum(
-                Case(
-                    When(meal_type='dinner2', then='quantity'),
-                    output_field=IntegerField(),
-                )
-            ),
+            total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
+            total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
+            total_snack=Sum(Case(When(meal_type='snack', then='quantity'), output_field=IntegerField())),
+            total_dinner=Sum(Case(When(meal_type='dinner', then='quantity'), output_field=IntegerField())),
+            total_dinner2=Sum(Case(When(meal_type='dinner2', then='quantity'), output_field=IntegerField())),
         )
         .order_by('date', 'delivery_address__name')
-        )
+    )
 
-    # Convert query results into a dictionary by date
+    print(f"Orders Query:\n{list(orders)}\n")
+
+    # Prepare order_dict as before
     order_dict = {}
     for order in orders:
-        date = order['date']
-        print("date", date)
-        # Initialize the day's entry if not already in the dictionary
-        if date not in order_dict:
-            order_dict[date] = {
-                'date': date,
+        date_str = str(order['date'])  # Ensure consistent date formatting
+        if date_str not in order_dict:
+            order_dict[date_str] = {
+                'date': order['date'],
                 'bulk_order__bulk_order_name': order['bulk_order__bulk_order_name'],
-                'delivery_data': {},  # Store all addresses and totals
+                'delivery_data': {},
                 'total_breakfast': 0,
                 'total_lunch': 0,
                 'total_snack': 0,
                 'total_dinner': 0,
                 'total_dinner2': 0,
             }
-            print(f"date not in order dict")
 
-        # Add delivery data for each address
         address = order['delivery_address__name']
-        total_sum = (
-            (order['total_breakfast'] or 0) +
-            (order['total_lunch'] or 0) +
-            (order['total_snack'] or 0) +
-            (order['total_dinner'] or 0) +
-            (order['total_dinner2'] or 0)
-        )
-        print("total_sum", total_sum)
-        order_dict[date]['delivery_data'][address] = {
+        total_sum = sum(order.get(f'total_{meal}', 0) or 0 for meal in ['breakfast', 'lunch', 'snack', 'dinner', 'dinner2'])
+
+        order_dict[date_str]['delivery_data'][address] = {
             'total_sum': total_sum,
             'total_breakfast': order['total_breakfast'],
             'total_lunch': order['total_lunch'],
@@ -709,22 +673,17 @@ def meal_ordered(request):
             'total_dinner': order['total_dinner'],
             'total_dinner2': order['total_dinner2'],
         }
-        print(f"order_dict values", order_dict.values)
-        # Accumulate totals for the day
-        order_dict[date]['total_breakfast'] = order['total_breakfast']
-        order_dict[date]['total_lunch'] = order['total_lunch']
-        order_dict[date]['total_snack'] = order['total_snack']
-        order_dict[date]['total_dinner'] = order['total_dinner']
-        order_dict[date]['total_dinner2'] = order['total_dinner2']
-        # print("order_dict values", order_dict.values)
-    # Prepare the full week data, including placeholders for missing days
+
+    # Prepare the full week data with placeholders
     week_days = []
     for i in range(7):
-        day = start_of_week + timedelta(days=i)
+        day = today + timedelta(days=i)
         day_name = day.strftime("%A")
-        print(f"Day in weekdays: {day_name}")
-        # Get the order for the current day or use placeholders
-        order = order_dict.get(day, {
+        day_str = str(day)
+
+        print(f"Processing Day: {day_name} ({day_str})")
+
+        order = order_dict.get(day_str, {
             'date': day,
             'bulk_order__bulk_order_name': None,
             'delivery_data': {},
@@ -736,35 +695,19 @@ def meal_ordered(request):
         })
 
         order['day_name'] = day_name
-        # print("next line")
-        # print(f"Order Result:\n{orders}\n")
-        # Adjust is_future logic based on the 6 PM cutoff condition
-        if day == today:
-            order['is_future'] = "No"  # Today is "No" since yesterday's 6 PM has passed
-            print(f"Is future , day == today: {order['is_future']}")
-        elif day == today + timedelta(days=1):
-            # Tomorrow depends on today's 6 PM cutoff
-            order['is_future'] = "Yes" if current_time < six_pm else "No"
-            print(f"Is future , day == today + 1: {order['is_future']}")
-        else:
-            # For future days beyond tomorrow
-            order['is_future'] = "Yes"
-            print(f"Is future , day > today + 1: {order['is_future']}")
-
-        # Check if the order has valid data
+        order['is_future'] = (
+            "Yes" if day > today or (day != today and current_time < six_pm) else "No"
+        )
         order['has_values'] = bool(order.get('bulk_order__bulk_order_name'))
-        print(f"order has values: {order['has_values']}")
-        # Add the order to the week days list
-        week_days.append(order)
-        print(f"Weekdays Result:\n{week_days}\n")
-    # print(week_days)  # Debugging output
 
-    # Render the template with the week data and notifications
+        week_days.append(order)
+        print(f"Added Order for {day_name}: {order}")
+
+    # Render the template with the data
     return render(request, 'mentor/meal/meals.html', {
         'notifications': notifications,
-        'orders': week_days  # Full week of orders, including placeholders
+        'orders': week_days,
     })
-
 
 
 @login_required
