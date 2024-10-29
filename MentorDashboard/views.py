@@ -622,11 +622,15 @@ def meal_ordered(request):
     today = now().date()
     current_time = now().time()  # Current time for comparison
     six_pm = time(18, 0)  # 6:00 PM time object
+    print("request.branch.id", request.branch.id)
 
     # Define the start and end of the current week
     start_of_week = today
     end_of_week = start_of_week + timedelta(days=6)
-
+    print("today", today)
+    print("start_of_week, end_of_week", start_of_week, end_of_week)
+    print("MealDelivery.objects: ",MealDelivery.objects.filter(branch=request.branch, date__range=[start_of_week, end_of_week]).query)
+    print("Orders",MealDelivery.objects.filter(branch=request.branch))
     # Fetch all meal deliveries within the week, grouped by date and address
     from django.db.models import Sum, Case, When, IntegerField
 
@@ -672,7 +676,7 @@ def meal_ordered(request):
     order_dict = {}
     for order in orders:
         date = order['date']
-
+        print("date", date)
         # Initialize the day's entry if not already in the dictionary
         if date not in order_dict:
             order_dict[date] = {
@@ -695,6 +699,7 @@ def meal_ordered(request):
             (order['total_dinner'] or 0) +
             (order['total_dinner2'] or 0)
         )
+        print("total_sum", total_sum)
         order_dict[date]['delivery_data'][address] = {
             'total_sum': total_sum,
             'total_breakfast': order['total_breakfast'],
@@ -703,14 +708,14 @@ def meal_ordered(request):
             'total_dinner': order['total_dinner'],
             'total_dinner2': order['total_dinner2'],
         }
-
+        print("order_dict", order_dict)
         # Accumulate totals for the day
         order_dict[date]['total_breakfast'] = order['total_breakfast']
         order_dict[date]['total_lunch'] = order['total_lunch']
         order_dict[date]['total_snack'] = order['total_snack']
         order_dict[date]['total_dinner'] = order['total_dinner']
         order_dict[date]['total_dinner2'] = order['total_dinner2']
-
+        # print("order_dict values", order_dict.values)
     # Prepare the full week data, including placeholders for missing days
     week_days = []
     for i in range(7):
@@ -730,7 +735,7 @@ def meal_ordered(request):
         })
 
         order['day_name'] = day_name
-
+        # print("order", order)
         # Adjust is_future logic based on the 6 PM cutoff condition
         if day == today:
             order['is_future'] = "No"  # Today is "No" since yesterday's 6 PM has passed
@@ -747,7 +752,7 @@ def meal_ordered(request):
         # Add the order to the week days list
         week_days.append(order)
 
-    print(week_days)  # Debugging output
+    # print(week_days)  # Debugging output
 
     # Render the template with the week data and notifications
     return render(request, 'mentor/meal/meals.html', {
