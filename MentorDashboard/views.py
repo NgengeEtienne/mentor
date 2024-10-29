@@ -735,7 +735,8 @@ def meal_ordered(request):
         })
 
         order['day_name'] = day_name
-        # print("order", order)
+        # print("next line")
+        print(f"Order Result:\n{orders}\n")
         # Adjust is_future logic based on the 6 PM cutoff condition
         if day == today:
             order['is_future'] = "No"  # Today is "No" since yesterday's 6 PM has passed
@@ -751,7 +752,7 @@ def meal_ordered(request):
 
         # Add the order to the week days list
         week_days.append(order)
-
+        print(f"Weekdays Result:\n{week_days}\n")
     # print(week_days)  # Debugging output
 
     # Render the template with the week data and notifications
