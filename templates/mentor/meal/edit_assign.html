@@ -23,7 +23,7 @@
                 Date: {{ date }}
               </div>
               <div class="inline-flex bg-meta-3 text-white font-bold p-2 gap-2 items-center shadow-md">
-                Total Meals: {{ sum }}
+                Total Meals: {{ total_sum }}
               </div>
             </div>
           </div>
@@ -41,7 +41,7 @@
       </div>
       
 </div>
-<div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+
     
     <!-- Date Picker and Total Meals Button -->
     <td class="w-20 px-6 py-3 flex items-center justify-between mb-2">
@@ -113,9 +113,7 @@
     <div class="flex items-center gap-5.5">
       <div>
         <p class="text-lg font-medium text-[#2F80ED]">Dinner</p>
-        <span class="font-medium">Dinner 1 Quantity: <span id="snack">{{ order.dinner }}</span></span>
-        <hr>
-        <span class="font-medium">Dinner 2 Quantity: <span id="snack">{{ order.dinner2 }}</span></span>
+        <span class="font-medium">Dinner  Quantity: <span id="snack">{{ order.dinner }}</span></span>
       </div>
     </div>
     <div>
@@ -131,77 +129,78 @@
       </div>
       <!-- File Details List End -->
     </td>
-   
+ <!-- Header Section -->
+
 <!-- Addresses Section -->
-<div class="mb-6">
-  {% for address in addresses %}
-  <div class="flex items-center rounded-sm border border-[#EEEEEE] mb-1 mt-4 grid grid-cols-12 bg-[#F9FAFB] px-5 py-4 dark:bg-meta-4 lg:px-7.5 2xl:px-11"> 
-      <!-- Adjusted inline-flex to flex-grow to help it align and stretch -->
-      <div class="flex-grow font-medium text-[#637381] dark:text-bodydark">
-          {{ address }}
-      </div>
-  </div>
-  <div class="w-full overflow-x-auto">
-    <div class="min-w-[700px]">
-      <!-- table header start -->
-      <div class="grid grid-cols-12 rounded-t-[10px] bg-primary px-5 py-4 lg:px-7.5 2xl:px-11">
-        <div class="col-span-3">
-          <h5 class="font-medium text-white">Meal Type</h5>
-        </div>
-        <div class="col-span-4">
-          <h5 class="font-medium text-white">Items</h5>
-        </div>
-        <div class="col-span-3">
-          <h5 class="font-medium text-white">Assign</h5>
-        </div>
-      </div>
-      <!-- table header end -->
-  
-      <!-- table body start -->
-      <div class="bg-white dark:bg-boxdark rounded-b-[10px]" id="mealTable">
-        {% for meal_type, dishes in day_meals.items %}
-        <div class="grid grid-cols-12 border-t border-[#EEEEEE] px-5 py-4 dark:border-strokedark lg:px-7.5 2xl:px-11 hover:bg-gray-100 transition duration-150" id="tr">
-          <div class="col-span-3" >
-            <p class="text-[#637381] dark:text-bodydark">{{ meal_type|capfirst }}</p>
-            <input type="hidden" id="meal-plan" value="{{ meal_type }}">
-          </div>
-  
-          <div class="col-span-4">
-            <p class="text-[#637381] dark:text-bodydark">
-              <div>
-                {% for dish in dishes %}
-                    <span>
-                        {% for selected_dish in dish.selected_dishes.all %}
-                            {{ selected_dish.dish_name }}{% if not forloop.last %}, {% endif %}
-                        {% endfor %}
-                    </span>{% if not forloop.last %} | {% endif %}
-                {% endfor %}
-            </div>
-            
-            </p>
-            <input type="hidden" id="address" value="{{ address.id }}">
-            <input type="hidden" id="date" value="{{ date }}">
-          </div>
-  
-          <div class="col-span-3 ">
-            <input type="number" id="quantity" min="0" 
-                 
-                   class="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+{% for address in addresses %}
+<div class="rounded-sm border border-stroke bg-white px-5 mt-4 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+<h4 class="mb-6 text-xl font-bold text-black dark:text-white">
+    {{address}}
+</h4>
 
-                   placeholder="0" required value="">
-           
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-      <!-- table body end -->
+<div class="flex flex-col">
+  <!-- Table Header -->
+  <div class="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
+    <div class="p-2.5 xl:p-5">
+      <h5 class="text-sm font-medium uppercase xsm:text-base">Meal Type</h5>
     </div>
- 
-  
-  
-</div>
+    <div class="p-2.5 text-center xl:p-5">
+      <h5 class="text-sm font-medium uppercase xsm:text-base">Items</h5>
+    </div>
+    <div class="p-2.5 text-center xl:p-5">
+      <h5 class="text-sm font-medium uppercase xsm:text-base">Assign</h5>
+    </div>
+  </div>
 
-  {% endfor %}
+  <!-- Table Body -->
+  <div class="bg-white dark:bg-boxdark rounded-b-[10px]" id="mealTable">
+    {% for meal_type, dishes in day_meals.items %}
+    <div class="grid grid-cols-3 border-b border-stroke dark:border-strokedark sm:grid-cols-5">
+      
+      <!-- Meal Type Column -->
+      <div class="flex items-center gap-3 p-2.5 xl:p-5">
+        <p class="font-medium text-black dark:text-white text-center">
+          {{ meal_type|capfirst }}
+        </p>
+        <input type="hidden" id="meal-plan" value="{{ meal_type }}">
+      </div>
+
+      <!-- Items Column -->
+      <div class="flex items-center justify-center p-2.5 xl:p-5">
+        <p class="font-medium text-black dark:text-white text-center">
+          {% for dish in dishes %}
+            <span>
+              {% for selected_dish in dish.selected_dishes.all %}
+                {{ selected_dish.dish_name }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </span>
+            {% if not forloop.last %} | {% endif %}
+          {% endfor %}
+        </p>
+      </div>
+
+      <!-- Assign Column -->
+      <div class="flex items-center justify-center p-2.5 xl:p-5 text-center" >
+        <input 
+          type="number" 
+          id="quantity" 
+          min="0" 
+          class="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          placeholder="0"
+          required 
+          value="">
+        <input type="hidden" id="address" value="{{ address.id }}">
+        <input type="hidden" id="date" value="{{ date }}">
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+</div>
+</div>
+{% endfor %}
+
+<div class="rounded-sm border border-stroke bg-white px-5 mt-4 p-1 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
 
   <div class="flex items-center justify-center mt-6">
       <button
@@ -212,8 +211,8 @@
       </button>
   </div>
 </div>
-
 </div>
+
 
 
 
