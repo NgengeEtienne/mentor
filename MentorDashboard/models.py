@@ -19,6 +19,7 @@ class DeliveryAddress(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
     branch=models.ForeignKey(Branch, on_delete=models.CASCADE)
     company=models.ForeignKey(Company, on_delete=models.CASCADE)
+    default_address = models.BooleanField(default=False, blank=True, null=True)
     def __str__(self):
         return self.name
     

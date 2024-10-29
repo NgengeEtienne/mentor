@@ -684,7 +684,7 @@ def meal_ordered(request):
         print(f"Processing Day: {day_name} ({day_str})")
 
         order = order_dict.get(day_str, {
-            'date': date_str,
+            'date': day,
             'bulk_order__bulk_order_name': None,
             'delivery_data': {},
             'total_breakfast': 0,
@@ -693,6 +693,26 @@ def meal_ordered(request):
             'total_dinner': 0,
             'total_dinner2': 0,
         })
+
+        # Check if there are no orders for that day
+        if not order['delivery_data']:
+            # Try to get the default address
+            default_address = DeliveryAddress.objects.filter(branch=request.branch, default_address=True).first()
+            if not default_address:
+                default_address = DeliveryAddress.objects.filter(branch=request.branch).first()
+
+            # If a default address is found, populate order data
+            total_sum = BulkOrders.objects.aggregate(total_sum=Sum('breakfast') + Sum('lunch') + Sum('snack') + Sum('dinner') + Sum('dinner2'))
+            if default_address:
+                order['delivery_data'][default_address.name] = {
+                    'total_sum': total_sum.get('total_sum', 0),  # Set to 0 since there are no existing orders
+                    'total_breakfast': BulkOrders.objects.first().breakfast if BulkOrders.objects.exists() else 0,
+                    'total_lunch': BulkOrders.objects.first().lunch if BulkOrders.objects.exists() else 0,
+                    'total_snack': BulkOrders.objects.first().snack if BulkOrders.objects.exists() else 0,
+                    'total_dinner': BulkOrders.objects.first().dinner if BulkOrders.objects.exists() else 0,
+                    'total_dinner2': BulkOrders.objects.first().dinner2 if BulkOrders.objects.exists() else 0,
+                }
+                order['bulk_order__bulk_order_name'] = BulkOrders.objects.first().bulk_order_name if BulkOrders.objects.exists() else None
 
         order['day_name'] = day_name
         order['is_future'] = (
