@@ -803,9 +803,7 @@ def meal_ordered(request):
 
 @login_required
 def assign_meal_post(request):
-    
-    order = BulkOrders.objects.all().first()
-   
+    order = BulkOrders.objects.first()
 
     if request.method == "POST":
         try:
@@ -820,29 +818,51 @@ def assign_meal_post(request):
                 date = assignment.get('date')
                 quantity = int(assignment.get('quantity', 0))
                 print(meal_type, address_id, date, quantity)
-                delivery_address = get_object_or_404(DeliveryAddress, pk=address_id)
+
                 if quantity == 0:
                     continue
-                # Save the meal assignment
-                deliver = MealDelivery.objects.create(
+
+                delivery_address = get_object_or_404(DeliveryAddress, pk=address_id)
+
+                # Check for existing MealDelivery entry
+                existing_delivery = MealDelivery.objects.filter(
                     bulk_order=order,
                     meal_type=meal_type,
-                    quantity=quantity,
                     date=date,
                     delivery_address=delivery_address,
                     branch=request.branch,
                     company=request.company
-                )
-                print("saved ",deliver)
-                message = f"{quantity} {meal_type} assigned to {delivery_address} by {request.branch}"
+                ).first()
+
+                if existing_delivery:
+                    # Update the quantity if it exists
+                    existing_delivery.quantity = quantity
+                    existing_delivery.save()
+                    message = f"{quantity} {meal_type} updated for {delivery_address} by {request.branch}"
+                    print("Updated", existing_delivery)
+                else:
+                    # Save a new meal assignment
+                    deliver = MealDelivery.objects.create(
+                        bulk_order=order,
+                        meal_type=meal_type,
+                        quantity=quantity,
+                        date=date,
+                        delivery_address=delivery_address,
+                        branch=request.branch,
+                        company=request.company
+                    )
+                    message = f"{quantity} {meal_type} assigned to {delivery_address} by {request.branch}"
+                    print("Saved", deliver)
+
+                # Create a notification for the action
                 Notification.objects.create(
-                    delivery=deliver,
+                    delivery=deliver if not existing_delivery else existing_delivery,
                     message=message,
-                    
                     branch=request.branch,
                     company=request.company
                 )
                 print(message)
+
             return JsonResponse({'success': True, 'message': 'Meal assigned successfully.'})
         except json.JSONDecodeError as e:
             return JsonResponse({'success': False, 'error': f'JSON decode error: {str(e)}'}, status=400)
