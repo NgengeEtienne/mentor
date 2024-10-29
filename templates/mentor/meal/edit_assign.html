@@ -141,14 +141,15 @@
 
 <div class="flex flex-col">
   <!-- Table Header -->
-  <div class="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
-    <div class="p-2.5 xl:p-5">
+  <div class="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-3">
+    
+  <div class="p-2.5 xl:p-5">
       <h5 class="text-sm font-medium uppercase xsm:text-base">Meal Type</h5>
     </div>
     <div class="p-2.5 text-center xl:p-5">
       <h5 class="text-sm font-medium uppercase xsm:text-base">Items</h5>
     </div>
-    <div class="p-2.5 text-center xl:p-5">
+    <div class="p-2.5 text-left text-center xl:p-5">
       <h5 class="text-sm font-medium uppercase xsm:text-base">Quantity</h5>
     </div>
   </div>
@@ -156,8 +157,8 @@
   <!-- Table Body -->
   <div class="bg-white dark:bg-boxdark rounded-b-[10px]" id="mealTable">
     {% for meal_type, dishes in day_meals.items %}
-    <div class="grid grid-cols-3 border-b border-stroke dark:border-strokedark sm:grid-cols-5">
-      
+    <div class="grid grid-cols-3 border-b border-stroke dark:border-strokedark sm:grid-cols-3">
+      <tr style="width:400px">
       <!-- Meal Type Column -->
       <div class="flex items-center gap-3 p-2.5 xl:p-5">
         <p class="font-medium text-black dark:text-white text-center">
@@ -165,20 +166,24 @@
         </p>
         <input type="hidden" id="meal-plan" value="{{ meal_type }}">
       </div>
-
+    </tr>
       <!-- Items Column -->
-      <div class="flex items-center justify-center p-2.5 xl:p-5">
-        <p class="font-medium text-black dark:text-white">
-          {% for dish in dishes %}
-            <span>
+<!-- Items Column -->
+<div class="flex items-center justify-center p-2.5 xl:p-5 min-w-[800px]"> <!-- Set width to 50% -->
+  <p class="font-medium text-black dark:text-white">
+      {% for dish in dishes %}
+          <span>
               {% for selected_dish in dish.selected_dishes.all %}
-                {{ selected_dish.dish_name }}{% if not forloop.last %}, {% endif %}
+                  {{ selected_dish.dish_name }}{% if not forloop.last %}, {% endif %}
               {% endfor %}
-            </span>
-            {% if not forloop.last %} | {% endif %}
-          {% endfor %}
-        </p>
-      </div>
+          </span>
+          {% if not forloop.last %} | {% endif %}
+      {% endfor %}
+  </p>
+</div>
+
+    
+    
 
       <!-- Assign Column -->
       <div class="flex items-center justify-center  ml-4 p-2.5 xl:p-5 text-center" >
@@ -186,7 +191,7 @@
           type="number" 
           id="quantity" 
           min="0" 
-          class="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          class="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-success active:border-success disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-success"
           placeholder="0"
           required 
           value="{% if meal_delivery_data|get_item:address and meal_delivery_data|get_item:address|get_item:meal_type %}{{ meal_delivery_data|get_item:address|get_item:meal_type }}{% else %}0{% endif %}">

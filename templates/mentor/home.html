@@ -252,11 +252,11 @@
                                   <td class="border border-gray-300 px-4 py-2">
                                       {% if order.has_values %}
                                           {% for address, totals in order.delivery_data.items %}
-                                              <div>
-                                                  {{ address }} - {{ totals.total_sum }}
-                                                  ({{ totals.total_breakfast }}, {{ totals.total_lunch }}, 
-                                                  {{ totals.total_snack }}, {{ totals.total_dinner }})
-                                              </div>
+                                          <div>
+                                            {{ address }} - {{ totals.total_sum }}
+                                            ({{ totals.total_breakfast }}, {{ totals.total_lunch }}, 
+                                            {{ totals.total_snack }}, {{ totals.total_dinner }},{{totals.total_dinner2}})
+                                        </div>
                                           {% endfor %}
                                       {% else %}
                                           Not Assigned
