@@ -704,17 +704,17 @@ def meal_ordered(request):
 
             # If a default address is found, populate order data
             # Calculate total sums with 0 as default for missing values
-            total_sum = BulkOrders.objects.aggregate(
-                total_sum=Sum('breakfast')  + 
-                        Sum('lunch')  + 
-                        Sum('snack')  + 
-                        Sum('dinner')  + 
-                        Sum('dinner2') 
+            bulk=BulkOrders.objects.get(branch=request.branch)
+            total_sum = (
+                (int(bulk.breakfast) if bulk.breakfast is not None else 0) +
+                (int(bulk.lunch) if bulk.lunch is not None else 0) +
+                (int(bulk.snack) if bulk.snack is not None else 0) +
+                (int(bulk.dinner) if bulk.dinner is not None else 0) +
+                (int(bulk.dinner2) if bulk.dinner2 is not None else 0)
             )
-
             if default_address:
                 order['delivery_data'][default_address.name] = {
-                    'total_sum': total_sum['total_sum'] if total_sum['total_sum'] is not None else 0,
+                    'total_sum': total_sum if total_sum is not None else 0,
                     'total_breakfast': BulkOrders.objects.aggregate(total=Sum('breakfast'))['total'] or 0,
                     'total_lunch': BulkOrders.objects.aggregate(total=Sum('lunch'))['total'] or 0,
                     'total_snack': BulkOrders.objects.aggregate(total=Sum('snack'))['total'] or 0,
