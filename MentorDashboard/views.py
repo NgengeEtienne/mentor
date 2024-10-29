@@ -670,7 +670,7 @@ def meal_ordered(request):
             ),
         )
         .order_by('date', 'delivery_address__name')
-    )
+        )
 
     # Convert query results into a dictionary by date
     order_dict = {}
@@ -689,6 +689,7 @@ def meal_ordered(request):
                 'total_dinner': 0,
                 'total_dinner2': 0,
             }
+            print(f"date not in order dict")
 
         # Add delivery data for each address
         address = order['delivery_address__name']
@@ -708,7 +709,7 @@ def meal_ordered(request):
             'total_dinner': order['total_dinner'],
             'total_dinner2': order['total_dinner2'],
         }
-        # print("order_dict", order_dict)
+        print(f"order_dict values", order_dict.values)
         # Accumulate totals for the day
         order_dict[date]['total_breakfast'] = order['total_breakfast']
         order_dict[date]['total_lunch'] = order['total_lunch']
