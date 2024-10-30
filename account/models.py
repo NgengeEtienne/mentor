@@ -45,7 +45,7 @@ class Branch(models.Model):
 class CustomUser(AbstractUser):
     username = models.CharField(max_length=250, null=True)
     email = models.EmailField(max_length=100, unique=True, null=True)
-    date_joined = models.DateTimeField(auto_now_add=True)
+    date_joined = models.DateTimeField(default=timezone.now)  # Make it editable
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, blank=True)
     role = models.CharField(max_length=20, choices=[

@@ -32,7 +32,7 @@ class DeliveryAddressAdmin(admin.ModelAdmin):
 @admin.register(MealDelivery)
 class MealDeliveryAdmin(admin.ModelAdmin):
     list_display = ('bulk_order', 'delivery_address', 'meal_type', 'quantity', 'date', 'status', 'created_at')
-    inlines = [NotificationInline]  # Include Notification inline here
+    # inlines = [NotificationInline]  # Include Notification inline here
 
 # Admin for Notification
 @admin.register(Notification)
