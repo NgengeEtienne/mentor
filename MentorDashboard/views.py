@@ -404,7 +404,7 @@ def assign_meal(request, date):
 
     # Parse the date to get the day of the week
     try:
-        date_obj = datetime.strptime(date, '%Y-%m-%d')
+        date_obj = make_aware(datetime.strptime(date, '%Y-%m-%d'))
         day_name = date_obj.strftime('%A').lower()  # e.g., 'monday'
     except ValueError:
         return render(request, 'your_template.html', {'error': 'Invalid date format'})
@@ -511,7 +511,7 @@ def edit_assign_meal(request, date):
     
     # Parse the date to get the day of the week
     try:
-        date_obj = datetime.strptime(date, '%Y-%m-%d')
+        date_obj = make_aware(datetime.strptime(date, '%Y-%m-%d'))
         day_name = date_obj.strftime('%A').lower()  # e.g., 'monday'
     except ValueError:
         return render(request, 'your_template.html', {'error': 'Invalid date format'})
@@ -599,10 +599,10 @@ def edit_assign_meal_without_date(request):
     order = get_object_or_404(BulkOrders, branch=request.branch)
     addresses = DeliveryAddress.objects.all()
     notifications = get_notifications(request)
-    date = datetime.now().date().isoformat()
+    date = make_aware(datetime.now().date().isoformat())
     # Parse the date to get the day of the week
     try:
-        date_obj = datetime.strptime(date, '%Y-%m-%d')
+        date_obj = make_aware(datetime.strptime(date, '%Y-%m-%d'))
         day_name = date_obj.strftime('%A').lower()  # e.g., 'monday'
     except ValueError:
         return render(request, 'your_template.html', {'error': 'Invalid date format'})
