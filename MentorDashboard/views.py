@@ -246,8 +246,13 @@ def delivery_address_create(request):
         latitude = request.POST['latitude']
         longitude = request.POST['longitude']
         default_address = request.POST.get('default_address')
+    
         branch = request.branch
         company = request.company
+        if default_address == "on":
+            default_address = True
+        else:
+            default_address = False
         DeliveryAddress.objects.create(name=name, address_line_1=address_line_1, address_line_2=address_line_2, default_address=default_address, city=city, state=state, pin_code=pin_code, latitude=latitude, longitude=longitude, branch_id=branch.id, company=company)
         return redirect('delivery_address_list')
 
@@ -257,22 +262,32 @@ def delivery_address_create(request):
 def delivery_address_edit(request, id):
     address = get_object_or_404(DeliveryAddress, id=id)
     notifications = get_notifications(request)  # Fetch notifications
-    form=DeliveryAddressForm(request.POST)
+    
     if request.method == 'POST':
-        if 'default_address' not in request.POST:
-            form = DeliveryAddressForm(request.POST, instance=address)
-            if form.is_valid():
+        form = DeliveryAddressForm(request.POST, instance=address)
+        
+        if form.is_valid():
+            # Check if the default_address is set and handle accordingly
+            default_address = form.cleaned_data.get('default_address')
+            print(default_address)
+            if default_address and DeliveryAddress.objects.filter(branch=request.branch, default_address=True).exclude(id=id).exists():
+                messages.error(request, 'A default address already exists in another address.')
+            else:
+                # Save the form if the default_address condition is met
                 form.save()
-            return redirect('delivery_address_list')
+                return redirect('delivery_address_list')
         else:
-            print("de fault address is ", request.POST.get('default_address'))
+            # If the form is not valid, handle errors accordingly
+            messages.error(request, 'Please correct the errors below.')
 
-            if DeliveryAddress.objects.filter(default_address=True).exists():
-                print("default address already exist")
-                messages.error(request, 'default address already exist in another Address.')
     else:
         form = DeliveryAddressForm(instance=address)
-    return render(request, 'mentor/delivery/form.html', {'form': form, 'object': address, 'notifications': notifications})
+        
+    return render(request, 'mentor/delivery/form.html', {
+        'form': form,
+        'object': address,
+        'notifications': notifications
+    })
 
 @login_required
 def delivery_address_delete(request, id):
@@ -393,7 +408,7 @@ def orders_list(request):
 @login_required
 def assign_meal(request, date):
     # Get the first order
-    order = BulkOrders.objects.first()
+    order = BulkOrders.objects.filter(branch=request.branch,company=request.company).first()
     if order:
         # Calculate total for meals
         total_sum = (order.breakfast or 0) + (order.lunch or 0) + (order.snack or 0) + (order.dinner or 0) + (order.dinner2 or 0)
