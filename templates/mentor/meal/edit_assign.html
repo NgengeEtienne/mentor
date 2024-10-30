@@ -157,7 +157,7 @@
   <!-- Table Body -->
   <div class="bg-white dark:bg-boxdark rounded-b-[10px]" id="mealTable">
     {% for meal_type, dishes in day_meals.items %}
-    <div class="grid grid-cols-3 border-b border-stroke dark:border-strokedark sm:grid-cols-3">
+    <div class="grid grid-cols-3 border-b border-stroke dark:border-strokedark sm:grid-cols-3" id="tr">
       <tr style="width:400px">
       <!-- Meal Type Column -->
       <div class="flex items-center gap-3 p-2.5 xl:p-5">
