@@ -385,6 +385,7 @@ def orders_list(request):
         'notifications': notifications,
         'paginator': paginator,
         'page_obj': page_obj,
+        'all_deliveries': all_deliveries
     })
 
 
