@@ -326,7 +326,7 @@ def meal_delivery_edit(request, id):
 @login_required
 def assign_address(request, id):
     delivery = get_object_or_404(MealDelivery, id=id)
-    addresses = DeliveryAddress.objects.all(branch=request.branch)
+    addresses = DeliveryAddress.objects.filter(branch=request.branch)
     notifications = get_notifications(request)  # Fetch notifications
     
     if request.method == 'POST':
@@ -400,7 +400,7 @@ def assign_meal(request, date):
     else:
         total_sum = 0
 
-    addresses = DeliveryAddress.objects.all()
+    addresses = DeliveryAddress.objects.filter(branch=request.branch,company=request.company)
     notifications = get_notifications(request)  # Fetch notifications
 
     # Parse the date to get the day of the week
@@ -507,7 +507,7 @@ def assign_meal(request, date):
 def edit_assign_meal(request, date):
     # Fetch the bulk order for the current branch
     order = get_object_or_404(BulkOrders, branch=request.branch)
-    addresses = DeliveryAddress.objects.all()
+    addresses = DeliveryAddress.objects.filter(branch=request.branch, company=request.company)
     notifications = get_notifications(request)
     
     # Parse the date to get the day of the week
@@ -598,7 +598,7 @@ def edit_assign_meal(request, date):
 def edit_assign_meal_without_date(request):
     # Fetch the bulk order for the current branch
     order = get_object_or_404(BulkOrders, branch=request.branch)
-    addresses = DeliveryAddress.objects.all()
+    addresses = DeliveryAddress.objects.filter(branch=request.branch, company=request.company)
     notifications = get_notifications(request)
     date = make_aware(datetime.now().date().isoformat())
     # Parse the date to get the day of the week
