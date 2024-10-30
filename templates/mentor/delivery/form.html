@@ -27,59 +27,93 @@
 </div>
 
 
-
-<div class="rounded-sm border border-stroke bg-white px-5 py-10 shadow-default dark:border-strokedark dark:bg-boxdark sm:py-20">
+<div class="w-3/4 rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+    <div class="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
+      <h3 class="font-medium text-black dark:text-white">
+        Delivery Address Form
+      </h3>
+    </div>
     <form method="post" 
           action="{% if object %} {% url 'delivery_address_edit' object.id %} {% else %} {% url 'delivery_address_create' %} {% endif %}">
-        {% csrf_token %}
-        
-        <div class="mx-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Name</label>
-                {{ form.name }}
-            </div>
-            <div>
-                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Address Line 1</label>
-                {{ form.address_line_1 }}
-            </div>
-            <div>
-                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Address Line 2</label>
-                {{ form.address_line_2 }}
-            </div>
-            <div>
-                <label class="mb-1 block text-sm font-medium text-black dark:text-white">City</label>
-                {{ form.city }}
-            </div>
-            <div>
-                <label class="mb-1 block text-sm font-medium text-black dark:text-white">State</label>
-                {{ form.state }}
-            </div>
-            <div>
-                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Pin Code</label>
-                {{ form.pin_code }}
-            </div>
-            <div>
-                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Latitude</label>
-                {{ form.latitude }}
-            </div>
-            <div>
-                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Longitude</label>
-                {{ form.longitude }}
-            </div>
-            <div>
-
-                <label class="mb-1 block text-sm font-medium text-black dark:text-white">Default Address: </label>
-                <div class="flex items-center ps-4 border border-gray-200 rounded dark:border-gray-700">
-                {{form.default_address}}    
-                <label for="bordered-checkbox-1" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Default radio</label>
-                </div>
-                   
+      {% csrf_token %}
+      <div class="p-6.5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="mb-4.5">
+          <label class="mb-3 block text-sm font-medium text-black dark:text-white">
+            Name
+          </label>
+          {{ form.name }}
         </div>
-        <button type="submit" 
-                class="inline-flex items-center justify-center mt-4 gap-2.5 bg-black px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
-            {% if object %} Update Address {% else %} Add Address {% endif %}
+  
+        <div class="mb-4.5">
+          <label class="mb-3 block text-sm font-medium text-black dark:text-white">
+            Address Line 1
+          </label>
+          {{ form.address_line_1 }}
+        </div>
+  
+        <div class="mb-4.5">
+          <label class="mb-3 block text-sm font-medium text-black dark:text-white">
+            Address Line 2
+          </label>
+          {{ form.address_line_2 }}
+        </div>
+  
+        <div class="mb-4.5">
+          <label class="mb-3 block text-sm font-medium text-black dark:text-white">
+            City
+          </label>
+          {{ form.city }}
+        </div>
+  
+        <div class="mb-4.5">
+          <label class="mb-3 block text-sm font-medium text-black dark:text-white">
+            State
+          </label>
+          {{ form.state }}
+        </div>
+  
+        <div class="mb-4.5">
+          <label class="mb-3 block text-sm font-medium text-black dark:text-white">
+            Pin Code
+          </label>
+          {{ form.pin_code }}
+        </div>
+  
+        <div class="mb-4.5">
+          <label class="mb-3 block text-sm font-medium text-black dark:text-white">
+            Latitude
+          </label>
+          {{ form.latitude }}
+        </div>
+  
+        <div class="mb-4.5">
+          <label class="mb-3 block text-sm font-medium text-black dark:text-white">
+            Longitude
+          </label>
+          {{ form.longitude }}
+        </div>
+  
+        <div class="mb-4.5">
+          <label class="mb-3 block text-sm font-medium text-black dark:text-white">
+            Default Address
+          </label>
+          <div class="flex items-center px-4 border border-stroke rounded dark:border-strokedark">
+            {{ form.default_address }}
+            <label class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              Default Address
+            </label>
+          </div>
+        </div>
+      </div>
+  
+      <div class="px-6.5 pb-6 ">
+        <button type="submit"
+                class="w-full flex justify-center rounded bg-primary p-3 font-medium text-white hover:bg-opacity-90">
+          {% if object %} Update Address {% else %} Add Address {% endif %}
         </button>
+      </div>
     </form>
-</div>
+  </div>
+  
 
 {% endblock content %}
