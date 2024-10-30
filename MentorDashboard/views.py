@@ -243,15 +243,21 @@ def delivery_address_create(request):
 def delivery_address_edit(request, id):
     address = get_object_or_404(DeliveryAddress, id=id)
     notifications = get_notifications(request)  # Fetch notifications
-    
+    form=DeliveryAddressForm(request.POST)
     if request.method == 'POST':
-        form = DeliveryAddressForm(request.POST, instance=address)
-        if form.is_valid():
-            form.save()
+        if 'default_address' not in request.POST:
+            form = DeliveryAddressForm(request.POST, instance=address)
+            if form.is_valid():
+                form.save()
             return redirect('delivery_address_list')
+        else:
+            print("de fault address is ", request.POST.get('default_address'))
+
+            if DeliveryAddress.objects.filter(default_address=True).exists():
+                print("default address already exist")
+                messages.error(request, 'default address already exist in another Address.')
     else:
         form = DeliveryAddressForm(instance=address)
-
     return render(request, 'mentor/delivery/form.html', {'form': form, 'object': address, 'notifications': notifications})
 
 @login_required
@@ -326,7 +332,7 @@ def orders_list(request):
     today = date.today()
     
     # Fetch today's deliveries
-    todays_deliveries = MealDelivery.objects.filter(branch=request.branch)[:5]
+    todays_deliveries = MealDelivery.objects.filter(branch=request.branch).filter(date=today)
     print(todays_deliveries)
     # Fetch past deliveries
     past_deliveries = MealDelivery.objects.filter(branch=request.branch, date__lt=today)
