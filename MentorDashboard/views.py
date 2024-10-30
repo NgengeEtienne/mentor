@@ -17,6 +17,7 @@ from django.db.models import Sum
 from django.utils.timezone import make_aware, now
 from django.http import JsonResponse
 from datetime import datetime
+from django.utils import timezone  # Use Django's timezone-aware utilities
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -342,24 +343,32 @@ from datetime import date
 @login_required
 def orders_list(request):
     # Get today's date
-    today = date.today()
+     # Get the current date and time in the timezone defined in settings.py
+    tz = timezone.get_current_timezone()  # Uses the TIME_ZONE from settings
+    today = timezone.localdate()  # Get the server's local date (timezone aware)
     old_date = today - timedelta(days=30)
+
     print("Today's date:", today)
     print("Old date:", old_date)
-    # Fetch today's deliveries
+
+    # Fetch today's deliveries for the branch
     todays_deliveries = MealDelivery.objects.filter(branch=request.branch, date=today)
-    print(todays_deliveries)
-    t=MealDelivery.objects.filter(branch=request.branch)
-    print(t)
+    print("Today's deliveries:", todays_deliveries)
+
+    # Fetch all deliveries for the branch
+    all_deliveries = MealDelivery.objects.filter(branch=request.branch)
+    print("All deliveries:", all_deliveries)
+
     # Fetch past deliveries (within the last 30 days)
     past_deliveries = MealDelivery.objects.filter(
         branch=request.branch, 
         date__range=(old_date, today)
     )
-    print(past_deliveries)
+    print("Past deliveries:", past_deliveries)
+
     # Combine today's and past deliveries
     deliveries = list(chain(todays_deliveries, past_deliveries))
-    # print(deliveries)
+
     # Paginate the combined deliveries
     paginator = Paginator(deliveries, 10)  # Show 10 deliveries per page
     page_number = request.GET.get('page', 1)
@@ -375,10 +384,8 @@ def orders_list(request):
         'past_deliveries': past_deliveries,
         'notifications': notifications,
         'paginator': paginator,
-        'page_obj': page_obj
+        'page_obj': page_obj,
     })
-
-
 
 
 
