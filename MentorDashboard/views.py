@@ -561,6 +561,96 @@ def edit_assign_meal(request, date):
     })
 
 @login_required
+def edit_assign_meal_without_date(request):
+    # Fetch the bulk order for the current branch
+    order = get_object_or_404(BulkOrders, branch=request.branch)
+    addresses = DeliveryAddress.objects.all()
+    notifications = get_notifications(request)
+    date = datetime.now().date().isoformat()
+    # Parse the date to get the day of the week
+    try:
+        date_obj = datetime.strptime(date, '%Y-%m-%d')
+        day_name = date_obj.strftime('%A').lower()  # e.g., 'monday'
+    except ValueError:
+        return render(request, 'your_template.html', {'error': 'Invalid date format'})
+
+    # Get all MealPlans related to the order
+    meal_plans = order.MealPlan.all()
+    
+    # Prepare a dictionary to store dishes for the selected day
+    dishes_for_day = {}
+    
+    # Meal types for iteration (e.g., breakfast, lunch, etc.)
+    meals = ['breakfast', 'lunch', 'snack', 'dinner', 'dinner2']
+    
+    # Loop through each meal type and get the related dishes for the specific day
+    for meal in meals:
+        if meal == 'dinner2':
+            field_name = f"{day_name}_dinner_meal_option"
+            meal_field = f"{day_name}_dinner_meal_option"  # Optional meal field for dinner2
+        else:
+            field_name = f"{day_name}_{meal}_meal"
+            meal_field = f"{day_name}_{meal}_meal"  # Optional meal field for other meals
+
+        # Get dishes for the current meal type and day
+        dishes = []
+        for meal_plan in meal_plans:
+            selected_meals = getattr(meal_plan, meal_field).all()
+            for meal in selected_meals:
+                dishes += list(meal.selected_dishes.all())
+
+        dishes_for_day[meal] = list(set(dishes))  # Remove duplicates
+
+    # Prepare data for rendering
+    day_meals = {}
+    
+    for meal_plan in meal_plans:
+        for meal_type in meals:
+            if meal_type == 'dinner2':
+                dish_attr = f"{day_name}_dinner_meal_option"
+            else:
+                dish_attr = f"{day_name}_{meal_type}_meal"
+
+            dishes = getattr(meal_plan, dish_attr).all()
+            
+            if meal_type not in day_meals:
+                day_meals[meal_type] = dishes
+            else:
+                day_meals[meal_type] |= dishes
+
+    # Prepare meal delivery data
+    meal_delivery_data = {}
+    for address in addresses:
+        meal_delivery_data[address] = {}
+        for meal_type in meals:
+            # Fetch the quantity for this address, meal type, and date
+            meal_delivery = MealDelivery.objects.filter(
+                delivery_address=address,
+                date=date,
+                meal_type=meal_type,
+                branch=request.branch,
+                company=request.company,
+                bulk_order=order
+            ).first()
+            meal_delivery_data[address][meal_type] = meal_delivery.quantity if meal_delivery else 0
+    print(meal_delivery_data)
+
+    return render(request, 'mentor/meal/edit_assign1.html', {
+        'order': order,
+        'addresses': addresses,
+        'notifications': notifications,
+        'selected_date': date,
+        'dishes_for_day': dishes_for_day,
+        'day_name': day_name.capitalize(),
+        'day_meals': day_meals, 
+        'meals': meals,
+        'date': date,
+        'dinner': sum((order.dinner or 0, order.dinner2 or 0)),
+        'selected_dishes': dishes_for_day,
+        'total_sum': sum((order.breakfast or 0, order.lunch or 0, order.snack or 0, order.dinner or 0, order.dinner2 or 0)),
+        'meal_delivery_data': meal_delivery_data  # Pass the meal delivery data to the template
+    })
+@login_required
 def meal_plan_list(request):
     notifications = get_notifications(request)  # Fetch notifications
     orders = BulkOrders.objects.filter(branch=request.branch) # Optimize with prefetch

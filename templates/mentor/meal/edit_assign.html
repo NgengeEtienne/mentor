@@ -170,7 +170,7 @@
       <!-- Items Column -->
 <!-- Items Column -->
 <div class="flex items-center justify-center p-2.5 xl:p-5 min-w-[800px]"> <!-- Set width to 50% -->
-  <p class="font-medium text-black dark:text-white">
+  <p class="font-small text-black dark:text-white">
       {% for dish in dishes %}
           <span>
               {% for selected_dish in dish.selected_dishes.all %}
@@ -209,11 +209,10 @@
 
 <div class="rounded-sm border border-stroke bg-white px-5 mt-4 p-1 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
 
-  <div class="flex items-center justify-center mt-6">
+  <div class="flex items-center justify-center mt-2 mb-2">
       <button
           id="submitBtn"
-          class="bg-meta-3 px-10 py-4 text-white hover:bg-opacity-90 ml-4"
-      >
+          class="bg-meta-3 px-10 py-4 text-white hover:bg-opacity-90 ml-4">
           Submit
       </button>
   </div>
