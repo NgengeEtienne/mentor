@@ -801,7 +801,7 @@ def meal_ordered(request):
         print(f"Processing Day: {day_name} ({day_str})")
 
         order = order_dict.get(day_str, {
-            'date': day,
+            'date': day_str,
             'bulk_order__bulk_order_name': None,
             'delivery_data': {},
             'total_breakfast': 0,
