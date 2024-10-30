@@ -326,7 +326,7 @@ def meal_delivery_edit(request, id):
 @login_required
 def assign_address(request, id):
     delivery = get_object_or_404(MealDelivery, id=id)
-    addresses = DeliveryAddress.objects.all()
+    addresses = DeliveryAddress.objects.all(branch=request.branch)
     notifications = get_notifications(request)  # Fetch notifications
     
     if request.method == 'POST':
