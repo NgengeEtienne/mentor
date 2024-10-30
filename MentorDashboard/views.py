@@ -344,10 +344,13 @@ def orders_list(request):
     # Get today's date
     today = date.today()
     old_date = today - timedelta(days=30)
+    print("Today's date:", today)
+    print("Old date:", old_date)
     # Fetch today's deliveries
     todays_deliveries = MealDelivery.objects.filter(branch=request.branch, date=today)
     print(todays_deliveries)
-
+    t=MealDelivery.objects.all()
+    print(t)
     # Fetch past deliveries (within the last 30 days)
     past_deliveries = MealDelivery.objects.filter(
         branch=request.branch, 
