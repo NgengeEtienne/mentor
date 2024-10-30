@@ -63,7 +63,8 @@ def get_notifications(request):
 
 @login_required
 def dashboard_overview(request):
-    
+    branch=request.branch
+    company=request.company
     today = now().date()
     current_time = now().time()  # Current time for comparison
     six_pm = time(18, 0)  # 6:00 PM time object
@@ -157,6 +158,7 @@ def dashboard_overview(request):
             'total_dinner2': 0,
         })
 
+        
         # Check if there are no orders for that day
         if not order['delivery_data']:
             # Try to get the default address
@@ -166,7 +168,7 @@ def dashboard_overview(request):
 
             # If a default address is found, populate order data
             # Calculate total sums with 0 as default for missing values
-            bulk=BulkOrders.objects.get(branch=request.branch)
+            bulk=BulkOrders.objects.get(branch=request.branch,company=request.company)
             total_sum = (
                 (int(bulk.breakfast) if bulk.breakfast is not None else 0) +
                 (int(bulk.lunch) if bulk.lunch is not None else 0) +
@@ -175,16 +177,27 @@ def dashboard_overview(request):
                 (int(bulk.dinner2) if bulk.dinner2 is not None else 0)
             )
             if default_address:
+
                 order['delivery_data'][default_address.name] = {
                     'total_sum': total_sum if total_sum is not None else 0,
-                    'total_breakfast': BulkOrders.objects.aggregate(total=Sum('breakfast'))['total'] or 0,
-                    'total_lunch': BulkOrders.objects.aggregate(total=Sum('lunch'))['total'] or 0,
-                    'total_snack': BulkOrders.objects.aggregate(total=Sum('snack'))['total'] or 0,
-                    'total_dinner': BulkOrders.objects.aggregate(total=Sum('dinner'))['total'] or 0,
-                    'total_dinner2': BulkOrders.objects.aggregate(total=Sum('dinner2'))['total'] or 0,
+                    'total_breakfast': BulkOrders.objects.filter(branch=branch, company=company)
+                                                        .aggregate(total=Sum('breakfast'))['total'] or 0,
+                    'total_lunch': BulkOrders.objects.filter(branch=branch, company=company)
+                                                    .aggregate(total=Sum('lunch'))['total'] or 0,
+                    'total_snack': BulkOrders.objects.filter(branch=branch, company=company)
+                                                    .aggregate(total=Sum('snack'))['total'] or 0,
+                    'total_dinner': BulkOrders.objects.filter(branch=branch, company=company)
+                                                    .aggregate(total=Sum('dinner'))['total'] or 0,
+                    'total_dinner2': BulkOrders.objects.filter(branch=branch, company=company)
+                                                    .aggregate(total=Sum('dinner2'))['total'] or 0,
                 }
-            order['bulk_order__bulk_order_name'] = BulkOrders.objects.first().bulk_order_name if BulkOrders.objects.exists() else None
 
+                # Optional: Get the first BulkOrder's name for the given branch and company.
+                order['bulk_order__bulk_order_name'] = (
+                    BulkOrders.objects.filter(branch=branch, company=company)
+                                    .first().bulk_order_name if BulkOrders.objects.filter(branch=branch, company=company).exists() 
+                    else None
+                )
         order['day_name'] = day_name
         order['is_future'] = (
             "Yes" if day > today or (day != today and current_time < six_pm) else "No"
@@ -330,12 +343,16 @@ from datetime import date
 def orders_list(request):
     # Get today's date
     today = date.today()
-    
+    old_date = today - timedelta(days=30)
     # Fetch today's deliveries
-    todays_deliveries = MealDelivery.objects.filter(branch=request.branch).filter(date=today)
+    todays_deliveries = MealDelivery.objects.filter(branch=request.branch, date=today)
     print(todays_deliveries)
-    # Fetch past deliveries
-    past_deliveries = MealDelivery.objects.filter(branch=request.branch, date__lt=today)
+
+    # Fetch past deliveries (within the last 30 days)
+    past_deliveries = MealDelivery.objects.filter(
+        branch=request.branch, 
+        date__range=(old_date, today)
+    )
     print(past_deliveries)
     # Combine today's and past deliveries
     deliveries = list(chain(todays_deliveries, past_deliveries))

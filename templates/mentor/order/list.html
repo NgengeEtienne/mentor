@@ -41,7 +41,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for delivery in deliveries %}
+                {% for delivery in todays_deliveries %}
                 <tr class="border-b">
                     <td class="border border-gray-300 py-2 px-4">{{ delivery.meal_type|upper }}</td>
                     <td class="border border-gray-300 py-2 px-4">{{ delivery.bulk_order }}</td>
@@ -85,7 +85,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for past_delivery in deliveries %}
+                {% for past_delivery in past_deliveries %}
                 <tr class="border-b">
                     <td class="border border-gray-300 py-2 px-4">{{ past_delivery.meal_type|upper }}</td>
                     <td class="border border-gray-300 py-2 px-4">{{ past_delivery.bulk_order }}</td>
