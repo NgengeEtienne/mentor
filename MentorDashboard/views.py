@@ -705,7 +705,8 @@ def meal_plan_detail(request, id):
 @login_required
 def meal_ordered(request):
     notifications = get_notifications(request)  # Fetch notifications
-
+    branch = request.branch  # Pass the branch instance here
+    company = request.company  # Pass the company instance here
     today = now().date()  # Current date (already timezone-aware)
     current_time = now().time()  # Current time (for 6 PM comparison)
     six_pm = time(18, 0)  # 6:00 PM
@@ -791,7 +792,7 @@ def meal_ordered(request):
 
             # If a default address is found, populate order data
             # Calculate total sums with 0 as default for missing values
-            bulk=BulkOrders.objects.get(branch=request.branch)
+            bulk=BulkOrders.objects.get(branch=request.branch,company=request.company)
             total_sum = (
                 (int(bulk.breakfast) if bulk.breakfast is not None else 0) +
                 (int(bulk.lunch) if bulk.lunch is not None else 0) +
@@ -800,16 +801,27 @@ def meal_ordered(request):
                 (int(bulk.dinner2) if bulk.dinner2 is not None else 0)
             )
             if default_address:
+
                 order['delivery_data'][default_address.name] = {
                     'total_sum': total_sum if total_sum is not None else 0,
-                    'total_breakfast': BulkOrders.objects.aggregate(total=Sum('breakfast'))['total'] or 0,
-                    'total_lunch': BulkOrders.objects.aggregate(total=Sum('lunch'))['total'] or 0,
-                    'total_snack': BulkOrders.objects.aggregate(total=Sum('snack'))['total'] or 0,
-                    'total_dinner': BulkOrders.objects.aggregate(total=Sum('dinner'))['total'] or 0,
-                    'total_dinner2': BulkOrders.objects.aggregate(total=Sum('dinner2'))['total'] or 0,
+                    'total_breakfast': BulkOrders.objects.filter(branch=branch, company=company)
+                                                        .aggregate(total=Sum('breakfast'))['total'] or 0,
+                    'total_lunch': BulkOrders.objects.filter(branch=branch, company=company)
+                                                    .aggregate(total=Sum('lunch'))['total'] or 0,
+                    'total_snack': BulkOrders.objects.filter(branch=branch, company=company)
+                                                    .aggregate(total=Sum('snack'))['total'] or 0,
+                    'total_dinner': BulkOrders.objects.filter(branch=branch, company=company)
+                                                    .aggregate(total=Sum('dinner'))['total'] or 0,
+                    'total_dinner2': BulkOrders.objects.filter(branch=branch, company=company)
+                                                    .aggregate(total=Sum('dinner2'))['total'] or 0,
                 }
-            order['bulk_order__bulk_order_name'] = BulkOrders.objects.first().bulk_order_name if BulkOrders.objects.exists() else None
 
+                # Optional: Get the first BulkOrder's name for the given branch and company.
+                order['bulk_order__bulk_order_name'] = (
+                    BulkOrders.objects.filter(branch=branch, company=company)
+                                    .first().bulk_order_name if BulkOrders.objects.filter(branch=branch, company=company).exists() 
+                    else None
+                )
         order['day_name'] = day_name
         order['is_future'] = (
             "Yes" if day > today or (day != today and current_time < six_pm) else "No"
