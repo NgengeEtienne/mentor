@@ -112,17 +112,21 @@ def dashboard_overview(request):
         if address not in data_by_address:
             data_by_address[address] = {}
         # today1 = datetime.combine(datetime.today().date(), datetime.min.time())  # Adjust if you need a specific time
-        order_date_str = order['date']  # e.g., '2024-11-02'
+        # order_date_str = order['date']  # e.g., '2024-11-02'
 
         # order_date = datetime.strptime(order_date_str, "%Y-%m-%d").date()  # This gives you a date object
 
         # Format the date as "Nov. 1, 2024"
-        formatted_date = order_date_str.strftime("%b. %d, %Y").lstrip("0")  # Remove leading zero from the day
+        # formatted_date = order_date_str.strftime("%b. %d, %Y").lstrip("0")  # Remove leading zero from the day
+        if isinstance(order['date'], str):
+            order_date = datetime.strptime(order['date'], "%Y-%m-%d").date()
+        else:
+            order_date = order['date']  # Assuming it's already a datetime.date object
 
         # Prepare default values for the day
         data_by_address[address][date_str] = {
             'day_name': datetime.strptime(date_str, date_format).strftime("%A"),
-            'date': formatted_date,
+            'date': order['date'],
             'total_breakfast': order.get('total_breakfast', '-'),
             'total_lunch': order.get('total_lunch', '-'),
             'total_snack': order.get('total_snack', '-'),
