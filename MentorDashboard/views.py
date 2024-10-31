@@ -122,7 +122,7 @@ def dashboard_overview(request):
             'total_snack': order.get('total_snack', 0),
             'total_dinner': order.get('total_dinner', 0),
             'total_dinner2': order.get('total_dinner2', 0),
-            'is_future':"True" if order['date'] > today or (order['date'] != today and current_time < six_pm) else "False",
+            'is_future':"True" if datetime.strptime(date_str, date_format).date() > today or (order['date'] != today and current_time < six_pm) else "False",
             # 'pk':order['pk'],
             'address_pk':address_pk,
         }
