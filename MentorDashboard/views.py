@@ -112,11 +112,12 @@ def dashboard_overview(request):
         if address not in data_by_address:
             data_by_address[address] = {}
         # today1 = datetime.combine(datetime.today().date(), datetime.min.time())  # Adjust if you need a specific time
-
+        order_date = order['date']
+        formatted_date = order_date.strftime("%b. %d, %Y")
         # Prepare default values for the day
         data_by_address[address][date_str] = {
             'day_name': datetime.strptime(date_str, date_format).strftime("%A"),
-            'date': order['date'],
+            'date': formatted_date,
             'total_breakfast': order.get('total_breakfast', 0),
             'total_lunch': order.get('total_lunch', 0),
             'total_snack': order.get('total_snack', 0),
@@ -667,11 +668,12 @@ def meal_ordered(request):
         if address not in data_by_address:
             data_by_address[address] = {}
         # today1 = datetime.combine(datetime.today().date(), datetime.min.time())  # Adjust if you need a specific time
-
+        order_date = order['date']
+        formatted_date = order_date.strftime("%b. %d, %Y")
         # Prepare default values for the day
         data_by_address[address][date_str] = {
             'day_name': datetime.strptime(date_str, date_format).strftime("%A"),
-            'date': order['date'],
+            'date': formatted_date,
             'total_breakfast': order.get('total_breakfast', 0),
             'total_lunch': order.get('total_lunch', 0),
             'total_snack': order.get('total_snack', 0),
