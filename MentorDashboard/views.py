@@ -653,27 +653,31 @@ def meal_ordered(request):
         )
         .order_by('date', 'delivery_address__name')
     )
-   
+    date_format = "%Y-%m-%d"
+    
     # Organize orders by address and date
     data_by_address = {}
     for order in orders:
+        # if isinstance(order['date'], str):
+        #     order['date'] = datetime.strptime(order['date'], date_format)
         address = order['delivery_address__name']
         address_pk = order['delivery_address__pk']
         date_str = str(order['date'])
 
         if address not in data_by_address:
             data_by_address[address] = {}
+        # today1 = datetime.combine(datetime.today().date(), datetime.min.time())  # Adjust if you need a specific time
 
         # Prepare default values for the day
         data_by_address[address][date_str] = {
-            'day_name': order['date'].strftime("%A"),
+            'day_name': datetime.strptime(date_str, date_format).strftime("%A"),
             'date': order['date'],
             'total_breakfast': order.get('total_breakfast', 0),
             'total_lunch': order.get('total_lunch', 0),
             'total_snack': order.get('total_snack', 0),
             'total_dinner': order.get('total_dinner', 0),
             'total_dinner2': order.get('total_dinner2', 0),
-            'is_future':"True" if order['date'] > today or (order['date'] != today and current_time < six_pm) else "False",
+            'is_future':"True" if datetime.strptime(date_str, date_format).date() > today or (order['date'] != today and current_time < six_pm) else "False",
             # 'pk':order['pk'],
             'address_pk':address_pk,
         }
