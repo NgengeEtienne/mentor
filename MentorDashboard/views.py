@@ -126,7 +126,7 @@ def dashboard_overview(request):
         # Prepare default values for the day
         data_by_address[address][date_str] = {
             'day_name': datetime.strptime(date_str, date_format).strftime("%A"),
-            'date': order['date'],
+            'date': order_date,
             'total_breakfast': order.get('total_breakfast', '-'),
             'total_lunch': order.get('total_lunch', '-'),
             'total_snack': order.get('total_snack', '-'),
