@@ -64,14 +64,15 @@ def get_notifications(request):
 
 @login_required
 def dashboard_overview(request):
-    branch=request.branch
-    company=request.company
-    today = now().date()
-    current_time = now().time()  # Current time for comparison
-    six_pm = time(18, 0)  # 6:00 PM time object
-    print("current time", current_time, "six pm", six_pm)
-    start_of_week = today - timedelta(days=today.weekday())  # Get Monday of the current week
-    end_of_week = start_of_week + timedelta(days=6)  # Get Sunday of the current week
+    branch = request.branch  
+    company = request.company  
+    today = now().date()  
+    current_time = now().time()  
+    six_pm = time(18, 0)  
+
+    # Start and end of the current week
+    start_of_week = make_aware(datetime.combine(today, time.min))
+    end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max))
 
     active_subscriptions = BulkOrders.objects.filter(branch=request.branch)
     dispatched = MealDelivery.objects.filter(status='DISPATCHED', branch=request.branch,created_at__range=[start_of_week, end_of_week]).count() or 0
@@ -83,22 +84,11 @@ def dashboard_overview(request):
     delivered = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch,created_at__range=[start_of_week, end_of_week])
 
     notifications = get_notifications(request)  # Fetch notifications
-    today = now().date()  # Current date (already timezone-aware)
-    current_time = now().time()  # Current time (for 6 PM comparison)
-    six_pm = time(18, 0)  # 6:00 PM
 
-    print(f"Branch ID: {request.branch.id}\nToday: {today}\nCurrent Time: {current_time}")
-
-    # Start and end of the current week
-    start_of_week = make_aware(datetime.combine(today, time.min))
-    end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max))
-
-    print(f"Start of Week: {start_of_week}, End of Week: {end_of_week}")
-
-    # Query the orders within the week
+    # Query all orders within the week, grouped by address and date
     orders = (
-        MealDelivery.objects.filter(branch=request.branch, date__range=[start_of_week, end_of_week])
-        .values('date', 'bulk_order__bulk_order_name', 'delivery_address__name')
+        MealDelivery.objects.filter(branch=branch, date__range=[start_of_week, end_of_week])
+        .values('date', 'delivery_address__name','delivery_address__pk')
         .annotate(
             total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
             total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
@@ -108,105 +98,54 @@ def dashboard_overview(request):
         )
         .order_by('date', 'delivery_address__name')
     )
-
-    print(f"Orders Query:\n{list(orders)}\n")
-
-    # Prepare order_dict as before
-    order_dict = {}
+   
+    # Organize orders by address and date
+    data_by_address = {}
     for order in orders:
-        date_str = str(order['date'])  # Ensure consistent date formatting
-        if date_str not in order_dict:
-            order_dict[date_str] = {
-                'date': order['date'],
-                'bulk_order__bulk_order_name': order['bulk_order__bulk_order_name'],
-                'delivery_data': {},
-                'total_breakfast': 0,
-                'total_lunch': 0,
-                'total_snack': 0,
-                'total_dinner': 0,
-                'total_dinner2': 0,
-            }
-
         address = order['delivery_address__name']
-        total_sum = sum(order.get(f'total_{meal}', 0) or 0 for meal in ['breakfast', 'lunch', 'snack', 'dinner', 'dinner2'])
+        address_pk = order['delivery_address__pk']
+        date_str = str(order['date'])
 
-        order_dict[date_str]['delivery_data'][address] = {
-            'total_sum': total_sum,
-            'total_breakfast': order['total_breakfast'],
-            'total_lunch': order['total_lunch'],
-            'total_snack': order['total_snack'],
-            'total_dinner': order['total_dinner'],
-            'total_dinner2': order['total_dinner2'],
+        if address not in data_by_address:
+            data_by_address[address] = {}
+
+        # Prepare default values for the day
+        data_by_address[address][date_str] = {
+            'day_name': order['date'].strftime("%A"),
+            'date': order['date'],
+            'total_breakfast': order.get('total_breakfast', 0),
+            'total_lunch': order.get('total_lunch', 0),
+            'total_snack': order.get('total_snack', 0),
+            'total_dinner': order.get('total_dinner', 0),
+            'total_dinner2': order.get('total_dinner2', 0),
+            'is_future':"True" if order['date'] > today or (order['date'] != today and current_time < six_pm) else "False",
+            # 'pk':order['pk'],
+            'address_pk':address_pk,
         }
-
-    # Prepare the full week data with placeholders
-    week_days = []
-    for i in range(7):
-        day = today + timedelta(days=i)
-        day_name = day.strftime("%A")
-        day_str = str(day)
-
-        print(f"Processing Day: {day_name} ({day_str})")
-
-        order = order_dict.get(day_str, {
-            'date': day,
-            'bulk_order__bulk_order_name': None,
-            'delivery_data': {},
-            'total_breakfast': 0,
-            'total_lunch': 0,
-            'total_snack': 0,
-            'total_dinner': 0,
-            'total_dinner2': 0,
-        })
-
-        
-        # Check if there are no orders for that day
-        if not order['delivery_data']:
-            # Try to get the default address
-            default_address = DeliveryAddress.objects.filter(branch=request.branch, default_address=True).first()
-            if not default_address:
-                default_address = DeliveryAddress.objects.filter(branch=request.branch).first()
-
-            # If a default address is found, populate order data
-            # Calculate total sums with 0 as default for missing values
-            bulk=BulkOrders.objects.get(branch=request.branch,company=request.company)
-            total_sum = (
-                (int(bulk.breakfast) if bulk.breakfast is not None else 0) +
-                (int(bulk.lunch) if bulk.lunch is not None else 0) +
-                (int(bulk.snack) if bulk.snack is not None else 0) +
-                (int(bulk.dinner) if bulk.dinner is not None else 0) +
-                (int(bulk.dinner2) if bulk.dinner2 is not None else 0)
-            )
-            if default_address:
-
-                order['delivery_data'][default_address.name] = {
-                    'total_sum': total_sum if total_sum is not None else 0,
-                    'total_breakfast': BulkOrders.objects.filter(branch=branch, company=company)
-                                                        .aggregate(total=Sum('breakfast'))['total'] or 0,
-                    'total_lunch': BulkOrders.objects.filter(branch=branch, company=company)
-                                                    .aggregate(total=Sum('lunch'))['total'] or 0,
-                    'total_snack': BulkOrders.objects.filter(branch=branch, company=company)
-                                                    .aggregate(total=Sum('snack'))['total'] or 0,
-                    'total_dinner': BulkOrders.objects.filter(branch=branch, company=company)
-                                                    .aggregate(total=Sum('dinner'))['total'] or 0,
-                    'total_dinner2': BulkOrders.objects.filter(branch=branch, company=company)
-                                                    .aggregate(total=Sum('dinner2'))['total'] or 0,
+    # order['is_future'] = (
+    #         "Yes" if day > today or (day != today and current_time < six_pm) else "No"
+    #     )
+    print(f'Data by address: {data_by_address}')
+    # Fill missing dates with default data
+    for address in data_by_address:
+        for i in range(7):
+            day = today + timedelta(days=i)
+            date_str = str(day)
+            if date_str not in data_by_address[address]:
+                data_by_address[address][date_str] = {
+                    'day_name': day.strftime("%A"),
+                    'date': day,
+                    'total_breakfast': 0,
+                    'total_lunch': 0,
+                    'total_snack': 0,
+                    'total_dinner': 0,
+                    'total_dinner2': 0,
+                    'address_pk':DeliveryAddress.objects.get(name=address,branch=request.branch).pk,
                 }
+                
 
-                # Optional: Get the first BulkOrder's name for the given branch and company.
-                order['bulk_order__bulk_order_name'] = (
-                    BulkOrders.objects.filter(branch=branch, company=company)
-                                    .first().bulk_order_name if BulkOrders.objects.filter(branch=branch, company=company).exists() 
-                    else None
-                )
-        order['day_name'] = day_name
-        order['is_future'] = (
-            "Yes" if day > today or (day != today and current_time < six_pm) else "No"
-        )
-        order['has_values'] = bool(order.get('bulk_order__bulk_order_name'))
-
-        week_days.append(order)
-        print(f"Added Order for {day_name}: {order}")
+    # Sort the addresses by name and dates within each address
+    sorted_data = {addr: dict(sorted(data.items())) for addr, data in sorted(data_by_address.items())}
 
     # print(week_days)  # Debug print to verify output
 
@@ -221,7 +160,7 @@ def dashboard_overview(request):
         "canceled": canceled,
         "addresses": addresses,
         "notifications": notifications,
-        "orders": week_days
+        'data_by_address': sorted_data,
     }
 
     return render(request, 'mentor/home.html', context)
@@ -519,98 +458,38 @@ def assign_meal(request, date):
     })
 
 @login_required
-def edit_assign_meal(request, date):
+def edit_assign_meal(request,id, date):
     # Fetch the bulk order for the current branch
-    order = get_object_or_404(BulkOrders, branch=request.branch)
-    addresses = DeliveryAddress.objects.filter(branch=request.branch, company=request.company)
+    address = DeliveryAddress.objects.filter(branch=request.branch, company=request.company,pk=id).first()
     notifications = get_notifications(request)
+    delivery=MealDelivery.objects.filter(delivery_address=id,date=date)
+    print(delivery)
+    print(f'address: {address.name}')
     
-    # Parse the date to get the day of the week
-    try:
-        date_obj = make_aware(datetime.strptime(date, '%Y-%m-%d'))
-        day_name = date_obj.strftime('%A').lower()  # e.g., 'monday'
-    except ValueError:
-        return render(request, 'your_template.html', {'error': 'Invalid date format'})
+    meal_quantities = {
+        'breakfast': 0,
+        'lunch': 0,
+        'snack': 0,
+        'dinner': 0,
+        
+    }
 
-    # Get all MealPlans related to the order
-    meal_plans = order.MealPlan.all()
-    
-    # Prepare a dictionary to store dishes for the selected day
-    dishes_for_day = {}
-    
-    # Meal types for iteration (e.g., breakfast, lunch, etc.)
-    meals = ['breakfast', 'lunch', 'snack', 'dinner', 'dinner2']
-    
-    # Loop through each meal type and get the related dishes for the specific day
-    for meal in meals:
-        if meal == 'dinner2':
-            field_name = f"{day_name}_dinner_meal_option"
-            meal_field = f"{day_name}_dinner_meal_option"  # Optional meal field for dinner2
-        else:
-            field_name = f"{day_name}_{meal}_meal"
-            meal_field = f"{day_name}_{meal}_meal"  # Optional meal field for other meals
+    # Aggregate quantities based on meal type
+    for meal in delivery:
+        meal_type_lower = meal.meal_type.lower()  # Convert to lowercase
+        if meal_type_lower in meal_quantities:  # Ensure meal_type exists in our dictionary
+            meal_quantities[meal_type_lower] = meal_quantities.get(meal_type_lower, 0) + (meal.quantity if meal.quantity else 0)
 
-        # Get dishes for the current meal type and day
-        dishes = []
-        for meal_plan in meal_plans:
-            selected_meals = getattr(meal_plan, meal_field).all()
-            for meal in selected_meals:
-                dishes += list(meal.selected_dishes.all())
-
-        dishes_for_day[meal] = list(set(dishes))  # Remove duplicates
-
-    # Prepare data for rendering
-    day_meals = {}
-    
-    for meal_plan in meal_plans:
-        for meal_type in meals:
-            if meal_type == 'dinner2':
-                dish_attr = f"{day_name}_dinner_meal_option"
-            else:
-                dish_attr = f"{day_name}_{meal_type}_meal"
-
-            dishes = getattr(meal_plan, dish_attr).all()
-            
-            if meal_type not in day_meals:
-                day_meals[meal_type] = dishes
-            else:
-                day_meals[meal_type] |= dishes
-
-    # Prepare meal delivery data
-    meal_delivery_data = {}
-    for address in addresses:
-        meal_delivery_data[address] = {}
-        for meal_type in meals:
-            # Fetch the quantity for this address, meal type, and date
-            meal_delivery = MealDelivery.objects.filter(
-                delivery_address=address,
-                date=date,
-                meal_type=meal_type,
-                branch=request.branch,
-                company=request.company,
-                bulk_order=order
-            ).first()
-            meal_delivery_data[address][meal_type] = meal_delivery.quantity if meal_delivery else 0
-    print(meal_delivery_data)
-
+    print(f'Address: {address.name}')
+    print(f'Meal Quantities: {meal_quantities}')
     return render(request, 'mentor/meal/edit_assign.html', {
-        'order': order,
-        'addresses': addresses,
+        'address': address,
+        'meal_quantities': meal_quantities, 
         'notifications': notifications,
-        'selected_date': date,
-        'dishes_for_day': dishes_for_day,
-        'day_name': day_name.capitalize(),
-        'day_meals': day_meals, 
-        'meals': meals,
-        'date': date,
-        'dinner': sum((order.dinner or 0, order.dinner2 or 0)),
-        'selected_dishes': dishes_for_day,
-        'total_sum': sum((order.breakfast or 0, order.lunch or 0, order.snack or 0, order.dinner or 0, order.dinner2 or 0)),
-        'meal_delivery_data': meal_delivery_data  # Pass the meal delivery data to the template
-    })
+        'date': date
+   })
 
-@login_required
-def edit_assign_meal_without_date(request):
+
     # Fetch the bulk order for the current branch
     order = get_object_or_404(BulkOrders, branch=request.branch)
     addresses = DeliveryAddress.objects.filter(branch=request.branch, company=request.company)
@@ -744,28 +623,23 @@ def meal_plan_detail(request, id):
         'status': status,
     })
 
-
 @login_required
 def meal_ordered(request):
-    notifications = get_notifications(request)  # Fetch notifications
-    branch = request.branch  # Pass the branch instance here
-    company = request.company  # Pass the company instance here
-    today = now().date()  # Current date (already timezone-aware)
-    current_time = now().time()  # Current time (for 6 PM comparison)
-    six_pm = time(18, 0)  # 6:00 PM
-
-    print(f"Branch ID: {request.branch.id}\nToday: {today}\nCurrent Time: {current_time}")
+    notifications = get_notifications(request)  
+    branch = request.branch  
+    company = request.company  
+    today = now().date()  
+    current_time = now().time()  
+    six_pm = time(18, 0)  
 
     # Start and end of the current week
     start_of_week = make_aware(datetime.combine(today, time.min))
     end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max))
 
-    print(f"Start of Week: {start_of_week}, End of Week: {end_of_week}")
-
-    # Query the orders within the week
+    # Query all orders within the week, grouped by address and date
     orders = (
-        MealDelivery.objects.filter(branch=request.branch, date__range=[start_of_week, end_of_week])
-        .values('date', 'bulk_order__bulk_order_name', 'delivery_address__name')
+        MealDelivery.objects.filter(branch=branch, date__range=[start_of_week, end_of_week])
+        .values('date', 'delivery_address__name','delivery_address__pk')
         .annotate(
             total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
             total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
@@ -775,111 +649,60 @@ def meal_ordered(request):
         )
         .order_by('date', 'delivery_address__name')
     )
-
-    print(f"Orders Query:\n{list(orders)}\n")
-
-    # Prepare order_dict as before
-    order_dict = {}
+   
+    # Organize orders by address and date
+    data_by_address = {}
     for order in orders:
-        date_str = str(order['date'])  # Ensure consistent date formatting
-        if date_str not in order_dict:
-            order_dict[date_str] = {
-                'date': order['date'],
-                'bulk_order__bulk_order_name': order['bulk_order__bulk_order_name'],
-                'delivery_data': {},
-                'total_breakfast': 0,
-                'total_lunch': 0,
-                'total_snack': 0,
-                'total_dinner': 0,
-                'total_dinner2': 0,
-            }
-
         address = order['delivery_address__name']
-        total_sum = sum(order.get(f'total_{meal}', 0) or 0 for meal in ['breakfast', 'lunch', 'snack', 'dinner', 'dinner2'])
+        address_pk = order['delivery_address__pk']
+        date_str = str(order['date'])
 
-        order_dict[date_str]['delivery_data'][address] = {
-            'total_sum': total_sum,
-            'total_breakfast': order['total_breakfast'],
-            'total_lunch': order['total_lunch'],
-            'total_snack': order['total_snack'],
-            'total_dinner': order['total_dinner'],
-            'total_dinner2': order['total_dinner2'],
+        if address not in data_by_address:
+            data_by_address[address] = {}
+
+        # Prepare default values for the day
+        data_by_address[address][date_str] = {
+            'day_name': order['date'].strftime("%A"),
+            'date': order['date'],
+            'total_breakfast': order.get('total_breakfast', 0),
+            'total_lunch': order.get('total_lunch', 0),
+            'total_snack': order.get('total_snack', 0),
+            'total_dinner': order.get('total_dinner', 0),
+            'total_dinner2': order.get('total_dinner2', 0),
+            'is_future':"True" if order['date'] > today or (order['date'] != today and current_time < six_pm) else "False",
+            # 'pk':order['pk'],
+            'address_pk':address_pk,
         }
-
-    # Prepare the full week data with placeholders
-    week_days = []
-    for i in range(7):
-        day = today + timedelta(days=i)
-        day_name = day.strftime("%A")
-        day_str = str(day)
-
-        print(f"Processing Day: {day_name} ({day_str})")
-
-        order = order_dict.get(day_str, {
-            'date': day_str,
-            'bulk_order__bulk_order_name': None,
-            'delivery_data': {},
-            'total_breakfast': 0,
-            'total_lunch': 0,
-            'total_snack': 0,
-            'total_dinner': 0,
-            'total_dinner2': 0,
-        })
-
-        # Check if there are no orders for that day
-        if not order['delivery_data']:
-            # Try to get the default address
-            default_address = DeliveryAddress.objects.filter(branch=request.branch, default_address=True).first()
-            if not default_address:
-                default_address = DeliveryAddress.objects.filter(branch=request.branch).first()
-
-            # If a default address is found, populate order data
-            # Calculate total sums with 0 as default for missing values
-            bulk=BulkOrders.objects.get(branch=request.branch,company=request.company)
-            total_sum = (
-                (int(bulk.breakfast) if bulk.breakfast is not None else 0) +
-                (int(bulk.lunch) if bulk.lunch is not None else 0) +
-                (int(bulk.snack) if bulk.snack is not None else 0) +
-                (int(bulk.dinner) if bulk.dinner is not None else 0) +
-                (int(bulk.dinner2) if bulk.dinner2 is not None else 0)
-            )
-            if default_address:
-
-                order['delivery_data'][default_address.name] = {
-                    'total_sum': total_sum if total_sum is not None else 0,
-                    'total_breakfast': BulkOrders.objects.filter(branch=branch, company=company)
-                                                        .aggregate(total=Sum('breakfast'))['total'] or 0,
-                    'total_lunch': BulkOrders.objects.filter(branch=branch, company=company)
-                                                    .aggregate(total=Sum('lunch'))['total'] or 0,
-                    'total_snack': BulkOrders.objects.filter(branch=branch, company=company)
-                                                    .aggregate(total=Sum('snack'))['total'] or 0,
-                    'total_dinner': BulkOrders.objects.filter(branch=branch, company=company)
-                                                    .aggregate(total=Sum('dinner'))['total'] or 0,
-                    'total_dinner2': BulkOrders.objects.filter(branch=branch, company=company)
-                                                    .aggregate(total=Sum('dinner2'))['total'] or 0,
+    # order['is_future'] = (
+    #         "Yes" if day > today or (day != today and current_time < six_pm) else "No"
+    #     )
+    print(f'Data by address: {data_by_address}')
+    # Fill missing dates with default data
+    for address in data_by_address:
+        for i in range(7):
+            day = today + timedelta(days=i)
+            date_str = str(day)
+            if date_str not in data_by_address[address]:
+                data_by_address[address][date_str] = {
+                    'day_name': day.strftime("%A"),
+                    'date': day,
+                    'total_breakfast': 0,
+                    'total_lunch': 0,
+                    'total_snack': 0,
+                    'total_dinner': 0,
+                    'total_dinner2': 0,
+                    'address_pk':DeliveryAddress.objects.get(name=address,branch=request.branch).pk,
                 }
+                
 
-                # Optional: Get the first BulkOrder's name for the given branch and company.
-                order['bulk_order__bulk_order_name'] = (
-                    BulkOrders.objects.filter(branch=branch, company=company)
-                                    .first().bulk_order_name if BulkOrders.objects.filter(branch=branch, company=company).exists() 
-                    else None
-                )
-        order['day_name'] = day_name
-        order['is_future'] = (
-            "Yes" if day > today or (day != today and current_time < six_pm) else "No"
-        )
-        order['has_values'] = bool(order.get('bulk_order__bulk_order_name'))
+    # Sort the addresses by name and dates within each address
+    sorted_data = {addr: dict(sorted(data.items())) for addr, data in sorted(data_by_address.items())}
 
-        week_days.append(order)
-        print(f"Added Order for {day_name}: {order}")
-
-    # Render the template with the data
+    # Render the template
     return render(request, 'mentor/meal/meals.html', {
         'notifications': notifications,
-        'orders': week_days,
+        'data_by_address': sorted_data,
     })
-
 
 @login_required
 def assign_meal_post(request):
@@ -899,8 +722,8 @@ def assign_meal_post(request):
                 quantity = int(assignment.get('quantity', 0))
                 print(meal_type, address_id, date, quantity)
 
-                if quantity == 0:
-                    continue
+                # if quantity == 0:
+                #     continue
 
                 delivery_address = get_object_or_404(DeliveryAddress, pk=address_id)
 

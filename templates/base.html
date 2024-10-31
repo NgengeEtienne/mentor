@@ -10,6 +10,14 @@
     </title>
   <link rel="icon" href="{% static '' %}favicon.ico">
   <link href="{% static '' %}style.css" rel="stylesheet">
+  <style>
+    .active {
+      font-weight: bold; /* or any other style you want */
+      color:green;
+      
+    }
+
+  </style>
 
   <body
     x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"

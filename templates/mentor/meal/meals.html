@@ -147,117 +147,74 @@
 
 <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 class="text-title-md2 font-semibold text-black dark:text-white">Delivery Assignment</h2>
-        <nav>
+        <h2 class="text-title-md2 font-semibold text-black dark:text-white">Daily Food Count</h2>
+        {% comment %} <nav>
             <ol class="flex items-center gap-2">
                 <li><a class="font-medium" href="{{dashboard}}">Dashboard /</a></li>
                 <li class="font-medium text-primary">Delivery Assignment</li>
             </ol>
-        </nav>
+        </nav> {% endcomment %}
     </div>
-    <div class="pb-5"><div class="flex justify-end p-3 container bg-white rounded-lg">
-        <div class="button flex items-center">
-             <button type="button" data-modal-hide="default-modal" data-modal-target="default-modal" data-modal-toggle="default-modal" class="inline-flex items-center gap-2 rounded-md bg-primary my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm90.5 224H272v74.5c0 8.8-7.2 16-16 16-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3V272h-74.5c-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3 0-8.8 7.2-16 16-16H240v-74.5c0-8.8 7.2-16 16-16s16 7.2 16 16V240h74.5c8.8 0 16 7.2 16 16s-7.2 16-16 16z"></path>
-                </svg>
-                <span>Assign</span>
-            </button>  
+    {% comment %} {% for order in orders %} {% endcomment %}
+    {% for address, orders in data_by_address.items %}
+    <div class="pb-2 mt-4">
+        <div class="flex justify-start p-3 container bg-black rounded-lg  mb-2">
+            <div class="button flex items-center">
+                <p class="inline-flex items-center gap-2 my-1 px-4 py-3 font-medium text-white text-lg hover:bg-opacity-90">
+                    <span>{{ address }}</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="rounded-lg border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+            <div class="max-w-full overflow-x-auto">
+                <table class="w-full table-auto border-collapse border border-gray-300 mb-4">
+                    <thead>
+                        <tr class="bg-[#F9FAFB] text-left dark:bg-meta-4">
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Day</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Date</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Breakfast</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Lunch</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Snacks</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Dinner</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders.values %}
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2">{{ order.day_name }}</td>
+                            <td class="border border-gray-300 px-4 py-2">{{ order.date }}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                {{ order.total_breakfast|default_if_none:"-"  }}
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                {{ order.total_lunch|default_if_none:"-"  }}
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                {{ order.total_snack|default_if_none:"-"  }}
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                {{ order.total_dinner|default_if_none:"-"  }}
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                {% if order.is_future == "False" %}
+                                <a class="bg-gray-300 text-black px-4 py-2 rounded text-sm cursor-not-allowed"
+                                       style="pointer-events: none;">Edit</a>
+                                   
+                                {% else %}
+                                     <a href="{% url 'edit_assign_address' id=order.address_pk date=order.date %}"
+                                       class="text-primary px-4 py-2 rounded text-md">Edit</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
-<div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-    <div class="max-w-full overflow-x-auto">
-        <table class="w-full table-auto">
-            <thead>
-                <tr class="bg-gray-2 text-left dark:bg-meta-4">
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
-                        Day
-                    </th>
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
-                        Date
-                    </th>
-                    {% comment %} <th class="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white">
-                        Orde count
-                    </th> {% endcomment %}
-                    <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
-                        Delivery Assignment
-                    </th>
-                    
-                    <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
-                        Actions
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-
-                {% for order in orders %}
-                <tr>
-                    <!-- Day -->
-                    <td class="border border-gray-300 px-4 py-2">{{ order.day_name }}</td>
-    
-                    <!-- Date -->
-                    <td class="border border-gray-300 px-4 py-2">{{ order.date }}</td>
-    
-                    <!-- Status -->
-                    {% comment %} <td class="border border-gray-300 px-4 py-2">
-                        {% if order.has_values %}
-                            Assigned
-                        {% else %}
-                            Not Assigned
-                        {% endif %}
-                    </td> {% endcomment %}
-    
-                    <!-- Delivery Assignment -->
-                    <td class="border border-gray-300 px-4 py-2">
-                        {% if order.has_values %}
-                            {% for address, totals in order.delivery_data.items %}
-                            <div>
-                                {{ address }} - {{ totals.total_sum|default_if_none:"0" }}
-                                (
-                                {% if totals.total_breakfast %}{{ totals.total_breakfast }}{% else %}0{% endif %}, 
-                                {% if totals.total_lunch %}{{ totals.total_lunch }}{% else %}0{% endif %}, 
-                                {% if totals.total_snack %}{{ totals.total_snack }}{% else %}0{% endif %}, 
-                                {% if totals.total_dinner %}{{ totals.total_dinner }}{% else %}0{% endif %} 
-                                {% if totals.total_dinner2 %}{% else %}{% endif %}
-                                )
-                            </div>
-                            
-                            {% endfor %}
-                        {% else %}
-                            Not Assigned
-                        {% endif %}
-                    </td>
-     
-                    <!-- Actions -->
-                    <td class="border border-gray-300 px-4 py-2">
-                        {% if order.has_values %}
-                            {%if order.is_future == "No" %}
-                            <a class="bg-gray text-black px-4 py-2 rounded text-sm" readonly style="cursor: not-allowed">Edit</a>
-                            {% else %}
-                                <a href="{% url 'edit_assign_address' order.date %}" class="bg-primary text-white px-4 py-2 rounded text-sm">Edit</a>
-                            {%endif%}
-                        {% else %}
-                            {%if order.is_future == "No" %}
-                            <a  class="bg-gray text-black px-4 py-2 rounded text-sm" readonly style="cursor: not-allowed">Edit</a>
-                            {% else %}
-                            <a  href="{% url 'assign_address' order.date %}"  class="bg-success text-white px-4 py-2 rounded text-sm">Edit</a>
-                            {%endif%}
-                            
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-               
-            </tbody>
-            
-        </tbody>
-
-        
-    </table>
-</div>
-</div>
-</div>
-
+{% endfor %}
 
 <!-- Modal toggle -->
 
