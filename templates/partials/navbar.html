@@ -122,9 +122,10 @@
               <span class="block text-xs font-medium">{{ request.user.role }}</span>
             </span>
   
-            <span class="h-12 w-12 rounded-full">
-              <img src="{% static '' %}images/admin1.jpg" alt="User" />
+            <span class="h-12 w-12 rounded-full overflow-hidden inline-block">
+              <img src="{% static 'images/cabriot-default.png' %}" alt="User" class="h-full w-full object-cover" />
             </span>
+            
   
             <svg
               :class="dropdownOpen && 'rotate-180'"

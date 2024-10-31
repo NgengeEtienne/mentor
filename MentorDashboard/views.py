@@ -196,8 +196,8 @@ def delivery_address_create(request):
         city = request.POST['city']
         state = request.POST['state']
         pin_code = request.POST['pin_code']
-        latitude = request.POST['latitude']
-        longitude = request.POST['longitude']
+        # latitude = request.POST['latitude']
+        # longitude = request.POST['longitude']
         default_address = request.POST.get('default_address')
     
         branch = request.branch
@@ -206,8 +206,8 @@ def delivery_address_create(request):
             default_address = True
         else:
             default_address = False
-        new=DeliveryAddress.objects.create(name=name, address_line_1=address_line_1, address_line_2=address_line_2, default_address=default_address, city=city, state=state, pin_code=pin_code, latitude=latitude, longitude=longitude, branch_id=branch.id, company=company)
-        newd=MealDelivery.objects.create(branch=branch, company=company, delivery_address=new, quantity=0, date=datetime.now().date(),bulk_order=BulkOrders.objects.filter(branch=branch, company=company).first())
+        new=DeliveryAddress.objects.create(name=name, address_line_1=address_line_1, address_line_2=address_line_2, default_address=default_address, city=city, state=state, pin_code=pin_code, branch_id=branch.id, company=company)
+        newd=MealDelivery.objects.create(branch=branch, company=company, delivery_address=new,status=0, quantity=0, date=datetime.now().date(),bulk_order=BulkOrders.objects.filter(branch=branch, company=company).first())
         print(f"New address created: {new}")
         print(f"New delivery created: {newd}")
         return redirect('delivery_address_list')
@@ -230,9 +230,13 @@ def delivery_address_edit(request, id):
                 messages.error(request, 'A default address already exists in another address.')
             else:
                 # Save the form if the default_address condition is met
+                # form.instance.latitude = form.cleaned_data.get('latitude') or 0.0
+                # form.instance.longitude = form.cleaned_data.get('longitude') or 0.0
                 form.save()
+                print(f"Address {address} updated successfully.")
                 return redirect('delivery_address_list')
         else:
+            print(form.errors)
             # If the form is not valid, handle errors accordingly
             messages.error(request, 'Please correct the errors below.')
 
@@ -323,19 +327,21 @@ def orders_list(request):
     print("Old date:", old_date)
 
     # Fetch today's deliveries for the branch
-    todays_deliveries = MealDelivery.objects.filter(branch=request.branch, date=today)
-    print("Today's deliveries:", todays_deliveries)
+    todays_deliveries = MealDelivery.objects.filter(branch=request.branch, date=today).exclude(status=0)
+    # print("Today's deliveries:", todays_deliveries)
 
     # Fetch all deliveries for the branch
-    all_deliveries = MealDelivery.objects.filter(branch=request.branch)
-    print("All deliveries:", all_deliveries)
+    all_deliveries = MealDelivery.objects.filter(branch=request.branch).exclude(status=0)
+    # print("All deliveries:", all_deliveries)
 
     # Fetch past deliveries (within the last 30 days)
     past_deliveries = MealDelivery.objects.filter(
         branch=request.branch, 
         date__range=(old_date, today)
-    )
-    print("Past deliveries:", past_deliveries)
+    ).exclude(status=0)
+    for delivery in past_deliveries:
+        print("Past delivery:", delivery.meal_type)
+    # print("Past deliveries:", past_deliveries)
 
     # Combine today's and past deliveries
     deliveries = list(chain(todays_deliveries, past_deliveries))

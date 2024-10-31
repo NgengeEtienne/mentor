@@ -69,24 +69,10 @@
 
 <div class="mt-10 flex flex-wrap items-center justify-center w-full xl:w-3/4 mx-auto rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark items-center">
   
-<div class="flex flex-wrap items-center">
-  <div class="hidden w-full xl:block xl:w-1/2">
-    <div class="px-26 py-17.5 text-center">
-      <a class="inline-block mb-8 mr-40" href="" style="width: 200px; height: 200px;">
-        <img
-          class="hidden dark:block w-full h-full object-contain"
-          src="{% static 'eat.svg' %}"
-          alt="Logo"
-          style="width: 300px; height: 300px;"
-        />
-        <img
-          class="dark:hidden w-full h-full object-contain"
-          src="{% static 'eat.svg' %}"
-          alt="Logo"
-          style="width: 300px; height: 300px;"
-        />
-      </a>
-    </div>
+<div class="flex flex-wrap w-full max-w-5xl shadow-lg bg-white rounded-lg overflow-hidden">
+  
+  <div class="hidden xl:flex w-1/2 items-center justify-center bg-gray-50 p-10">
+    <img src="{% static 'eat.svg' %}" alt="Cabriot Eat Logo" class="w-3/4 h-64 object-contain" />
   </div>
 
   <div class="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
@@ -155,7 +141,7 @@
           <input
             type="submit"
             value="Login"
-            class="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 font-medium text-white transition hover:bg-opacity-90"
+            class="w-full cursor-pointer rounded-xl border border-success bg-success p-4 font-medium text-white transition hover:bg-opacity-90"
           />
         </div>
 

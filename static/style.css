@@ -3331,6 +3331,10 @@ body{
 .bg-\[\#000\]\/20{
   background-color: rgb(0 0 0 / 0.2);
 }
+.bg-\[\#00BE62\]{
+  --tw-bg-opacity: 1;
+  background-color: rgb(0, 190, 98/ var(--tw-bg-opacity));
+}
 .bg-\[\#0FADCF\]{
   --tw-bg-opacity: 1;
   background-color: rgb(15 173 207 / var(--tw-bg-opacity));
@@ -3349,7 +3353,7 @@ body{
 }
 .bg-\[\#219653\]{
   --tw-bg-opacity: 1;
-  background-color: rgb(33 150 83 / var(--tw-bg-opacity));
+  background-color: rgb(0 190 98 / var(--tw-bg-opacity));
 }
 .bg-\[\#219653\]\/\[0\.08\]{
   background-color: rgb(33 150 83 / 0.08);
@@ -3546,7 +3550,7 @@ body{
 }
 .bg-success{
   --tw-bg-opacity: 1;
-  background-color: rgb(33 150 83 / var(--tw-bg-opacity));
+  background-color: rgb(0, 190, 98 / var(--tw-bg-opacity));
 }
 .bg-transparent{
   background-color: transparent;
@@ -4207,7 +4211,7 @@ body{
 }
 .text-success{
   --tw-text-opacity: 1;
-  color: rgb(33 150 83 / var(--tw-text-opacity));
+  color: rgb(0 190 98 / var(--tw-text-opacity));
 }
 .text-warning{
   --tw-text-opacity: 1;

@@ -58,8 +58,9 @@
                             </td>
                             <td class="border border-gray-300 px-4 py-2 text-center">
                                 {% if order.is_future == "False" %}
-                                <a class="bg-gray-300 text-black px-4 py-2 rounded text-sm cursor-not-allowed"
-                                       style="pointer-events: none;">Edit</a>
+                                <a class="bg-gray-300 text-black px-4 py-2 rounded text-sm"
+                                style=" cursor: not-allowed;">Edit</a>
+
                                    
                                 {% else %}
                                      <a href="{% url 'edit_assign_address' id=order.address_pk date=order.date %}"
