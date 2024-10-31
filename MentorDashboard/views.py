@@ -111,7 +111,7 @@ def dashboard_overview(request):
 
         if address not in data_by_address:
             data_by_address[address] = {}
-        today = datetime.combine(datetime.today().date(), datetime.min.time())  # Adjust if you need a specific time
+        today1 = datetime.combine(datetime.today().date(), datetime.min.time())  # Adjust if you need a specific time
 
         # Prepare default values for the day
         data_by_address[address][date_str] = {
@@ -122,7 +122,7 @@ def dashboard_overview(request):
             'total_snack': order.get('total_snack', 0),
             'total_dinner': order.get('total_dinner', 0),
             'total_dinner2': order.get('total_dinner2', 0),
-            'is_future':"True" if order['date'] > today or (order['date'] != today and current_time < six_pm) else "False",
+            'is_future':"True" if order['date'] > today1 or (order['date'] != today1 and current_time < six_pm) else "False",
             # 'pk':order['pk'],
             'address_pk':address_pk,
         }
