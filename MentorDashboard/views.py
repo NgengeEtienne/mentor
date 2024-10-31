@@ -113,16 +113,16 @@ def dashboard_overview(request):
             data_by_address[address] = {}
         # today1 = datetime.combine(datetime.today().date(), datetime.min.time())  # Adjust if you need a specific time
         order_date = order['date']
-        formatted_date = order_date.strftime("%b. %d, %Y")
+        formatted_date = datetime.strptime(order_date,"%b. %d, %Y")
         # Prepare default values for the day
         data_by_address[address][date_str] = {
             'day_name': datetime.strptime(date_str, date_format).strftime("%A"),
             'date': formatted_date,
-            'total_breakfast': order.get('total_breakfast', 0),
-            'total_lunch': order.get('total_lunch', 0),
-            'total_snack': order.get('total_snack', 0),
-            'total_dinner': order.get('total_dinner', 0),
-            'total_dinner2': order.get('total_dinner2', 0),
+            'total_breakfast': order.get('total_breakfast', '-'),
+            'total_lunch': order.get('total_lunch', '-'),
+            'total_snack': order.get('total_snack', '-'),
+            'total_dinner': order.get('total_dinner', '-'),
+            'total_dinner2': order.get('total_dinner2', '-'),
             'is_future':"True" if datetime.strptime(date_str, date_format).date() > today or (order['date'] != today and current_time < six_pm) else "False",
             # 'pk':order['pk'],
             'address_pk':address_pk,
@@ -140,11 +140,11 @@ def dashboard_overview(request):
                 data_by_address[address][date_str] = {
                     'day_name': day.strftime("%A"),
                     'date': day,
-                    'total_breakfast': 0,
-                    'total_lunch': 0,
-                    'total_snack': 0,
-                    'total_dinner': 0,
-                    'total_dinner2': 0,
+                    'total_breakfast': '-',
+                    'total_lunch': '-',
+                    'total_snack': '-',
+                    'total_dinner': '-',
+                    'total_dinner2': '-',
                     'address_pk':DeliveryAddress.objects.get(name=address,branch=request.branch).pk,
                 }
                 
