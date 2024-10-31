@@ -206,7 +206,10 @@ def delivery_address_create(request):
             default_address = True
         else:
             default_address = False
-        DeliveryAddress.objects.create(name=name, address_line_1=address_line_1, address_line_2=address_line_2, default_address=default_address, city=city, state=state, pin_code=pin_code, latitude=latitude, longitude=longitude, branch_id=branch.id, company=company)
+        new=DeliveryAddress.objects.create(name=name, address_line_1=address_line_1, address_line_2=address_line_2, default_address=default_address, city=city, state=state, pin_code=pin_code, latitude=latitude, longitude=longitude, branch_id=branch.id, company=company)
+        newd=MealDelivery.objects.create(branch=branch, company=company, delivery_address=new, quantity=0, date=datetime.now().date(),bulk_order=BulkOrders.objects.filter(branch=branch, company=company).first())
+        print(f"New address created: {new}")
+        print(f"New delivery created: {newd}")
         return redirect('delivery_address_list')
 
     return render(request, 'mentor/delivery/form.html', {'form': form, 'notifications': notifications})
