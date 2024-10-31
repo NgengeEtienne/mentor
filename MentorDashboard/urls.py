@@ -22,8 +22,8 @@ urlpatterns = [
     path('delivery-address/edit/<int:id>/', delivery_address_edit, name='delivery_address_edit'),
     path('delivery-address/delete/<int:id>/', delivery_address_delete, name='delivery_address_delete'),
     # Add URLs for MealDelivery and Notification similarly
-    path('meal-deliveries/', views.meal_delivery_list, name='meal_delivery_list'),
-    path('meal-deliveries/list/', views.meal_delivered, name='meal_delivered'),
+    # path('meal-deliveries/', views.meal_delivery_list, name='meal_delivery_list'),
+    # path('meal-deliveries/list/', views.meal_delivered, name='meal_delivered'),
     path('meal-deliveries/<int:id>/edit/', views.meal_delivery_edit, name='meal_delivery_edit'),
     path('meal-deliveries/assign-address/post/', views.assign_meal_post, name='assign_address_ajax'),
     path('meal-deliveries/assign-address/<str:date>/', views.assign_meal, name='assign_address'),

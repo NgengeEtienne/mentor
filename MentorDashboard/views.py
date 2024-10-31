@@ -649,7 +649,7 @@ def meal_ordered(request):
     # Start and end of the current week
     start_of_week = make_aware(datetime.combine(today, time.min))
     end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max))
-
+    addresses = DeliveryAddress.objects.filter(branch=branch)
     # Query all orders within the week, grouped by address and date
     orders = (
         MealDelivery.objects.filter(branch=branch, date__range=[start_of_week, end_of_week])
@@ -724,6 +724,7 @@ def meal_ordered(request):
     return render(request, 'mentor/meal/meals.html', {
         'notifications': notifications,
         'data_by_address': sorted_data,
+        # 'addresses': addresses
     })
 
 @login_required
