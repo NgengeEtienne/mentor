@@ -98,10 +98,13 @@ def dashboard_overview(request):
         )
         .order_by('date', 'delivery_address__name')
     )
-   
+    date_format = "%Y-%m-%d"
+    
     # Organize orders by address and date
     data_by_address = {}
     for order in orders:
+        if isinstance(order['date'], str):
+            order['date'] = datetime.strptime(order['date'], date_format)
         address = order['delivery_address__name']
         address_pk = order['delivery_address__pk']
         date_str = str(order['date'])
