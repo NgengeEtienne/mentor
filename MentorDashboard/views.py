@@ -111,6 +111,7 @@ def dashboard_overview(request):
 
         if address not in data_by_address:
             data_by_address[address] = {}
+        today = datetime.combine(datetime.today().date(), datetime.min.time())  # Adjust if you need a specific time
 
         # Prepare default values for the day
         data_by_address[address][date_str] = {
