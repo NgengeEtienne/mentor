@@ -28,6 +28,7 @@ from .models import BulkOrders, DeliveryAddress, MealDelivery, Notification  # E
 
 
 
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 def mentor_login(request):
     if request.method == 'POST':
@@ -38,11 +39,13 @@ def mentor_login(request):
             user = authenticate(request, email=email, password=password)
 
             if user is not None:
-                if user.role == 'MENTOR':
+                # Check if user is either a mentor or a staff (non-superuser)
+                if user.role == 'MENTOR' or (user.is_staff and not user.is_superuser):
                     login(request, user)
-                    return redirect('dashboard')  # Redirect to mentor dashboard
+                    return redirect('dashboard')  # Redirect to custom dashboard
                 else:
                     messages.error(request, 'You do not have permission to access this area.')
+                    return redirect('dashboard')
             else:
                 messages.error(request, 'Invalid username or password.')
     else:

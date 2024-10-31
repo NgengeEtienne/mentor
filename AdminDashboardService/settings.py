@@ -78,6 +78,7 @@ MIDDLEWARE = [
     # "django_browser_reload.middleware.BrowserReloadMiddleware",
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'MentorDashboard.middleware.BranchCompanyMiddleware',
+    'MentorDashboard.middleware.RestrictAdminMiddleware',
 
 ]
 

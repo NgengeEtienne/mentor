@@ -32,3 +32,22 @@ class BranchCompanyMiddleware(MiddlewareMixin):
             request.company = None
             # Log the error message
             print(f"An unexpected error occurred: {e}")
+
+
+
+# middleware/restrict_admin.py
+
+from django.shortcuts import redirect
+from django.urls import reverse
+
+class RestrictAdminMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Check if the user is trying to access the admin panel
+        if request.path.startswith(reverse('admin:index')):
+            # If the user is authenticated but not a superuser, redirect them to the dashboard
+            if request.user.is_authenticated and not request.user.is_superuser:
+                return redirect('dashboard')  # Replace 'dashboard' with the name of your dashboard URL
+        return self.get_response(request)
