@@ -75,13 +75,13 @@ def dashboard_overview(request):
     end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max))
 
     active_subscriptions = BulkOrders.objects.filter(branch=request.branch)
-    dispatched = MealDelivery.objects.filter(status='DISPATCHED', branch=request.branch,created_at__range=[start_of_week, end_of_week]).count() or 0
-    cooking = MealDelivery.objects.filter(status='COOKING', branch=request.branch,created_at__range=[start_of_week, end_of_week]).count() or 0
-    deliveredcount = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch,created_at__range=[start_of_week, end_of_week]).count() or 0
-    canceled = MealDelivery.objects.filter(status='CANCELED', branch=request.branch,created_at__range=[start_of_week, end_of_week]).count() or 0
+    dispatched = MealDelivery.objects.filter(status='DISPATCHED', branch=request.branch).count() or 0
+    cooking = MealDelivery.objects.filter(status='COOKING', branch=request.branch).count() or 0
+    deliveredcount = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch).count() or 0
+    canceled = MealDelivery.objects.filter(status='CANCELED', branch=request.branch).count() or 0
     
     addresses = DeliveryAddress.objects.filter(branch=request.branch)
-    delivered = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch,created_at__range=[start_of_week, end_of_week])
+    delivered = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch).count() or 0
 
     notifications = get_notifications(request)  # Fetch notifications
 
