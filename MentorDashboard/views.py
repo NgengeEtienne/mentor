@@ -640,24 +640,39 @@ def meal_plan_detail(request, id):
         'sum': sum,
         'status': status,
     })
+from datetime import datetime, time, timedelta
+from django.utils.timezone import make_aware
+from django.db.models import Sum, Case, When, IntegerField
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+import pytz
+
+# Define the Indian timezone
+india_tz = pytz.timezone('Asia/Kolkata')
 
 @login_required
 def meal_ordered(request):
     notifications = get_notifications(request)  
     branch = request.branch  
     company = request.company  
-    today = now().date()  
-    current_time = now().time()  
-    six_pm = time(18, 0)  
 
-    # Start and end of the current week
-    start_of_week = make_aware(datetime.combine(today, time.min))
-    end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max))
-    addresses = DeliveryAddress.objects.filter(branch=branch)
+    # Get current date and time in Indian timezone
+    now_ist = timezone.now().astimezone(india_tz)
+    today = now_ist.date()  
+    current_time = now_ist.time()  
+    six_pm = time(18, 0)  
+    print(today, current_time, six_pm)
+    # Start and end of the current week in IST
+    start_of_week = make_aware(datetime.combine(today, time.min), india_tz)
+    end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max), india_tz)
+
+    # Query all addresses for the given branch and company
+    addresses = DeliveryAddress.objects.filter(branch=branch, company=company)
+
     # Query all orders within the week, grouped by address and date
     orders = (
         MealDelivery.objects.filter(branch=branch, date__range=[start_of_week, end_of_week])
-        .values('date', 'delivery_address__name','delivery_address__pk')
+        .values('date', 'delivery_address__name', 'delivery_address__pk')
         .annotate(
             total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
             total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
@@ -667,29 +682,22 @@ def meal_ordered(request):
         )
         .order_by('date', 'delivery_address__name')
     )
+
     date_format = "%Y-%m-%d"
-    # print(orders)
    
     # Organize orders by address and date
     data_by_address = {}
     for order in orders:
-        # if isinstance(order['date'], str):
-        #     order['date'] = datetime.strptime(order['date'], date_format)
         address = order['delivery_address__name']
         address_pk = order['delivery_address__pk']
         date_str = str(order['date'])
 
         if address not in data_by_address:
             data_by_address[address] = {}
-        # today1 = datetime.combine(datetime.today().date(), datetime.min.time())  # Adjust if you need a specific time
-        # order_date_str = order['date']  # e.g., '2024-11-02'
 
-        # order_date = datetime.strptime(order_date_str, "%Y-%m-%d").date()  # This gives you a date object
-
-        # Format the date as "Nov. 1, 2024"
-        # formatted_date = order_date_str.strftime("%b. %d, %Y").lstrip("0")  # Remove leading zero from the day
+        # Determine the order date
         if isinstance(order['date'], str):
-            order_date = datetime.strptime(order['date'], "%Y-%m-%d").date()
+            order_date = datetime.strptime(order['date'], date_format).date()
         else:
             order_date = order['date']  # Assuming it's already a datetime.date object
 
@@ -702,21 +710,23 @@ def meal_ordered(request):
             'total_snack': order.get('total_snack', '-'),
             'total_dinner': order.get('total_dinner', '-'),
             'total_dinner2': order.get('total_dinner2', '-'),
-            'is_future':"True" if datetime.strptime(date_str, date_format).date() > today or (order['date'] != today and current_time < six_pm) else "False",
-            # 'pk':order['pk'],
-            'address_pk':address_pk,
+            'is_future': "True" if datetime.strptime(date_str, date_format).date() > today or (order_date != today and current_time < six_pm) else "False",
+            'address_pk': address_pk,
         }
-    # order['is_future'] = (
-    #         "Yes" if day > today or (day != today and current_time < six_pm) else "No"
-    #     )
+
     print(f'Data by address: {data_by_address}')
-    # Fill missing dates with default data
-    for address in data_by_address:
+    
+    # Fill missing dates with default data for all addresses
+    for address in addresses:  # Loop through all addresses instead of data_by_address keys
+        address_name = address.name
+        address_pk = address.pk
+        
         for i in range(7):
             day = today + timedelta(days=i)
             date_str = str(day)
-            if date_str not in data_by_address[address]:
-                data_by_address[address][date_str] = {
+
+            if date_str not in data_by_address.get(address_name, {}):
+                data_by_address.setdefault(address_name, {})[date_str] = {
                     'day_name': day.strftime("%A"),
                     'date': day,
                     'total_breakfast': '-',
@@ -724,10 +734,9 @@ def meal_ordered(request):
                     'total_snack': '-',
                     'total_dinner': '-',
                     'total_dinner2': '-',
-                    'address_pk':DeliveryAddress.objects.get(name=address,branch=request.branch).pk,
+                    'address_pk': address_pk,
                 }
-                
-
+    
     # Sort the addresses by name and dates within each address
     sorted_data = {addr: dict(sorted(data.items())) for addr, data in sorted(data_by_address.items())}
 
@@ -735,7 +744,6 @@ def meal_ordered(request):
     return render(request, 'mentor/meal/meals.html', {
         'notifications': notifications,
         'data_by_address': sorted_data,
-        # 'addresses': addresses
     })
 
 @login_required
