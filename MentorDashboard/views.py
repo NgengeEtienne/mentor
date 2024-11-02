@@ -90,7 +90,7 @@ def dashboard_overview(request):
 
     # Query all orders within the week, grouped by address and date
     orders = (
-        MealDelivery.objects.filter(branch=branch)
+        MealDelivery.objects.filter(branch=branch, date__range=[start_of_week, end_of_week])
         .values('date', 'delivery_address__name','delivery_address__pk')
         .annotate(
             total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
@@ -655,7 +655,7 @@ def meal_ordered(request):
     addresses = DeliveryAddress.objects.filter(branch=branch)
     # Query all orders within the week, grouped by address and date
     orders = (
-        MealDelivery.objects.filter(branch=branch)
+        MealDelivery.objects.filter(branch=branch, date__range=[start_of_week, end_of_week])
         .values('date', 'delivery_address__name','delivery_address__pk')
         .annotate(
             total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
