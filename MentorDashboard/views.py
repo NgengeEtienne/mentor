@@ -674,6 +674,14 @@ def meal_ordered(request):
     data_by_address = {}
     for order in orders:
         order_date = order['date']
+        if isinstance(order['date'], str):
+            order_date = datetime.strptime(order['date'], date_format)
+        else:
+            order_date = order['date']  # Assume it's already a datetime object
+
+        # Ensure order_date is a date object before combining
+        if isinstance(order_date, datetime):
+            order_date = order_date.date()  # Get just the date part
 
         # Combine the date with the minimum time (00:00:00)
         order_datetime = datetime.combine(order_date, time.min)
