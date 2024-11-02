@@ -673,43 +673,17 @@ def meal_ordered(request):
     # Organize orders by address and date
     data_by_address = {}
     for order in orders:
-        order_date = order['date']
-        if isinstance(order['date'], str):
-            order_date = datetime.strptime(order['date'], date_format)
-        else:
-            order_date = order['date']  # Assume it's already a datetime object
-
-        # Ensure order_date is a date object before combining
-        if isinstance(order_date, datetime):
-            order_date = order_date.date()  # Get just the date part
-
-        # Combine the date with the minimum time (00:00:00)
-        order_datetime = datetime.combine(order_date, time.min)
-
-        # Make it timezone-aware (assuming your server's timezone is UTC)
-        order_datetime_aware = timezone.make_aware(order_datetime)
-
-        india_time_zone = pytz.timezone('Asia/Kolkata')
-        order_datetime_aware = order_datetime_aware.astimezone(india_time_zone)
-        print("Order Date (Timezone-aware):", order_datetime_aware)
-
         # if isinstance(order['date'], str):
         #     order['date'] = datetime.strptime(order['date'], date_format)
         address = order['delivery_address__name']
         address_pk = order['delivery_address__pk']
-# Assuming order['date'] is a string in the format 'YYYY-MM-DD'
-        # print(make_aware(order['date']))
-        # Now order['date'] is guaranteed to be a datetime object
-        order_date = order['date']
-        print(f"timezone.now(): {timezone.now()}")  # Output: datetime.datetime(2023, 2, 27, 14, 30, 30, 957000, tzinfo=timezone.now())
-        # Combine the date with the minimum time (00:00:00)
-        order_datetime = datetime.combine(order_date, time.min)
+        order_datetime = datetime.combine(order['date'], datetime.min.time())
 
-        # Make it timezone-aware (assuming your server's timezone is UTC)
+# Make it timezone-aware
         order_datetime_aware = timezone.make_aware(order_datetime)
-
-        # Convert it back to a string in the format 'YYYY-MM-DD'
         date_str = order_datetime_aware.strftime(date_format)
+        # print(address, address_pk, date_str,order['date'])
+
         if address not in data_by_address:
             data_by_address[address] = {}
         # today1 = datetime.combine(datetime.today().date(), datetime.min.time())  # Adjust if you need a specific time
