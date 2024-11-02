@@ -11,8 +11,9 @@
         <h2 class="text-title-md2 font-semibold text-black dark:text-white">{% if object %} Edit Delivery Address {% else %} Add Delivery Address {% endif %}</h2>
         <nav>
             <ol class="flex items-center gap-2">
-                <li><a class="font-medium" href="{{dashboard}}">Dashboard /</a></li>
-                <li class="font-medium text-success">Delivery List</li>
+                <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
+                <li><a class="font-medium" href="{% url 'delivery_address_list' %}">Delivery List /</a></li>
+                <li class="font-medium text-success">{% if object %} Edit Delivery Address {% else %} Add Delivery Address {% endif %}</li>
             </ol>
         </nav>
     </div>

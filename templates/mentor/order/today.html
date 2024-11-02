@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Today's Delivery{% endblock title %}
+
+{% block content %}
+
+<div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-title-md2 font-semibold text-black dark:text-white">Today's Delivery</h2>
+         <nav>
+            <ol class="flex items-center gap-2">
+                <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
+                <li class="font-medium text-success">Today's Delivery</li>
+            </ol>
+        </nav>
+    </div>
+    {% comment %} {% for order in orders %} {% endcomment %}
+    
+    <div class="pb-2 mt-4">
+        <div class="flex justify-start p-3 container bg-black rounded-lg  mb-2">
+            <div class="button flex items-center">
+                <p class="inline-flex items-center gap-2 my-1 px-4 py-3 font-medium text-white text-lg hover:bg-opacity-90">
+                    <span>Today's Order</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="rounded-lg border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+            <div class="max-w-full overflow-x-auto">
+                <table class="w-full table-auto border-collapse border border-gray-300 mb-4">
+                    <thead>
+                        <tr class="bg-[#F9FAFB] text-left dark:bg-meta-4">
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">ORDER #</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">DATE</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">MEAL TYPE</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">BRANCH</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">LOCATION</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">QUANTITY</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in todays_deliveries %}
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2">#{{ order.id }}</td>
+                            <td class="border border-gray-300 px-4 py-2">{{ order.date }}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                {% if order.meal_type == 'snack' %}
+                                    TEA & SNACK
+                                {% else %}
+                                    {{ order.meal_type|upper  }}
+                                {% endif %}
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                {{ order.branch  }}
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                {{ order.delivery_address  }}
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                {{ order.quantity  }}
+                            </td>
+                                {% if  order.status == 'DELIVERED' %}
+                                <td class="border border-gray-300 px-4 py-2 text-center text-success">{{  order.status }}</td>
+                                {% elif  order.status == 'CANCELED' %}
+                                <td class="border border-gray-300 px-4 py-2 text-center text-danger">{{  order.status }}</td>
+                                {% elif  order.status == 'DISPATCHED' %}
+                                <td class="border border-gray-300 px-4 py-2 text-center text-warning">{{  order.status }}</td>
+                                {% else %}
+                                <td class="border border-gray-300 px-4 py-2 text-center text-primary">{{  order.status }}</td>
+                                {% endif %}
+                        </tr>
+                        {%empty%}
+                        <tr>
+                            <td colspan=7 class="border border-gray-300 px-4 py-2 text-center">No Meals Delivered today!</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}
+
+    
+
+    
+      

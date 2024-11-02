@@ -77,14 +77,14 @@ def dashboard_overview(request):
     start_of_week = make_aware(datetime.combine(today, time.min))
     end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max))
 
-    active_subscriptions = BulkOrders.objects.filter(branch=request.branch)
-    dispatched = MealDelivery.objects.filter(status='DISPATCHED', branch=request.branch).count() or 0
-    cooking = MealDelivery.objects.filter(status='COOKING', branch=request.branch).count() or 0
-    deliveredcount = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch).count() or 0
-    canceled = MealDelivery.objects.filter(status='CANCELED', branch=request.branch).count() or 0
+    active_subscriptions = BulkOrders.objects.filter(branch=request.branch,company=request.company).count() or 0
+    dispatched = MealDelivery.objects.filter(status='DISPATCHED', branch=request.branch,company=request.company).exclude(status=0).count() or 0
+    cooking = MealDelivery.objects.filter(status='COOKING', branch=request.branch,company=request.company).exclude(status=0).count() or 0
+    deliveredcount = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch,company=request.company).exclude(status=0).count() or 0
+    canceled = MealDelivery.objects.filter(status='CANCELED', branch=request.branch,company=request.company).exclude(status=0).count() or 0
     
-    addresses = DeliveryAddress.objects.filter(branch=request.branch)
-    delivered = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch).count() or 0
+    addresses = DeliveryAddress.objects.filter(branch=request.branch,company=request.company)
+    delivered = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch,company=request.company).exclude(status=0).count() or 0
 
     notifications = get_notifications(request)  # Fetch notifications
 
@@ -326,6 +326,32 @@ def orders_list(request):
     today = timezone.localdate()  # Get the server's local date (timezone aware)
     old_date = today - timedelta(days=30)
 
+   
+    # Fetch all deliveries for the branch
+    all_deliveries = MealDelivery.objects.filter(branch=request.branch,company=request.company).exclude(status=0)
+    # print("All deliveries:", all_deliveries)
+
+    # Fetch past deliveries (within the last 30 days)
+    past_deliveries = MealDelivery.objects.filter(
+        branch=request.branch, 
+        company=request.company,
+        date__range=(old_date, today)
+    ).exclude(status=0)
+    # Fetch notifications
+    notifications = get_notifications(request)
+
+    # Render the response
+    return render(request, 'mentor/order/list.html', {
+        'past_deliveries': past_deliveries,
+        'notifications': notifications,
+        'all_deliveries': all_deliveries
+    })
+
+def orders_today(request):
+    tz = timezone.get_current_timezone()  # Uses the TIME_ZONE from settings
+    today = timezone.localdate()  # Get the server's local date (timezone aware)
+    old_date = today - timedelta(days=30)
+
     print("Today's date:", today)
     print("Old date:", old_date)
 
@@ -333,42 +359,7 @@ def orders_list(request):
     todays_deliveries = MealDelivery.objects.filter(branch=request.branch, date=today).exclude(status=0)
     # print("Today's deliveries:", todays_deliveries)
 
-    # Fetch all deliveries for the branch
-    all_deliveries = MealDelivery.objects.filter(branch=request.branch).exclude(status=0)
-    # print("All deliveries:", all_deliveries)
-
-    # Fetch past deliveries (within the last 30 days)
-    past_deliveries = MealDelivery.objects.filter(
-        branch=request.branch, 
-        date__range=(old_date, today)
-    ).exclude(status=0)
-    for delivery in past_deliveries:
-        print("Past delivery:", delivery.meal_type)
-    # print("Past deliveries:", past_deliveries)
-
-    # Combine today's and past deliveries
-    deliveries = list(chain(todays_deliveries, past_deliveries))
-
-    # Paginate the combined deliveries
-    paginator = Paginator(deliveries, 10)  # Show 10 deliveries per page
-    page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
-
-    # Fetch notifications
-    notifications = get_notifications(request)
-
-    # Render the response
-    return render(request, 'mentor/order/list.html', {
-        'deliveries': page_obj,
-        'todays_deliveries': todays_deliveries,
-        'past_deliveries': past_deliveries,
-        'notifications': notifications,
-        'paginator': paginator,
-        'page_obj': page_obj,
-        'all_deliveries': all_deliveries
-    })
-
-
+    return render(request, 'mentor/order/today.html', {'todays_deliveries': todays_deliveries})
 
 @login_required
 def assign_meal(request, date):
@@ -607,7 +598,7 @@ def edit_assign_meal(request,id, date):
 @login_required
 def meal_plan_list(request):
     notifications = get_notifications(request)  # Fetch notifications
-    orders = BulkOrders.objects.filter(branch=request.branch) # Optimize with prefetch
+    orders = BulkOrders.objects.filter(branch=request.branch, company=request.company) # Optimize with prefetch
     mealplans = [mealplan for order in orders for mealplan in order.MealPlan.all()]  # Extract all meal plans
      # Check the status of each order's `bulk_order_end_date`
     for order in orders:

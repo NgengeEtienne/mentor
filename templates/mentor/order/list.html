@@ -1,159 +1,332 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %} Delivery Status {% endblock title %}
+{% block title %} Order Status{% endblock title %}
 
 {% block content %}
+
 <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 class="text-title-md2 font-semibold text-black dark:text-white">Delivery status</h2>
-        <nav>
+        <h2 class="text-title-md2 font-semibold text-black dark:text-white">Order Status</h2>
+         <nav>
             <ol class="flex items-center gap-2">
-                <li><a class="font-medium" href="{{dashboard}}">Dashboard /</a></li>
-                <li class="font-medium text-success">Delivery status</li>
+                <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
+                <li class="font-medium text-success">Order Status</li>
             </ol>
         </nav>
     </div>
-    <div class="pb-5"><div class="flex justify-end p-3 container bg-white rounded-lg">
-       {% comment %}  <div class="button flex items-center">
-             <a href="" class="inline-flex items-center gap-2 rounded-md bg-primary my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm90.5 224H272v74.5c0 8.8-7.2 16-16 16-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3V272h-74.5c-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3 0-8.8 7.2-16 16-16H240v-74.5c0-8.8 7.2-16 16-16s16 7.2 16 16V240h74.5c8.8 0 16 7.2 16 16s-7.2 16-16 16z"></path>
-                </svg>
-                <span>Assign</span>
-            </a> 
-        </div>{% endcomment %}
-    </div> 
-</div>
-<div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-    <div class="max-w-full overflow-x-auto">
-<div class="container mx-auto p-4">
-    <!-- Today's Deliveries Section -->
-    <div class="mb-8">
-        <h2 class="text-xl font-bold text-blue-600 mb-4 text-black dark:text-white">Today’s Delivery</h2>
-        <table class="w- table-auto">
-            <thead>
-                <tr class="bg-gray-2 text-left dark:bg-meta-4">
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Category</th>
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Order</th>
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Location</th>
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Status</th>
-                    {% comment %} <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">ETA</th> {% endcomment %}
-                    {% comment %} <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Action</th> {% endcomment %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for delivery in todays_deliveries %}
-                <tr class="border-b">
-                    <td class="border border-gray-300 py-2 px-4">{{ delivery.meal_type|upper }}</td>
-                    <td class="border border-gray-300 py-2 px-4">{{ delivery.bulk_order }}</td>
-                    <td class="border border-gray-300 py-2 px-4">{{ delivery.delivery_address }}</td>
-                    {% comment %} <td class="border border-gray-300 py-2 px-4"> {% endcomment %}
-                        {% if delivery.status == 'DELIVERED' %}
-                        <td class="border border-gray-300 py-2 px-4 bg-success text-white">{{ delivery.status }}</td>
-                        {% elif delivery.status == 'CANCELED' %}
-                        <td class="border border-gray-300 py-2 px-4 bg-[#DC3545] text-white">{{ delivery.status }}</td>
-                        {% elif delivery.status == 'DISPATCHED' %}
-                        <td class="border border-gray-300 py-2 px-4 bg-[#F9C107] text-white">{{ delivery.status }}</td>
-                        {% else %}
-                        <td class="border border-gray-300 py-2 px-4 bg-[#3BA2B8] text-white">{{ delivery.status }}</td>
-                        {% endif %}
-                        {% comment %} <td class="border border-gray-300 py-2 px-4">{{ delivery.date|time:"H:i" }}</td> {% endcomment %}
-                    {% comment %} </td> {% endcomment %}
-                    {% comment %} <td class="border border-gray-300 py-2 px-4"><a href="{% url 'meal_delivery_edit' delivery.id %}" class="bg-success text-white px-4 py-2 rounded text-sm">Edit</a></td> {% endcomment %}
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center py-2">No deliveries for today</td>
-                </tr>
-                {% endfor %}
+    {% comment %} {% for order in orders %} {% endcomment %}
+    
+    <div class="pb-2 mt-4">
+        <div class="flex justify-start p-3 container bg-black rounded-lg  mb-2">
+            <div class="button flex items-center">
+                <p class="inline-flex items-center gap-2 my-1 px-4 py-3 font-medium text-white text-lg hover:bg-opacity-90">
+                    <span>Order Status</span>
+                </p>
+            </div>
+        </div>
+
+        {% comment %} <div class="rounded-lg border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1"> {% endcomment %}
+            <div
+                class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark"
+              >
+                <div
+                  class="data-table-common data-table-one max-w-full overflow-x-auto"
+                >
+                  <table class="table w-full table-auto" id="dataTableOne">
+                    <thead>
+                      <tr>
+                        <th>
+                          <div class="flex items-center gap-1.5">
+                            <p>ORDER #</p>
+                            <div class="inline-flex flex-col space-y-[2px]">
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path d="M5 0L0 5H10L5 0Z" fill="" />
+                                </svg>
+                              </span>
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M5 5L10 0L-4.37114e-07 8.74228e-07L5 5Z"
+                                    fill=""
+                                  />
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                        </th>
+                        <th>
+                          <div class="flex items-center gap-1.5">
+                            <p>DATE</p>
+                            <div class="inline-flex flex-col space-y-[2px]">
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path d="M5 0L0 5H10L5 0Z" fill="" />
+                                </svg>
+                              </span>
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M5 5L10 0L-4.37114e-07 8.74228e-07L5 5Z"
+                                    fill=""
+                                  />
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                        </th>
+                        <th data-type="date" data-format="YYYY/DD/MM">
+                          <div class="flex items-center gap-1.5">
+                            <p>MEAL TYPE</p>
+                            <div class="inline-flex flex-col space-y-[2px]">
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path d="M5 0L0 5H10L5 0Z" fill="" />
+                                </svg>
+                              </span>
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M5 5L10 0L-4.37114e-07 8.74228e-07L5 5Z"
+                                    fill=""
+                                  />
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                        </th>
+                        <th>
+                          <div class="flex items-center gap-1.5">
+                            <p>BRANCH</p>
+                            <div class="inline-flex flex-col space-y-[2px]">
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path d="M5 0L0 5H10L5 0Z" fill="" />
+                                </svg>
+                              </span>
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M5 5L10 0L-4.37114e-07 8.74228e-07L5 5Z"
+                                    fill=""
+                                  />
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                        </th>
+                        <th>
+                          <div class="flex items-center gap-1.5">
+                            <p>LOCATION</p>
+                            <div class="inline-flex flex-col space-y-[2px]">
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path d="M5 0L0 5H10L5 0Z" fill="" />
+                                </svg>
+                              </span>
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M5 5L10 0L-4.37114e-07 8.74228e-07L5 5Z"
+                                    fill=""
+                                  />
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                        </th>
+                        <th>
+                          <div class="flex items-center gap-1.5">
+                            <p>QUANTITY</p>
+                            <div class="inline-flex flex-col space-y-[2px]">
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path d="M5 0L0 5H10L5 0Z" fill="" />
+                                </svg>
+                              </span>
+                              <span class="inline-block">
+                                <svg
+                                  class="fill-current"
+                                  width="10"
+                                  height="5"
+                                  viewBox="0 0 10 5"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M5 5L10 0L-4.37114e-07 8.74228e-07L5 5Z"
+                                    fill=""
+                                  />
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                        </th>
+
+                        <th>
+                            <div class="flex items-center gap-1.5">
+                              <p>STATUS</p>
+                              <div class="inline-flex flex-col space-y-[2px]">
+                                <span class="inline-block">
+                                  <svg
+                                    class="fill-current"
+                                    width="10"
+                                    height="5"
+                                    viewBox="0 0 10 5"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path d="M5 0L0 5H10L5 0Z" fill="" />
+                                  </svg>
+                                </span>
+                                <span class="inline-block">
+                                  <svg
+                                    class="fill-current"
+                                    width="10"
+                                    height="5"
+                                    viewBox="0 0 10 5"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M5 5L10 0L-4.37114e-07 8.74228e-07L5 5Z"
+                                      fill=""
+                                    />
+                                  </svg>
+                                </span>
+                              </div>
+                            </div>
+                          </th>
+                          
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in all_deliveries %}
+
+                            <tr>
+                                <td>#{{ order.id }}</td>
+                                <td>{{ order.date }}</td>
+                                <td>
+                                    {% if order.meal_type == 'snack' %}
+                                    TEA & SNACK
+                                {% else %}
+                                    {{ order.meal_type|upper  }}
+                                {% endif %}
+                            </td>
+                                <td>{{ order.branch  }}</td>
+                                <td>{{ order.delivery_address  }}</td>
+                                <td>{{ order.quantity  }}</td>
+                                {% if  order.status == 'DELIVERED' %}
+                                <td><span class="text-success">{{  order.status }}</span></td>
+                                {% elif  order.status == 'CANCELED' %}
+                                <td><span class="text-danger">{{  order.status }}</span></td>
+                                {% elif  order.status == 'DISPATCHED' %}
+                                <td><span class="text-warning">{{  order.status }}</span></td>
+                                {% else %}
+                                <td><span class="text-primary">{{  order.status }}</span></td>
+                                {% endif %}
+                            </tr>
+                        {%empty%}
+                            <tr>
+                                <td colspan=7 class="border border-gray-300 m-4 py-2 text-center">No Meals Delivered so far!</td>
+                            </tr>
+                      {%endfor%}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <!-- ====== Data Table One End -->
             </tbody>
         </table>
+      </div>
     </div>
+        </div>
+    </div>
+    
+    <script defer src="{% static '' %}bundle.js"></script>
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js"></script>
 
-    <!-- Past Deliveries Section -->
-    <div>
-        <h2 class="text-xl font-bold text-blue-600 mb-4 text-black dark:text-white">Past Deliveries</h2>
-        <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-            <thead>
-                <tr class="bg-blue-600 text-white">
-                    
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Category</th>
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Order</th>
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Location</th>
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Status</th>
-                    <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Date</th>
-                   
-                </tr>
-            </thead>
-            <tbody>
-                {% for past_delivery in all_deliveries %}
-                <tr class="border-b">
-                    <td class="border border-gray-300 py-2 px-4">{{ past_delivery.meal_type|upper }}</td>
-                    <td class="border border-gray-300 py-2 px-4">{{ past_delivery.bulk_order }}</td>
-                    <td class="border border-gray-300 py-2 px-4">{{ past_delivery.delivery_address }}</td>
-                    {% comment %} <td class="border border-gray-300 py-2 px-4"> {% endcomment %}
-                        {% if  past_delivery.status == 'DELIVERED' %}
-                        <td class="border border-gray-300 py-2 px-4 bg-success text-white">{{  past_delivery.status }}</td>
-                        {% elif  past_delivery.status == 'CANCELED' %}
-                        <td class="border border-gray-300 py-2 px-4 bg-[#DC3545] text-white">{{  past_delivery.status }}</td>
-                        {% elif  past_delivery.status == 'DISPATCHED' %}
-                        <td class="border border-gray-300 py-2 px-4 bg-[#F9C107] text-white">{{  past_delivery.status }}</td>
-                        {% else %}
-                        <td class="border border-gray-300 py-2 px-4 bg-[#3BA2B8] text-white">{{  past_delivery.status }}</td>
-                        {% endif %}
-                    {% comment %} </td> {% endcomment %}
-                    <td class="border border-gray-300 py-2 px-4">{{ past_delivery.date }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center py-2">No past deliveries available</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-   <!-- Pagination Controls -->
-   <nav aria-label="Page navigation example">
-    <ul class="list-style-none flex">
-        {% if page_obj.has_previous %}
-        <li>
-            <a
-                class="relative block rounded-full bg-transparent px-3 py-1.5 text-sm text-surface transition duration-300 dark:text-neutral-400"
-                href="?page={{ page_obj.previous_page_number }}">Previous</a>
-        </li>
-        {% else %}
-        <li>
-            <a
-                class="pointer-events-none relative block rounded-full bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400"
-                >Previous</a
-            >
-        </li>
-        {% endif %}
 
-        {% for num in page_obj.paginator.page_range %}
-        <li {% if num == page_obj.number %}aria-current="page"{% endif %}>
-            <a
-                class="relative block rounded-full bg-transparent px-3 py-1.5 text-sm text-surface transition duration-300 
-                {% if num == page_obj.number %}bg-primary text-primary-700 font-medium{% else %}hover:bg-neutral-100 focus:bg-neutral-100 focus:text-primary{% endif %} 
-                focus:outline-none dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 dark:focus:text-primary-500 dark:active:bg-neutral dark:active:text-primary-500"
-                href="?page={{ num }}"
-                >{{ num }}</a
-            >
-        </li>
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-        <li>
-            <a
-                class="relative block rounded-full bg-transparent px-3 py-1.5 text-sm text-surface transition duration-300"
-                href="?page={{ page_obj.next_page_number }}">Next</a>
-        </li>
-        {% else %}
-        <li>
-            <a
-                class="pointer-events-none relative block rounded-full bg-transparent px-3 py-1.5 text-sm text-surface/50 transition duration-300 dark:text-neutral-400"
-                >Next</a
-            >
-        </li>
-        {% endif %}
-    </ul>
-</nav>
 {% endblock content %}
+
+    
+
+    
+      

@@ -10,8 +10,9 @@
         <h2 class="text-title-md2 font-semibold text-black dark:text-white">Update Daily Food Count</h2>
         <nav>
             <ol class="flex items-center gap-2">
-                <li><a class="font-medium" href="{{dashboard}}">Dashboard /</a></li>
-                <li class="font-medium text-success">Update Daily Food Count</li>
+              <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
+              <li><a class="font-medium" href="{% url 'meal_ordered' %}">Daily Food Count /</a></li>
+              <li class="font-medium text-success">Update Daily Food Count</li>
             </ol>
         </nav>
   </div>
