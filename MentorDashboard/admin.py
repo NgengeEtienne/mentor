@@ -10,28 +10,16 @@ from .models import DeliveryAddress, MealDelivery, Notification
 from django.contrib import admin
 from .models import DeliveryAddress, MealDelivery, Notification
 
-# Inline for MealDelivery
-class MealDeliveryInline(admin.TabularInline):
-    model = MealDelivery
-    extra = 1  # Number of empty forms to display
-    fields = ('bulk_order', 'meal_type', 'quantity', 'date', 'status')
-
-# Inline for Notification
-class NotificationInline(admin.TabularInline):
-    model = Notification
-    extra = 1  # Number of empty forms to display
-    fields = ('message',)
-
+#
 # Admin for DeliveryAddress
 @admin.register(DeliveryAddress)
 class DeliveryAddressAdmin(admin.ModelAdmin):
-    list_display = ('name', 'address_line_1', 'city', 'state', 'pin_code', 'default_address')
-    inlines = [MealDeliveryInline]  # Only include MealDelivery here
+    list_display = ('name','company','branch', 'address_line_1', 'city', 'state', 'pin_code', 'default_address')
 
 # Admin for MealDelivery
 @admin.register(MealDelivery)
 class MealDeliveryAdmin(admin.ModelAdmin):
-    list_display = ('bulk_order', 'delivery_address', 'meal_type', 'quantity', 'date', 'status', 'created_at')
+    list_display = ('bulk_order', 'company','branch','delivery_address', 'meal_type', 'quantity', 'date', 'status')
     # inlines = [NotificationInline]  # Include Notification inline here
 
 # Admin for Notification
