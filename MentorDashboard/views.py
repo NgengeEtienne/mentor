@@ -675,7 +675,12 @@ def meal_ordered(request):
         #     order['date'] = datetime.strptime(order['date'], date_format)
         address = order['delivery_address__name']
         address_pk = order['delivery_address__pk']
-        date_str = str(order['date'])
+        order_datetime = datetime.combine(order['date'], datetime.min.time())
+
+# Make it timezone-aware
+        order_datetime_aware = timezone.make_aware(order_datetime)
+        date_str = order_datetime_aware.strftime(date_format)
+        # print(address, address_pk, date_str,order['date'])
 
         if address not in data_by_address:
             data_by_address[address] = {}
