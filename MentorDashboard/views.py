@@ -734,6 +734,7 @@ def meal_ordered(request):
                     'total_snack': '-',
                     'total_dinner': '-',
                     'total_dinner2': '-',
+                    'is_future': "True" if day > today or (day != today and current_time < six_pm) else "False",
                     'address_pk': address_pk,
                 }
     
