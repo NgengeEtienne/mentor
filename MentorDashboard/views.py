@@ -681,7 +681,7 @@ def meal_ordered(request):
 
         # Ensure order_date is a date object before combining
         if isinstance(order_date, datetime):
-            order_date = order_date  # Get just the date part
+            order_date = str(order_date)  # Convert to string
 
         # Combine the date with the minimum time (00:00:00)
         order_datetime = datetime.combine(order_date, time.min)
