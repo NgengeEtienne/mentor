@@ -677,16 +677,17 @@ def meal_ordered(request):
         #     order['date'] = datetime.strptime(order['date'], date_format)
         address = order['delivery_address__name']
         address_pk = order['delivery_address__pk']
-        order_datetime = datetime.combine(order['date'], datetime.min.time())
-
-# Make it timezone-aware
-        order_datetime_aware = timezone.make_aware(order_datetime)
-        date_str = order_datetime_aware.strftime(date_format)
-        # print(address, address_pk, date_str,order['date'])
+        date_str = str(order['date'])
 
         if address not in data_by_address:
             data_by_address[address] = {}
         # today1 = datetime.combine(datetime.today().date(), datetime.min.time())  # Adjust if you need a specific time
+        # order_date_str = order['date']  # e.g., '2024-11-02'
+
+        # order_date = datetime.strptime(order_date_str, "%Y-%m-%d").date()  # This gives you a date object
+
+        # Format the date as "Nov. 1, 2024"
+        # formatted_date = order_date_str.strftime("%b. %d, %Y").lstrip("0")  # Remove leading zero from the day
         if isinstance(order['date'], str):
             order_date = datetime.strptime(order['date'], "%Y-%m-%d").date()
         else:
