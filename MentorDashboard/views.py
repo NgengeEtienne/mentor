@@ -500,6 +500,7 @@ def edit_assign_meal(request,id, date):
         'lunch': 0,
         'snack': 0,
         'dinner': 0,
+        'dinner2': 0
         
     }
 

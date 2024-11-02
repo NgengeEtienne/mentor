@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %} Order Status{% endblock title %}
+{% block title %} Order History {% endblock title %}
 
 {% block content %}
 
 <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 class="text-title-md2 font-semibold text-black dark:text-white">Order Status</h2>
+        <h2 class="text-title-md2 font-semibold text-black dark:text-white">Order History </h2>
          <nav>
             <ol class="flex items-center gap-2">
                 <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
-                <li class="font-medium text-success">Order Status</li>
+                <li class="font-medium text-success">Order History </li>
             </ol>
         </nav>
     </div>
@@ -20,7 +20,7 @@
         <div class="flex justify-start p-3 container bg-black rounded-lg  mb-2">
             <div class="button flex items-center">
                 <p class="inline-flex items-center gap-2 my-1 px-4 py-3 font-medium text-white text-lg hover:bg-opacity-90">
-                    <span>Order Status</span>
+                    <span>Order History </span>
                 </p>
             </div>
         </div>

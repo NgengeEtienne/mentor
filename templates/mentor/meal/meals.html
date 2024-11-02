@@ -54,8 +54,11 @@
                                 {{ order.total_snack|default_if_none:"-"  }}
                             </td>
                             <td class="border border-gray-300 px-4 py-2 text-center">
-                                {{ order.total_dinner|default_if_none:"-"  }}
-                            </td>
+                                {% with order.total_dinner|default_if_none:0 as dinner %}
+                                {% with order.total_dinner2|default_if_none:0 as dinner2 %}
+                                {{ dinner|add:dinner2 }}
+                                {% endwith %}
+                                {% endwith %}                            </td>
                             <td class="border border-gray-300 px-4 py-2 text-center">
                                 {% if order.is_future == "False" %}
                                 <a class="bg-gray-300 text-black px-4 py-2 rounded text-sm"
