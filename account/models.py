@@ -46,8 +46,9 @@ class CustomUser(AbstractUser):
     username = models.CharField(max_length=250, null=True)
     email = models.EmailField(max_length=100, unique=True, null=True)
     date_joined = models.DateTimeField(default=timezone.now)  # Make it editable
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, blank=True)
+    company = models.ManyToManyField(Company, blank=True, related_name='managers')
+    branch = models.ManyToManyField(Branch, blank=True, related_name='managers')
+
     role = models.CharField(max_length=20, choices=[
         ('MENTOR', 'Mentor'),
         ('BRANCH_MANAGER', 'Branch Manager'),

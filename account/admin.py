@@ -51,7 +51,15 @@ class CustomUserAdmin(UserAdmin):
 
 
     # Customize display fields in the user list
-    list_display = ('email', 'username', 'company', 'branch', 'role', 'is_staff', 'is_active')
+    list_display = ('email', 'username', 'get_companies', 'get_branches', 'role', 'is_staff', 'is_active')
+
+    def get_companies(self, obj):
+        return ", ".join([company.name for company in obj.company.all()])
+    get_companies.short_description = 'Companies'
+
+    def get_branches(self, obj):
+        return ", ".join([branch.name for branch in obj.branch.all()])
+    get_branches.short_description = 'Branches'
     search_fields = ('email', 'username', 'company__name', 'branch__name')  # Search by company and branch names
     ordering = ('email',)
     filter_horizontal = ()

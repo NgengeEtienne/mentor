@@ -6,34 +6,27 @@ class BranchCompanyMiddleware(MiddlewareMixin):
     def process_request(self, request):
         try:
             if request.user.is_authenticated:
-                request.branch = Branch.objects.get(id=request.user.branch.id)
-                request.company = Company.objects.get(id=request.user.branch.company_id)
+                # Retrieve all branches and companies related to the user
+                request.branches = request.user.branch.all()  # queryset of branches
+                request.companies = request.user.company.all()  # queryset of companies
+
+                # If you need only the first branch or company, use .first()
+                request.branch = request.user.branch.all().first()  # First branch, if needed
+                request.company = request.user.company.all().first()  # First company, if needed
             else:
-                # Handle unauthenticated users
-                # You can either set defaults or raise an error
-                request.branch = None  # Set to a default branch
-                request.company = None  # Set to a default company
-
-        except Branch.DoesNotExist:
-            # Handle case where branch does not exist
-            request.branch = None  # or some default branch
-            # Optionally log the error or raise an exception
-            print(f"Branch not found for user {request.user.id}")
-
-        except Company.DoesNotExist:
-            # Handle case where company does not exist
-            request.company = None  # or some default company
-            # Optionally log the error or raise an exception
-            print(f"Company not found for branch {request.user.branch.id}")
+                # Handle unauthenticated users by setting to empty querysets
+                request.branches = Branch.objects.none()  # Empty queryset for branches
+                request.companies = Company.objects.none()  # Empty queryset for companies
+                request.branch = None
+                request.company = None
 
         except Exception as e:
-            # Handle any other exception
+            # Log any unexpected error and set to empty querysets
+            request.branches = Branch.objects.none()
+            request.companies = Company.objects.none()
             request.branch = None
             request.company = None
-            # Log the error message
             print(f"An unexpected error occurred: {e}")
-
-
 
 # middleware/restrict_admin.py
 

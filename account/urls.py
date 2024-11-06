@@ -1,6 +1,7 @@
 from django.urls import path, include
 from .views import *
 from. import views
+from .views import csrf_token_view  # Import your view
 
 
 name="account"
@@ -11,6 +12,7 @@ urlpatterns = [
     path('reset-password/confirm_password/', CustomPasswordTokenVerificationView.as_view(), name='confirm_password'),  # confirm password
     path('reset-password/', include('django_rest_passwordreset.urls', namespace='password_reset')),
 
+    path('csrf-token/', csrf_token_view, name='csrf_token'),
 
     path('companies/', views.CompanyList.as_view()),
     path('companies/<int:pk>/', views.CompanyDetail.as_view()),

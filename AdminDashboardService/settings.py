@@ -42,7 +42,7 @@ DEBUG = "true"#os.environ.get('DEBUG', "False").lower() == "true"
 #ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 # ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(" ")
 
-ALLOWED_HOSTS=['*']
+ALLOWED_HOSTS=['localhost','127.0.0.1','159.89.164.235']
 
 
 # Application definition
@@ -208,13 +208,26 @@ CORS_ALLOWED_ORIGINS = [
     'http://34.211.200.85',  # Add 'http://' or 'https://'
     'http://localhost:5173',
     'http://localhost:8000',
+    'http://localhost:8001',
     'http://159.89.164.235:8000',
+    'http://159.89.164.235:8001',
+    'http://localhost:8001',
+    'http://127.0.0.1:8001',
 ]
 
 # Optional: Allow all methods and headers
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to access the CSRF cookie
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8001',
+    'http://127.0.0.1:8001',
+    'http://159.89.164.235:8000'
+    'http://159.89.164.235:8001'  # Add other domains you need
+]
 
+# CSRF_TRUSTED_ORIGINS=True
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

@@ -26,25 +26,53 @@ from .models import Company
 
 from django.views.decorators.csrf import csrf_exempt
 
-@csrf_exempt
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
+
+def csrf_token_view(request):
+    csrf_token = get_token(request)
+    return JsonResponse({'csrfToken': csrf_token})
+
 class AdminLoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        # Print incoming request data for debugging
+        print("Incoming request data:", request.data)
+        
         serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data
+        
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            print("Validation error:", str(e))
+            return Response({
+                'status': 400,
+                'msg': 'Invalid data',
+                'errors': serializer.errors  # Return the validation errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        user = serializer.validated_data.get('user')  # Ensure you get the user object
+        print("Validated user:", user)
+
         if user.is_staff:
+            print("User is staff, proceeding with login...")
             auth_login(request, user)  # Start session
             token = RefreshToken.for_user(user)
+            print("Generated token:", token.access_token)
+
             return Response({
                 'status': 200,
                 'msg': 'Admin login successful',
                 'token': str(token.access_token),
                 'refresh_token': str(token),
             })
-        else:
-            return Response({'status': 403, 'msg': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)
+
+        print("User is not staff, returning forbidden response.")
+        return Response({
+            'status': 403,
+            'msg': 'Forbidden - User does not have admin access'
+        }, status=status.HTTP_403_FORBIDDEN)
 
 class AdminLogoutView(APIView):
     permission_classes = [AllowAny]
