@@ -1,24 +1,34 @@
 from django.utils.deprecation import MiddlewareMixin
 from django.http import Http404
-from AdminDashboard.models import Branch, Company
+from account.models import Branch,CustomUser,Company
 
 class BranchCompanyMiddleware(MiddlewareMixin):
     def process_request(self, request):
         try:
             if request.user.is_authenticated:
                 # Retrieve all branches and companies related to the user
-                request.branches = request.user.branch.all()  # queryset of branches
-                request.companies = request.user.company.all()  # queryset of companies
+                request.branch = request.user.branch.all()  # queryset of branches
+                request.company = request.user.company.all()  # queryset of companies
+                # print(request.branch, request.company)
 
                 # If you need only the first branch or company, use .first()
                 request.branch = request.user.branch.all().first()  # First branch, if needed
                 request.company = request.user.company.all().first()  # First company, if needed
+                # print(request.branch, request.company)
+
+                # user = CustomUser.objects.get(email="et@gmail.com")  # Replace with an actual user email
+                # print(user.branch.all())  # Should return queryset of branches if populated
+                # print(user.company.all())  # Should return queryset of companies if populated
+
             else:
                 # Handle unauthenticated users by setting to empty querysets
                 request.branches = Branch.objects.none()  # Empty queryset for branches
                 request.companies = Company.objects.none()  # Empty queryset for companies
                 request.branch = None
                 request.company = None
+                print("unauth")
+
+
 
         except Exception as e:
             # Log any unexpected error and set to empty querysets
