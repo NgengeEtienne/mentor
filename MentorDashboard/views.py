@@ -31,7 +31,11 @@ from django.db.models import Sum, Case, When, IntegerField
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 import pytz
-
+from django.core.paginator import Paginator
+from itertools import chain
+from datetime import date
+from django.contrib.auth import logout
+from django.shortcuts import redirect
 # Define the Indian timezone
 india_tz = pytz.timezone('Asia/Kolkata')
 
@@ -50,7 +54,7 @@ def mentor_login(request):
 
             if user is not None:
                 # Check if user is either a mentor or a staff (non-superuser)
-                if user.role == 'MENTOR' or (user.is_staff and not user.is_superuser):
+                if user.role in ['MENTOR', 'BRANCH_MANAGER', 'COMPANY_ADMIN'] :
                     login(request, user)
                     return redirect('dashboard')  # Redirect to custom dashboard
                 else:
@@ -63,8 +67,7 @@ def mentor_login(request):
 
     return render(request, 'login.html', {'form': form})
 
-from django.contrib.auth import logout
-from django.shortcuts import redirect
+
 
 def logout_view(request):
     logout(request)  # Log out the user
@@ -73,12 +76,25 @@ def logout_view(request):
 # Utility function to fetch notifications
 @login_required
 def get_notifications(request):
-    return Notification.objects.order_by('-created_at').filter(branch=request.branch)[:5]
+    if request.user.role != 'MENTOR':
+        branch=Branch.objects.all()
+        # company=branch.company
+        return Notification.objects.order_by('-created_at').filter(branch__in=branch)[:5]
+    else:
+        branch = request.branch
+        company = request.company
+        return Notification.objects.order_by('-created_at').filter(branch=branch)[:5]
+    
+    # return Notification.objects.order_by('-created_at').filter(branch=branch)[:5]
 
 @login_required
 def dashboard_overview(request):
-    branch = request.branch  
-    company = request.company  
+    if request.user.role != 'MENTOR':
+        branch=Branch.objects.all()
+        # company=branch.company
+    else:
+        branch = request.branch  
+        company = request.company  
     #Get current date and time in Indian timezone
     now_ist = timezone.now().astimezone(india_tz)
     today = now_ist.date()  
@@ -89,24 +105,27 @@ def dashboard_overview(request):
     start_of_week = make_aware(datetime.combine(today, time.min), india_tz)
     end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max), india_tz)
 
-    active_subscriptions = BulkOrders.objects.filter(branch=request.branch,company=request.company).count() or 0
-    dispatched = MealDelivery.objects.filter(status='DISPATCHED', branch=request.branch,company=request.company).exclude(status=0).count() or 0
-    cooking = MealDelivery.objects.filter(status='COOKING', branch=request.branch,company=request.company).exclude(status=0).count() or 0
-    deliveredcount = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch,company=request.company).exclude(status=0).count() or 0
-    canceled = MealDelivery.objects.filter(status='CANCELED', branch=request.branch,company=request.company).exclude(status=0).count() or 0
+    active_subscriptions = BulkOrders.objects.filter(branch__in=branch).count() or 0
+    dispatched = MealDelivery.objects.filter(status='DISPATCHED', branch__in=branch).exclude(status=0).count() or 0
+    cooking = MealDelivery.objects.filter(status='COOKING', branch__in=branch).exclude(status=0).count() or 0
+    deliveredcount = MealDelivery.objects.filter(status='DELIVERED', branch__in=branch).exclude(status=0).count() or 0
+    canceled = MealDelivery.objects.filter(status='CANCELED', branch__in=branch).exclude(status=0).count() or 0
     
-    addresses = DeliveryAddress.objects.filter(branch=request.branch,company=request.company)
-    delivered = MealDelivery.objects.filter(status='DELIVERED', branch=request.branch,company=request.company).exclude(status=0).count() or 0
+    addresses = DeliveryAddress.objects.filter(branch__in=branch)
+    delivered = MealDelivery.objects.filter(status='DELIVERED', branch__in=branch).exclude(status=0).count() or 0
 
-    notifications = get_notifications(request)  # Fetch notifications
+    # if branch_id:
+    #     notifications = get_notifications(request)
+    # else:
+    #     notifications = get_notifications(request)  # Fetch notifications
 
-    #
+    # #
     # Query all addresses for the given branch and company
-    addresses = DeliveryAddress.objects.filter(branch=branch, company=company)
+    addresses = DeliveryAddress.objects.filter(branch__in=branch)
 
     # Query all orders within the week, grouped by address and date
     orders = (
-        MealDelivery.objects.filter(branch=branch, date__range=[start_of_week, end_of_week])
+        MealDelivery.objects.filter(branch__in=branch, date__range=[start_of_week, end_of_week])
         .values('date', 'delivery_address__name', 'delivery_address__pk')
         .annotate(
             total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
@@ -188,22 +207,43 @@ def dashboard_overview(request):
         "deliveredcount": deliveredcount,
         "canceled": canceled,
         "addresses": addresses,
-        "notifications": notifications,
+        # "notifications": notifications,
         'data_by_address': sorted_data,
     }
 
     return render(request, 'mentor/home.html', context)
 
 @login_required
-def delivery_address_list(request):
-    addresses = DeliveryAddress.objects.filter(branch=request.branch)
-    notifications = get_notifications(request)  # Fetch notifications
+def delivery_address_list(request, branch_id=None):
+    if request.user.role == 'BRANCH_MANAGER':
+        # Get all branches managed by the Branch Manager
+        branches = request.user.branch.all()
+
+        # Filter by specific branch if branch_id is provided
+        if branch_id:
+            branches = branches.filter(id=branch_id)
+            addresses = DeliveryAddress.objects.filter(branch__in=branches)
+    else:
+        # Get all branches
+        # Filter addresses for the selected branches
+        addresses = DeliveryAddress.objects.filter(branch=request.branch)
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+  # Fetch notifications
     return render(request, 'mentor/delivery/list.html', {'addresses': addresses, 'notifications': notifications})
 
 @login_required
-def delivery_address_create(request):
+def delivery_address_create(request, branch_id=None):
     form = DeliveryAddressForm()
-    notifications = get_notifications(request)  # Fetch notifications
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+  # Fetch notifications
     if request.method == 'POST':
         name = request.POST['name']
         address_line_1 = request.POST['address_line_1']
@@ -214,9 +254,12 @@ def delivery_address_create(request):
         # latitude = request.POST['latitude']
         # longitude = request.POST['longitude']
         default_address = request.POST.get('default_address')
-    
-        branch = request.branch
-        company = request.company
+        if branch_id:
+            branch=Branch.objects.get(id=branch_id)
+            company=branch.company
+        else:
+            branch = request.branch
+            company = request.company
         if default_address == "on":
             default_address = True
         else:
@@ -230,9 +273,14 @@ def delivery_address_create(request):
     return render(request, 'mentor/delivery/form.html', {'form': form, 'notifications': notifications})
 
 @login_required
-def delivery_address_edit(request, id):
+def delivery_address_edit(request, id, branch_id=None):
     address = get_object_or_404(DeliveryAddress, id=id)
-    notifications = get_notifications(request)  # Fetch notifications
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+  # Fetch notifications
     
     if request.method == 'POST':
         form = DeliveryAddressForm(request.POST, instance=address)
@@ -241,6 +289,12 @@ def delivery_address_edit(request, id):
             # Check if the default_address is set and handle accordingly
             default_address = form.cleaned_data.get('default_address')
             print(default_address)
+            if branch_id:
+                branch=Branch.objects.get(id=branch_id)
+                company=branch.company
+            else:
+                branch = request.branch
+                company = request.company
             if default_address and DeliveryAddress.objects.filter(branch=request.branch, default_address=True).exclude(id=id).exists():
                 messages.error(request, 'A default address already exists in another address.')
             else:
@@ -265,9 +319,13 @@ def delivery_address_edit(request, id):
     })
 
 @login_required
-def delivery_address_delete(request, id):
+def delivery_address_delete(request, id, branch_id=None):
     address = get_object_or_404(DeliveryAddress, id=id)
-    notifications = get_notifications(request)  # Fetch notifications
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
     
     if request.method == 'POST':
         address.delete()
@@ -276,21 +334,48 @@ def delivery_address_delete(request, id):
     return render(request, 'mentor/delivery/confirm_delete.html', {'address': address, 'notifications': notifications})
 
 @login_required
-def meal_delivery_list(request):
-    deliveries = BulkOrders.objects.filter(branch=request.branch).all()
-    notifications = get_notifications(request)  # Fetch notifications
+def meal_delivery_list(request, branch_id=None):
+ 
+        # Filter by specific branch if branch_id is provided
+    if branch_id:
+            branch = request.branch.filter(id=branch_id)
+            deliveries = MealDelivery.objects.filter(branch=branch).all()
+    else:
+        # Get all branches
+        # Filter deliveries for the selected branches
+        deliveries = MealDelivery.objects.filter(branch=request.branch).all()
+    # deliveries = BulkOrders.objects.filter(branch=request.branch).all()
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+  # Fetch notifications
     return render(request, 'mentor/meal/list.html', {'deliveries': deliveries, 'notifications': notifications})
 
 @login_required
-def meal_delivered(request):
-    deliveries = MealDelivery.objects.filter(branch=request.branch).all()
-    notifications = get_notifications(request)  # Fetch notifications
+def meal_delivered(request, branch_id=None):
+    if branch_id:
+        deliveries = MealDelivery.objects.filter(branch_id=branch_id).all()
+    else:
+        deliveries = MealDelivery.objects.filter(branch=request.branch).all()
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+  # Fetch notifications
     return render(request, 'mentor/meal/form.html', {'deliveries': deliveries, 'notifications': notifications})
 
 @login_required
-def meal_delivery_edit(request, id):
+def meal_delivery_edit(request, id, branch_id=None):
     delivery = get_object_or_404(MealDelivery, id=id)
-    notifications = get_notifications(request)  # Fetch notifications
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+  # Fetch notifications
     
     if request.method == 'POST':
         form = MealDeliveryForm(request.POST, instance=delivery)
@@ -298,13 +383,15 @@ def meal_delivery_edit(request, id):
             old_status = delivery.status
             updated_delivery = form.save(commit=False)
             updated_delivery.save()
-
+            if branch_id:
+                branch = Branch.objects.get(id=branch_id)
+                company = branch.company
             if old_status != updated_delivery.status:
                 Notification.objects.create(
                     delivery=updated_delivery.deliver,
                     message=f"Status changed from {old_status} to {updated_delivery.status} for Meal Delivery ID {updated_delivery.id}.",
-                    branch=request.branch,
-                    company=request.company
+                    branch=branch,
+                    company=company
                 )
 
             return redirect('orders_list')
@@ -314,10 +401,21 @@ def meal_delivery_edit(request, id):
     return render(request, 'mentor/meal/edit.html', {'form': form, 'delivery': delivery, 'notifications': notifications})
 
 @login_required
-def assign_address(request, id):
+def assign_address(request, id, branch_id=None):
+    if branch_id:
+        branch=Branch.objects.get(id=branch_id)
+        company=branch.company
+    else:
+        branch = request.branch
+        company = request.company
     delivery = get_object_or_404(MealDelivery, id=id)
-    addresses = DeliveryAddress.objects.filter(branch=request.branch)
-    notifications = get_notifications(request)  # Fetch notifications
+    addresses = DeliveryAddress.objects.filter(branch=branch)
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+  # Fetch notifications
     
     if request.method == 'POST':
         address_id = request.POST.get('address')
@@ -327,30 +425,38 @@ def assign_address(request, id):
     
     return render(request, 'mentor/meal/assign_address.html', {'delivery': delivery, 'addresses': addresses, 'notifications': notifications})
 
-from django.core.paginator import Paginator
-from itertools import chain
-from datetime import date
+
 @login_required
-def orders_list(request):
+def orders_list(request, branch_id=None):
     # Get today's date
      # Get the current date and time in the timezone defined in settings.py
     tz = timezone.get_current_timezone()  # Uses the TIME_ZONE from settings
     today = timezone.localdate()  # Get the server's local date (timezone aware)
     old_date = today - timedelta(days=30)
-
-   
+    if branch_id:
+        branch=Branch.objects.get(id=branch_id)
+        company=branch.company
+    else:
+        branch = request.branch
+        company = request.company
+    
     # Fetch all deliveries for the branch
-    all_deliveries = MealDelivery.objects.filter(branch=request.branch,company=request.company).exclude(status=0)
+    all_deliveries = MealDelivery.objects.filter(branch=branch,company=company).exclude(status=0)
     # print("All deliveries:", all_deliveries)
 
     # Fetch past deliveries (within the last 30 days)
     past_deliveries = MealDelivery.objects.filter(
-        branch=request.branch, 
-        company=request.company,
+        branch=branch, 
+        company=company,
         date__range=(old_date, today)
     ).exclude(status=0)
     # Fetch notifications
-    notifications = get_notifications(request)
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+
 
     # Render the response
     return render(request, 'mentor/order/list.html', {
@@ -359,32 +465,50 @@ def orders_list(request):
         'all_deliveries': all_deliveries
     })
 
-def orders_today(request):
+def orders_today(request, branch_id=None):
     tz = timezone.get_current_timezone()  # Uses the TIME_ZONE from settings
     today = timezone.localdate()  # Get the server's local date (timezone aware)
     old_date = today - timedelta(days=30)
 
     print("Today's date:", today)
     print("Old date:", old_date)
-
+    if branch_id:
+        branch=Branch.objects.get(id=branch_id)
+        company=branch.company
+    else:
+        branch = request.branch
+        company = request.company
+    
     # Fetch today's deliveries for the branch
-    todays_deliveries = MealDelivery.objects.filter(branch=request.branch, date=today).exclude(status=0)
+    todays_deliveries = MealDelivery.objects.filter(branch=branch, date=today).exclude(status=0)
     # print("Today's deliveries:", todays_deliveries)
 
     return render(request, 'mentor/order/today.html', {'todays_deliveries': todays_deliveries})
 
 @login_required
-def assign_meal(request, date):
+def assign_meal(request, date, branch_id=None):
     # Get the first order
-    order = BulkOrders.objects.filter(branch=request.branch,company=request.company).first()
+    if branch_id:
+        branch=Branch.objects.get(id=branch_id)
+        company=branch.company
+    else:
+        branch = request.branch
+        company = request.company
+    
+    order = BulkOrders.objects.filter(branch=branch,company=company).first()
     if order:
         # Calculate total for meals
         total_sum = (order.breakfast or 0) + (order.lunch or 0) + (order.snack or 0) + (order.dinner or 0) + (order.dinner2 or 0)
     else:
         total_sum = 0
 
-    addresses = DeliveryAddress.objects.filter(branch=request.branch,company=request.company)
-    notifications = get_notifications(request)  # Fetch notifications
+    addresses = DeliveryAddress.objects.filter(branch=branch,company=company)
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+  # Fetch notifications
 
     # Parse the date to get the day of the week
     try:
@@ -456,15 +580,15 @@ def assign_meal(request, date):
                     quantity=quantity,
                     date=delivery_date,
                     delivery_address=delivery_address,
-                    branch=request.branch,
-                    company=request.company
+                    branch=branch,
+                    company=company
                 )
-                message = f"{quantity} {meal_type} assigned to {delivery_address} by {request.branch}"
+                message = f"{quantity} {meal_type} assigned to {delivery_address} by {branch}"
                 Notification.objects.create(
                     delivery=deliver,
                     message=message,
-                    branch=request.branch,
-                    company=request.company
+                    branch=branch,
+                    company=company
                 )
 
             return JsonResponse({'success': True, 'message': 'Meal assigned successfully.'})
@@ -487,10 +611,22 @@ def assign_meal(request, date):
     })
 
 @login_required
-def edit_assign_meal(request,id, date):
+def edit_assign_meal(request,id, date, branch_id=None):
     # Fetch the bulk order for the current branch
-    address = DeliveryAddress.objects.filter(branch=request.branch, company=request.company,pk=id).first()
-    notifications = get_notifications(request)
+    if branch_id:
+        branch=Branch.objects.get(id=branch_id)
+        company=branch.company
+    else:
+        branch = request.branch
+        company = request.company
+    
+    address = DeliveryAddress.objects.filter(branch=branch, company=company,pk=id).first()
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+
     delivery=MealDelivery.objects.filter(delivery_address=id,date=date)
     print(delivery)
     print(f'address: {address.name}')
@@ -523,7 +659,12 @@ def edit_assign_meal(request,id, date):
     # Fetch the bulk order for the current branch
     order = get_object_or_404(BulkOrders, branch=request.branch)
     addresses = DeliveryAddress.objects.filter(branch=request.branch, company=request.company)
-    notifications = get_notifications(request)
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+
     date = make_aware(datetime.now().date().isoformat())
     # Parse the date to get the day of the week
     try:
@@ -609,9 +750,21 @@ def edit_assign_meal(request,id, date):
         'meal_delivery_data': meal_delivery_data  # Pass the meal delivery data to the template
     })
 @login_required
-def meal_plan_list(request):
-    notifications = get_notifications(request)  # Fetch notifications
-    orders = BulkOrders.objects.filter(branch=request.branch, company=request.company) # Optimize with prefetch
+def meal_plan_list(request, branch_id=None):
+    if branch_id:
+        branch=Branch.objects.get(id=branch_id)
+        company=branch.company
+    else:
+        branch = request.branch
+        company = request.company
+    
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+  # Fetch notifications
+    orders = BulkOrders.objects.filter(branch=branch, company=company) # Optimize with prefetch
     mealplans = [mealplan for order in orders for mealplan in order.MealPlan.all()]  # Extract all meal plans
      # Check the status of each order's `bulk_order_end_date`
     for order in orders:
@@ -629,10 +782,22 @@ def meal_plan_list(request):
         'end': end
     })
 @login_required
-def meal_plan_detail(request, id):
-    notifications = get_notifications(request)  # Fetch notifications
+def meal_plan_detail(request, id, branch_id=None):
+    if branch_id:
+        branch=Branch.objects.get(id=branch_id)
+        company=branch.company
+    else:
+        branch = request.branch
+        company = request.company
+    
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+  # Fetch notifications
     mealplan = get_object_or_404(MealPlan, pk=id)
-    order= get_object_or_404(BulkOrders, MealPlan=mealplan, branch=request.branch)
+    order= get_object_or_404(BulkOrders, MealPlan=mealplan, branch=branch)
     status = 1 if order.bulk_order_end_date > now().date() else 0
     sum = order.breakfast + order.lunch + order.snack + order.dinner
     days = [ 'sunday','monday', 'tuesday', 'wednesday', 'thursday', 
@@ -654,10 +819,20 @@ def meal_plan_detail(request, id):
     })
 
 @login_required
-def meal_ordered(request):
-    notifications = get_notifications(request)  
-    branch = request.branch  
-    company = request.company  
+def meal_ordered(request, branch_id=None):
+    if branch_id:
+        branch=Branch.objects.get(id=branch_id)
+        company=branch.company
+    else:
+        branch = request.branch
+        company = request.company
+    
+    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+   
 
     # Get current date and time in Indian timezone
     now_ist = timezone.now().astimezone(india_tz)
@@ -751,9 +926,15 @@ def meal_ordered(request):
     })
 
 @login_required
-def assign_meal_post(request):
+def assign_meal_post(request, branch_id=None):
     order = BulkOrders.objects.first()
-
+    if branch_id:
+        branch=Branch.objects.get(id=branch_id)
+        company=branch.company
+    else:
+        branch = request.branch
+        company = request.company
+    
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -779,15 +960,15 @@ def assign_meal_post(request):
                     meal_type=meal_type,
                     date=date,
                     delivery_address=delivery_address,
-                    branch=request.branch,
-                    company=request.company
+                    branch=branch,
+                    company=company
                 ).first()
 
                 if existing_delivery:
                     # Update the quantity if it exists
                     existing_delivery.quantity = quantity
                     existing_delivery.save()
-                    message = f"{quantity} {meal_type} updated for {delivery_address} by {request.branch}"
+                    message = f"{quantity} {meal_type} updated for {delivery_address} by {branch}"
                     print("Updated", existing_delivery)
                 else:
                     # Save a new meal assignment
@@ -797,18 +978,18 @@ def assign_meal_post(request):
                         quantity=quantity,
                         date=date,
                         delivery_address=delivery_address,
-                        branch=request.branch,
-                        company=request.company
+                        branch=branch,
+                        company=company
                     )
-                    message = f"{quantity} {meal_type} assigned to {delivery_address} by {request.branch}"
+                    message = f"{quantity} {meal_type} assigned to {delivery_address} by {branch}"
                     print("Saved", deliver)
 
                 # Create a notification for the action
                 Notification.objects.create(
                     delivery=deliver if not existing_delivery else existing_delivery,
                     message=message,
-                    branch=request.branch,
-                    company=request.company
+                    branch=branch,
+                    company=company
                 )
                 print(message)
 
@@ -819,3 +1000,35 @@ def assign_meal_post(request):
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
+
+
+
+
+
+
+################################ BRANCH MANAGER AND COMPANY ADMIN ####################################
+
+def meal_plan_branches(request):
+    branches=request.branch
+    company=request.company
+    return render(request, 'branches/meal_plan_branches.html', {'branches': branches, 'company': company})
+def delivery_address_branches(request): 
+    branches=request.branch
+    company=request.company
+    return render(request, 'branches/delivery_address_branches.html', {'branches': branches, 'company': company})
+def meal_delivery_branches(request): 
+    branches=request.branch 
+    company=request.company
+    return render(request, 'branches/meal_delivery_branches.html', {'branches': branches, 'company': company})
+def meal_ordered_branches(request):
+    branches=request.branch 
+    company=request.company
+    return render(request, 'branches/meal_ordered_branches.html', {'branches': branches, 'company': company})
+def orders_today_branches(request):
+    branches=request.branch
+    company=request.company
+    return render(request, 'branches/orders_today_branches.html', {'branches': branches, 'company': company})
+def orders_branches(request):
+    branches=request.branch
+    company=request.company
+    return render(request, 'branches/orders_branches.html', {'branches': branches, 'company': company})

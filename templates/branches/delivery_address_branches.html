@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Delivery Addresses Branches {% endblock title %}
+
+{% block content %}
+
+<div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <h2 class="text-title-md2 font-semibold text-black dark:text-white">Delivery Addresses Branches</h2>
+      <nav>
+          <ol class="flex items-center gap-2">
+              <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
+              <li class="font-medium text-success">Delivery Addresses Branches</li>
+          </ol>
+      </nav>
+  </div>
+  <div class="pb-5"><div class="flex justify-start p-3 container bg-white rounded-lg"> Choose Branch
+      <div class="button flex items-center">
+       {% comment %}    <a href="{% url 'delivery_address_create' %}" class="inline-flex items-center gap-2 rounded-md bg-black my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+              <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm90.5 224H272v74.5c0 8.8-7.2 16-16 16-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3V272h-74.5c-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3 0-8.8 7.2-16 16-16H240v-74.5c0-8.8 7.2-16 16-16s16 7.2 16 16V240h74.5c8.8 0 16 7.2 16 16s-7.2 16-16 16z"></path>
+              </svg>
+              <span>Add Delivery Addresses</span>
+          </a>{% endcomment %}
+      </div> 
+  </div>
+</div>
+<div class="rounded-sm border border-stroke bg-white p-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:py-20">
+  <table class="w-full border-collapse">
+    <thead>
+      <tr class="bg-gray-2 dark:bg-meta-4">
+        <th scope="co" class="px-6 py-4">#</th>
+        <th scope="co" class="px-6 py-4">Name</th>
+        <th scope="co" class="px-6 py-4">Address 1</th>
+        {% comment %} <th scope="col" class="px-6 py-3">Address 2</th> {% endcomment %}
+        <th scope="co" class="px-6 py-4">City</th>
+        <th scope="co" class="px-6 py-4">State</th>
+        <th scope="co" class="px-6 py-4">Postal Code</th>
+        {% comment %} <th scope="col" class="px-6 py-3">Geo Location</th> {% endcomment %}
+        <th scope="co" class="px-6 py-4">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for address in branches %}
+      <a href="#">
+      <tr class="border-b border-stroke dark:border-strokedark">
+        <td class="mr-2 px-6 py-4">{{ address.id }}</td>
+        <td class="mr-2 px-6 py-4 inline-flex items-center justify-center">
+          {{ address.name }}
+         </td>
+        <td class="mr-2 px-6 py-4">{{ address.address_line_1 }}</td>
+        {% comment %} <td class="px-6 py-4">{{ address.address_line_2 }}</td> {% endcomment %}
+        <td class="mr-2 px-6 py-4">{{ address.city }}</td>
+        <td class="mr-2 px-6 py-4">{{ address.state }}</td>
+        <td class="mr-2 px-6 py-4">{{ address.pin_code }}</td>
+        {% comment %} <td class="px-6 py-1"></td> {% endcomment %}
+        <td class="mr-2 px-6 py-4 flex items-center space-x-3.5 ">
+          <a href="{% url 'delivery_address_list_by_branch' address.id %}" class="hover:text-primary text-primary px-4 py-2 rounded text-md">
+            View
+          </a>
+          
+        </td>
+      </tr></a>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% comment %} <div
+                    class="min-w-[370px] max-w-max rounded-md mt-10 border border-stroke py-1 dark:border-strokedark"
+                  >
+                    <ul class="flex flex-col">
+                      <li
+                        class="flex items-center gap-2.5 border-b border-stroke px-5 py-3 last:border-b-0 dark:border-strokedark"
+                      >
+                        <span class="text-primary">
+                          <svg
+                            class="fill-current"
+                            width="21"
+                            height="21"
+                            viewBox="0 0 21 21"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g clip-path="url(#clip0_1890_16515)">
+                              <path
+                                d="M10.8672 0.949463C5.64844 0.949463 1.42969 5.16821 1.42969 10.387C1.42969 15.6057 5.64844 19.8557 10.8672 19.8557C16.0859 19.8557 20.3359 15.6057 20.3359 10.387C20.3359 5.16821 16.0859 0.949463 10.8672 0.949463ZM10.8672 18.4495C6.42969 18.4495 2.83594 14.8245 2.83594 10.387C2.83594 5.94946 6.42969 2.35571 10.8672 2.35571C15.3047 2.35571 18.9297 5.98071 18.9297 10.4182C18.9297 14.8245 15.3047 18.4495 10.8672 18.4495Z"
+                                fill=""
+                              />
+                              <path
+                                d="M13.5549 7.48076L9.83611 11.1058L8.14861 9.44951C7.86736 9.16826 7.42986 9.19951 7.14861 9.44951C6.86736 9.73076 6.89861 10.1683 7.14861 10.4495L9.14861 12.387C9.33611 12.5745 9.58611 12.6683 9.83611 12.6683C10.0861 12.6683 10.3361 12.5745 10.5236 12.387L14.5549 8.51201C14.8361 8.23076 14.8361 7.79326 14.5549 7.51201C14.2736 7.23076 13.8361 7.23076 13.5549 7.48076Z"
+                                fill=""
+                              />
+                            </g>
+                            <defs>
+                              <clipPath id="clip0_1890_16515">
+                                <rect
+                                  width="20"
+                                  height="20"
+                                  fill="white"
+                                  transform="translate(0.867188 0.386963)"
+                                />
+                              </clipPath>
+                            </defs>
+                          </svg>
+                        </span>
+                        <span> Default Address </span>
+                      </li>
+                    </ul>
+                  </div> {% endcomment %}
+</div>
+
+
+{% endblock content %}

@@ -86,7 +86,7 @@ class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hid
         <li class="">
           <a
             class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {% if request.resolver_match.url_name == 'meal_plan_list' or  request.resolver_match.url_name == 'meal_plan_detail' %}active{% endif %}"
-            href="{% url 'meal_plan_list'%}"
+            href="{% if user.role != 'MENTOR' %}{% url 'meal_plan_branches' %}{% else %}{% url 'meal_plan_list'%}{% endif %}"
           >
           <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-18176s2" height="24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M445.588 56l-.026 384.352c6.881 11.323 14 15.677 19.97 15.648 5.924-.028 12.967-4.434 19.714-15.418L466.82 244.27l-.215-2.391 1.475-1.906c21.174-27.169 28.573-74.108 22.533-113.81-3.02-19.852-9.342-37.82-18.195-50.522-7.424-10.652-16.28-17.447-26.828-19.641h-.002zm-372.375.004l-.016 67.127-12.56-.016V56.008H46.332l.002 67.11H33.756v-67.11h-14.57v103.228c-.001 11.417 6.23 17.748 16.04 21.662l4.06 1.622-.09 4.37c-2 84.57-3.977 169.139-5.962 253.708C40.074 451.79 47.1 456.028 52.95 456c5.85-.028 12.87-4.377 19.623-15.432-2.315-84.547-4.63-169.096-6.941-253.644l-.12-4.4 4.073-1.606c10.324-4.106 17.039-11.074 17.039-21.676V56.004h-13.41zM256 95A161 161 0 0 0 95 256a161 161 0 0 0 161 161 161 161 0 0 0 161-161A161 161 0 0 0 256 95z"></path></svg>
 
@@ -97,8 +97,8 @@ class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hid
         
         <li class="{% if request.resolver_match.url_name == 'meal_ordered' %}active{% endif %}">
           <a
-            class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {% if request.resolver_match.url_name == 'meal_ordered' or request.resolver_match.url_name == 'edit_assign_address' %}active{% endif %}"
-            href="{% url 'meal_ordered'%}"
+            class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {% if request.resolver_match.url_name == 'meal_ordered' or request.resolver_match.url_name == 'edit_assign_address' or request.resolver_match.url_name == 'meal_ordered_branches' %}active{% endif %}"
+            href="{% if user.role != 'MENTOR' %}{% url 'meal_ordered_branches' %}{% else %}{% url 'meal_ordered'%}{% endif %}"
           >
           <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5.464V3.099m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175C19 17.4 19 18 18.462 18H5.538C5 18 5 17.4 5 16.807c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.464ZM6 5 5 4M4 9H3m15-4 1-1m1 5h1M8.54 18a3.48 3.48 0 0 0 6.92 0H8.54Z"/>
@@ -112,8 +112,8 @@ class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hid
 
         <li>
           <a
-            class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {% if request.resolver_match.url_name == 'orders_today' %}active{% endif %}"
-            href="{% url 'orders_today'%}"
+            class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {% if request.resolver_match.url_name == 'orders_today' or request.resolver_match.url_name == 'orders_today_branches' %}active{% endif %}"
+            href="{% if user.role != 'MENTOR' %}{% url 'orders_today_branches' %}{% else %}{% url 'orders_today' %}{% endif %}"
           >
           <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 1 1 0-18c1.052 0 2.062.18 3 .512M7 9.577l3.923 3.923 8.5-8.5M17 14v6m-3-3h6"/>
@@ -126,8 +126,8 @@ class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hid
 
         <li class="{% if request.resolver_match.url_name == 'orders_list' %}active{% endif %}">
           <a
-            class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {% if request.resolver_match.url_name == 'orders_list' %}active{% endif %}"
-            href="{% url 'orders_list'%}"
+            class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {% if request.resolver_match.url_name == 'orders_list' or request.resolver_match.url_name == 'orders_branches' %}active{% endif %}"
+            href="{% if user.role != 'MENTOR' %}{% url 'orders_branches' %}{% else %}{% url 'orders_list' %}{% endif %}"
           >
           <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
@@ -140,8 +140,8 @@ class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hid
 
         <li class="{% if request.resolver_match.url_name == 'delivery_address_list' %}active{% endif %}">
           <a
-            class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {% if request.resolver_match.url_name == 'delivery_address_list' or request.resolver_match.url_name == 'delivery_address_create' or request.resolver_match.url_name == 'delivery_address_edit' %}active{% endif %}"
-            href="{% url 'delivery_address_list'%}"
+            class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 my-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {% if request.resolver_match.url_name == 'delivery_address_list' or request.resolver_match.url_name == 'delivery_address_create' or request.resolver_match.url_name == 'delivery_address_edit' or request.resolver_match.url_name == 'delivery_address_branches' or request.resolver_match.url_name == 'delivery_address_list_by_branch' or request.resolver_match.url_name == 'delivery_address_create_by_branch' or request.resolver_match.url_name == 'delivery_address_edit_by_branch' %}active{% endif %}"
+            href="{% if user.role != 'MENTOR' %}{% url 'delivery_address_branches' %}{% else %}{% url 'delivery_address_list' %}{% endif %}"
           >
           <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h6l2 4m-8-4v8H9m4-8V6c0-.26522-.1054-.51957-.2929-.70711C12.5196 5.10536 12.2652 5 12 5H4c-.26522 0-.51957.10536-.70711.29289C3.10536 5.48043 3 5.73478 3 6v9h2m14 0h2v-4m0 0h-5M8 8.66669V10l1.5 1.5m10 5c0 1.3807-1.1193 2.5-2.5 2.5s-2.5-1.1193-2.5-2.5S15.6193 14 17 14s2.5 1.1193 2.5 2.5Zm-10 0C9.5 17.8807 8.38071 19 7 19s-2.5-1.1193-2.5-2.5S5.61929 14 7 14s2.5 1.1193 2.5 2.5Z"/>

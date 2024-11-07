@@ -10,6 +10,9 @@
       <nav>
           <ol class="flex items-center gap-2">
               <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
+              {% if user.role != 'mentor' %}
+              <li><a class="font-medium" href="{% url 'delivery_address_branches' %}">Delivery Addresses Branches /</a></li>
+              {% endif %}
               <li class="font-medium text-success">Delivery Addresses</li>
           </ol>
       </nav>
