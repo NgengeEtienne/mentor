@@ -13,7 +13,7 @@ class BranchCompanyMiddleware(MiddlewareMixin):
                     print(request.branch)
                 elif request.user.role == 'COMPANY_ADMIN':
                     # Retrieve all branches and companies related to the user
-                    request.branch = Branch.objects.filter(company__in=request.user.company.all())
+                    request.branch = request.user.branch.all()
                     request.company = request.user.company.all()
                 elif request.user.role == 'MENTOR':
                     request.branch = request.user.branch.all().first()

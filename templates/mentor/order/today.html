@@ -10,7 +10,7 @@
          <nav>
             <ol class="flex items-center gap-2">
                 <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
-                {% if user.role != 'mentor' %}
+                {% if user.role != 'MENTOR' %}
               <li><a class="font-medium" href="{% url 'orders_today_branches' %}"> Branches /</a></li>
               {% endif %}
                 <li class="font-medium text-success">Today's Delivery</li>
@@ -34,9 +34,9 @@
                     <thead>
                         <tr class="bg-[#F9FAFB] text-left dark:bg-meta-4">
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">ORDER #</th>
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">BRANCH</th>
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">DATE</th>
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">MEAL TYPE</th>
-                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">BRANCH</th>
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">LOCATION</th>
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">QUANTITY</th>
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">STATUS</th>
@@ -46,6 +46,9 @@
                         {% for order in todays_deliveries %}
                         <tr>
                             <td class="border border-gray-300 px-4 py-2">#{{ order.id }}</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                {{ order.branch  }}
+                            </td>
                             <td class="border border-gray-300 px-4 py-2">{{ order.date }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-center">
                                 {% if order.meal_type == 'snack' %}
@@ -54,9 +57,7 @@
                                     {{ order.meal_type|upper  }}
                                 {% endif %}
                             </td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                {{ order.branch  }}
-                            </td>
+                           
                             <td class="border border-gray-300 px-4 py-2 text-center">
                                 {{ order.delivery_address  }}
                             </td>

@@ -1,26 +1,23 @@
 # urls.py
 from django.urls import path
 from . import views
-from .views import (
-    delivery_address_list, delivery_address_create, 
-    delivery_address_edit, delivery_address_delete
-)
 
 name='MentorDashboard'
+# app_name = 'mentor'
 urlpatterns = [
     path('login/', views.mentor_login, name='mentor_login'),
     path('logout/', views.logout_view, name='logout'),
 
     path('', views.dashboard_overview, name='dashboard'),
 
-    path('mealplan/', views.meal_plan_list, name='meal_plan_list'),
-    path('mealplan/<int:id>/', views.meal_plan_detail, name='meal_plan_detail'),
+    path('menu/', views.meal_plan_list, name='meal_plan_list'),
+    path('menu/<int:id>/', views.meal_plan_detail, name='meal_plan_detail'),
 
     # path('profile', views.profile, name='profile'),
-    path('deliver/', delivery_address_list, name='delivery_address_list'),
-    path('delivery-address/add/', delivery_address_create, name='delivery_address_create'),
-    path('delivery-address/edit/<int:id>/', delivery_address_edit, name='delivery_address_edit'),
-    path('delivery-address/delete/<int:id>/', delivery_address_delete, name='delivery_address_delete'),
+    path('deliver/', views.delivery_address_list, name='delivery_address_list'),
+    path('delivery-address/add/', views.delivery_address_create, name='delivery_address_create'),
+    path('delivery-address/edit/<int:id>/', views.delivery_address_edit, name='delivery_address_edit'),
+    path('delivery-address/delete/<int:id>/', views.delivery_address_delete, name='delivery_address_delete'),
     # Add URLs for MealDelivery and Notification similarly
     # path('meal-deliveries/', views.meal_delivery_list, name='meal_delivery_list'),
     # path('meal-deliveries/list/', views.meal_delivered, name='meal_delivered'),
@@ -40,7 +37,7 @@ urlpatterns = [
 
 
     # Optional branch_id for meal plan list and detail
-    path('menu/branches/', views.meal_plan_branches, name='meal_plan_branches'),
+    path('menu/branches/', views.meal_plan_list, name='meal_plan_branches'),
     path('menu/<int:branch_id>/', views.meal_plan_list, name='meal_plan_list_by_branch'),
     path('menu/<int:branch_id>/<int:id>/', views.meal_plan_detail, name='meal_plan_detail_by_branch'),
 
@@ -63,10 +60,10 @@ urlpatterns = [
     path('meals_ordered/<int:branch_id>/', views.meal_ordered, name='meal_ordered_by_branch'),
 
     # Orders list and today's orders with optional branch_id
-    path('orders/today/branches/', views.orders_today_branches, name='orders_today_branches'),
+    path('orders/today/branches/', views.orders_today, name='orders_today_branches'),
     path('orders/today/<int:branch_id>/', views.orders_today, name='orders_today_by_branch'),
 
-    path('orders/branches/', views.orders_branches, name='orders_branches'),
+    path('orders/branches/', views.orders_list, name='orders_branches'),
     path('orders/<int:branch_id>/', views.orders_list, name='orders_list_by_branch'),
 
      path('set-branch/<int:branch_id>/', views.set_branch_session, name='set_branch_session'),

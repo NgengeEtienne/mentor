@@ -10,7 +10,7 @@
       <nav>
           <ol class="flex items-center gap-2">
               <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
-              {% if user.role != 'mentor' %}
+              {% if user.role != 'MENTOR' %}
               <li><a class="font-medium" href="{% url 'delivery_address_branches' %}">Branches /</a></li>
               {% endif %}
               <li class="font-medium text-success">Delivery Addresses</li>
@@ -88,8 +88,8 @@
         <td class="mr-2 px-6 py-4">{{ address.pin_code }}</td>
         {% comment %} <td class="px-6 py-1"></td> {% endcomment %}
         <td class="mr-2 px-6 py-4 flex items-center space-x-3.5 ">
-          {% if user.role != 'mentor' %}
-          <a href="{% url 'delivery_address_edit_by_branch' request.session.branch_id  address.branch_id %}" class="hover:text-primary"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" focusable="false" class="chakra-icon css-1gm3tio" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+          {% if user.role != 'MENTOR' %}
+          <a href="{% url 'delivery_address_edit_by_branch' request.session.branch_id  address.id %}" class="hover:text-primary"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" focusable="false" class="chakra-icon css-1gm3tio" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
           {% else %}
           <a href="{% url 'delivery_address_edit' address.id %}" class="hover:text-primary"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" focusable="false" class="chakra-icon css-1gm3tio" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
           {% endif %}

@@ -11,7 +11,7 @@
         <nav>
             <ol class="flex items-center gap-2">
                 <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
-                {% if user.role != 'mentor' %}
+                {% if user.role != 'MENTOR' %}
               <li><a class="font-medium" href="{% url 'meal_plan_branches' %}"> Branches /</a></li>
               {% endif %}
                 <li class="font-medium text-success">Delivery List</li>
