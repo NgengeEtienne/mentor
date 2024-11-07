@@ -13,11 +13,11 @@ urlpatterns = [
 
     path('', views.dashboard_overview, name='dashboard'),
 
-    path('mealplan', views.meal_plan_list, name='meal_plan_list'),
+    path('mealplan/', views.meal_plan_list, name='meal_plan_list'),
     path('mealplan/<int:id>/', views.meal_plan_detail, name='meal_plan_detail'),
 
     # path('profile', views.profile, name='profile'),
-    path('deliver', delivery_address_list, name='delivery_address_list'),
+    path('deliver/', delivery_address_list, name='delivery_address_list'),
     path('delivery-address/add/', delivery_address_create, name='delivery_address_create'),
     path('delivery-address/edit/<int:id>/', delivery_address_edit, name='delivery_address_edit'),
     path('delivery-address/delete/<int:id>/', delivery_address_delete, name='delivery_address_delete'),
@@ -29,7 +29,7 @@ urlpatterns = [
     path('meal-deliveries/assign-address/<str:date>/', views.assign_meal, name='assign_address'),
     path('meal-deliveries/edit-assigned-address/<int:id>/<str:date>/', views.edit_assign_meal, name='edit_assign_address'),
     # path('meal-deliveries/asign-meal/', views.edit_assign_meal_without_date, name='edit_assign_meal_without_date'),
-    path('meals_ordered', views.meal_ordered, name='meal_ordered'),
+    path('meals_ordered/', views.meal_ordered, name='meal_ordered'),
     path('orders/today/', views.orders_today, name='orders_today'),  # List of all orders
     path('orders/', views.orders_list, name='orders_list'),  # List of all orders
     # path('orders/<int:id>/', views.order_detail, name='order_detail'),  # Order detail by ID
@@ -40,9 +40,9 @@ urlpatterns = [
 
 
     # Optional branch_id for meal plan list and detail
-    path('mealplan/branches/', views.meal_plan_branches, name='meal_plan_branches'),
-    path('mealplan/<int:branch_id>/', views.meal_plan_list, name='meal_plan_list_by_branch'),
-    path('mealplan/<int:branch_id>/<int:id>/', views.meal_plan_detail, name='meal_plan_detail_by_branch'),
+    path('menu/branches/', views.meal_plan_branches, name='meal_plan_branches'),
+    path('menu/<int:branch_id>/', views.meal_plan_list, name='meal_plan_list_by_branch'),
+    path('menu/<int:branch_id>/<int:id>/', views.meal_plan_detail, name='meal_plan_detail_by_branch'),
 
     # Optional branch_id for delivery address list and actions
     path('deliver/branches/', views.delivery_address_branches, name='delivery_address_branches'),
@@ -68,6 +68,8 @@ urlpatterns = [
 
     path('orders/branches/', views.orders_branches, name='orders_branches'),
     path('orders/<int:branch_id>/', views.orders_list, name='orders_list_by_branch'),
+
+     path('set-branch/<int:branch_id>/', views.set_branch_session, name='set_branch_session'),
 ]
 
 

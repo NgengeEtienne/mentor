@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Order History {% endblock title %}
+
+{% block content %}
+
+<div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <h2 class="text-title-md2 font-semibold text-black dark:text-white">Order History</h2>
+      <nav>
+          <ol class="flex items-center gap-2">
+              <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
+              <li class="font-medium text-success">Order History</li>
+          </ol>
+      </nav>
+  </div>
+  <div class="pb-5"><div class="flex justify-start p-3 container bg-white rounded-lg"> Choose Branch
+      <div class="button flex items-center">
+       {% comment %}    <a href="{% url 'delivery_address_create' %}" class="inline-flex items-center gap-2 rounded-md bg-black my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+              <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm90.5 224H272v74.5c0 8.8-7.2 16-16 16-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3V272h-74.5c-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3 0-8.8 7.2-16 16-16H240v-74.5c0-8.8 7.2-16 16-16s16 7.2 16 16V240h74.5c8.8 0 16 7.2 16 16s-7.2 16-16 16z"></path>
+              </svg>
+              <span>Add Delivery Addresses</span>
+          </a>{% endcomment %}
+      </div> 
+  </div>
+</div>
+<div class="rounded-sm border border-stroke bg-white p-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:py-20">
+  <table class="w-full border-collapse">
+    <thead>
+      <tr class="bg-gray-2 dark:bg-meta-4">
+        <th scope="co" class="px-6 py-4">#</th>
+        <th scope="co" class="px-6 py-4">Name</th>
+        <th scope="co" class="px-6 py-4">Address 1</th>
+        {% comment %} <th scope="col" class="px-6 py-3">Address 2</th> {% endcomment %}
+        <th scope="co" class="px-6 py-4">City</th>
+        <th scope="co" class="px-6 py-4">State</th>
+        <th scope="co" class="px-6 py-4">Postal Code</th>
+        {% comment %} <th scope="col" class="px-6 py-3">Geo Location</th> {% endcomment %}
+        <th scope="co" class="px-6 py-4">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for address in branches %}
+      <a href="#">
+      <tr class="border-b border-stroke dark:border-strokedark">
+        <td class="mr-2 px-6 py-4">{{ address.id }}</td>
+        <td class="mr-2 px-6 py-4 inline-flex items-center justify-center">
+          {{ address.name }}
+         </td>
+        <td class="mr-2 px-6 py-4">{{ address.address_line_1 }}</td>
+        {% comment %} <td class="px-6 py-4">{{ address.address_line_2 }}</td> {% endcomment %}
+        <td class="mr-2 px-6 py-4">{{ address.city }}</td>
+        <td class="mr-2 px-6 py-4">{{ address.state }}</td>
+        <td class="mr-2 px-6 py-4">{{ address.pin_code }}</td>
+        {% comment %} <td class="px-6 py-1"></td> {% endcomment %}
+        <td class="mr-2 px-6 py-4 flex items-center space-x-3.5 ">
+          <a href="#" onclick="setBranchAndRedirect({{ address.id }}, '{% url 'orders_list_by_branch' address.id %}')" class="hover:text-primary text-primary px-4 py-2 rounded text-md">
+
+            View
+          </a>
+          
+        </td>
+      </tr></a>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+</div>
+
+<script>
+  function setBranchAndRedirect(branchId, redirectUrl) {
+      // Use Django's URL template tag to generate the set_branch URL
+      const setBranchUrl = `{% url 'set_branch_session' 0 %}`.replace('/0/', `/${branchId}/`);
+      
+      fetch(setBranchUrl, {
+          method: 'POST',
+          headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+          },
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              window.location.href = redirectUrl;
+          } else {
+              console.error("Failed to set branch:", data.error);
+          }
+      })
+      .catch(error => console.error("Error:", error));
+  }
+</script>
+
+{% endblock content %}

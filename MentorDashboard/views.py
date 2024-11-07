@@ -238,7 +238,7 @@ def delivery_address_list(request, branch_id=None):
 @login_required
 def delivery_address_create(request, branch_id=None):
     form = DeliveryAddressForm()
-    
+    branch_id = request.session.get('branch_id')
     if branch_id:
         notifications = get_notifications(request)
     else:
@@ -268,14 +268,17 @@ def delivery_address_create(request, branch_id=None):
         newd=MealDelivery.objects.create(branch=branch, company=company, delivery_address=new,status=0, quantity=0, date=datetime.now().date(),bulk_order=BulkOrders.objects.filter(branch=branch, company=company).first())
         print(f"New address created: {new}")
         print(f"New delivery created: {newd}")
-        return redirect('delivery_address_list')
+        if request.user.role != "MENTOR":
+            return redirect('delivery_address_list_by_branch branch_id')
+        else:
+            return redirect('delivery_address_list')
 
-    return render(request, 'mentor/delivery/form.html', {'form': form, 'notifications': notifications})
+    return render(request, 'mentor/delivery/form.html', {'branch_id': branch_id,'form': form, 'notifications': notifications})
 
 @login_required
 def delivery_address_edit(request, id, branch_id=None):
     address = get_object_or_404(DeliveryAddress, id=id)
-    
+    branch_id = request.session.get('branch_id')
     if branch_id:
         notifications = get_notifications(request)
     else:
@@ -314,6 +317,7 @@ def delivery_address_edit(request, id, branch_id=None):
         
     return render(request, 'mentor/delivery/form.html', {
         'form': form,
+        'branch_id': branch_id,
         'object': address,
         'notifications': notifications
     })
@@ -329,7 +333,7 @@ def delivery_address_delete(request, id, branch_id=None):
     
     if request.method == 'POST':
         address.delete()
-        return redirect('delivery_address_list')
+        return redirect('delivery_address_list_by_branch' if branch_id else 'delivery_address_list')
 
     return render(request, 'mentor/delivery/confirm_delete.html', {'address': address, 'notifications': notifications})
 
@@ -351,7 +355,7 @@ def meal_delivery_list(request, branch_id=None):
     else:
         notifications = get_notifications(request)  # Fetch notifications
   # Fetch notifications
-    return render(request, 'mentor/meal/list.html', {'deliveries': deliveries, 'notifications': notifications})
+    return render(request, 'mentor/meal/list.html', {'branch_id': branch_id,'deliveries': deliveries, 'notifications': notifications})
 
 @login_required
 def meal_delivered(request, branch_id=None):
@@ -365,7 +369,7 @@ def meal_delivered(request, branch_id=None):
     else:
         notifications = get_notifications(request)  # Fetch notifications
   # Fetch notifications
-    return render(request, 'mentor/meal/form.html', {'deliveries': deliveries, 'notifications': notifications})
+    return render(request, 'mentor/meal/form.html', {'branch_id': branch_id,'deliveries': deliveries, 'notifications': notifications})
 
 @login_required
 def meal_delivery_edit(request, id, branch_id=None):
@@ -398,7 +402,7 @@ def meal_delivery_edit(request, id, branch_id=None):
     else:
         form = MealDeliveryForm(instance=delivery)
 
-    return render(request, 'mentor/meal/edit.html', {'form': form, 'delivery': delivery, 'notifications': notifications})
+    return render(request, 'mentor/meal/edit.html', {'branch_id': branch_id,'form': form, 'delivery': delivery, 'notifications': notifications})
 
 @login_required
 def assign_address(request, id, branch_id=None):
@@ -423,7 +427,7 @@ def assign_address(request, id, branch_id=None):
         delivery.save()
         return redirect('meal_delivery_list')
     
-    return render(request, 'mentor/meal/assign_address.html', {'delivery': delivery, 'addresses': addresses, 'notifications': notifications})
+    return render(request, 'mentor/meal/assign_address.html', {'branch_id': branch_id,'delivery': delivery, 'addresses': addresses, 'notifications': notifications})
 
 
 @login_required
@@ -461,6 +465,7 @@ def orders_list(request, branch_id=None):
     # Render the response
     return render(request, 'mentor/order/list.html', {
         'past_deliveries': past_deliveries,
+        'branch_id': branch_id,
         'notifications': notifications,
         'all_deliveries': all_deliveries
     })
@@ -483,7 +488,7 @@ def orders_today(request, branch_id=None):
     todays_deliveries = MealDelivery.objects.filter(branch=branch, date=today).exclude(status=0)
     # print("Today's deliveries:", todays_deliveries)
 
-    return render(request, 'mentor/order/today.html', {'todays_deliveries': todays_deliveries})
+    return render(request, 'mentor/order/today.html', {'branch_id': branch_id,'todays_deliveries': todays_deliveries})
 
 @login_required
 def assign_meal(request, date, branch_id=None):
@@ -600,6 +605,7 @@ def assign_meal(request, date, branch_id=None):
     # Render the template with context data
     return render(request, 'mentor/meal/assign.html', {
         'order': order,
+        'branch_id': branch_id,
         'addresses': addresses,
         'notifications': notifications,
         'total_sum': total_sum,
@@ -775,6 +781,7 @@ def meal_plan_list(request, branch_id=None):
         print(f"Order {order.bulk_order_name} status: {status}")
     return render(request, 'mentor/mealplan/list.html', {
         'notifications': notifications,
+        'branch_id': branch_id,
         'mealplans': mealplans,
         'orders': orders,
         'status': status,
@@ -797,7 +804,7 @@ def meal_plan_detail(request, id, branch_id=None):
         notifications = get_notifications(request)  # Fetch notifications
   # Fetch notifications
     mealplan = get_object_or_404(MealPlan, pk=id)
-    order= get_object_or_404(BulkOrders, MealPlan=mealplan, branch=branch)
+    order= get_object_or_404(BulkOrders, MealPlan=mealplan, branch=branch_id)
     status = 1 if order.bulk_order_end_date > now().date() else 0
     sum = order.breakfast + order.lunch + order.snack + order.dinner
     days = [ 'sunday','monday', 'tuesday', 'wednesday', 'thursday', 
@@ -812,6 +819,7 @@ def meal_plan_detail(request, id, branch_id=None):
     return render(request, 'mentor/mealplan/detail.html', {
         'notifications': notifications,
         'mealplan': mealplan,
+        'branch_id': branch_id,
         'days': days,
         'order': order,
         'sum': sum,
@@ -923,6 +931,7 @@ def meal_ordered(request, branch_id=None):
     return render(request, 'mentor/meal/meals.html', {
         'notifications': notifications,
         'data_by_address': sorted_data,
+        'branch_id': branch_id,
     })
 
 @login_required
@@ -1032,3 +1041,12 @@ def orders_branches(request):
     branches=request.branch
     company=request.company
     return render(request, 'branches/orders_branches.html', {'branches': branches, 'company': company})
+
+
+
+def set_branch_session(request, branch_id):
+    if request.method == "POST":
+        request.session['branch_id'] = branch_id
+        print(branch_id)
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)

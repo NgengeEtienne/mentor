@@ -10,6 +10,9 @@
          <nav>
             <ol class="flex items-center gap-2">
                 <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
+                {% if user.role != 'mentor' %}
+              <li><a class="font-medium" href="{% url 'meal_plan_branches' %}"> Branches /</a></li>
+              {% endif %}
                 <li class="font-medium text-success">Daily Food Count</li>
             </ol>
         </nav>
@@ -64,9 +67,8 @@
                                 <a class="bg-gray-300 text-black px-4 py-2 rounded text-sm"
                                 style=" cursor: not-allowed;">Edit</a>
 
-                                   
                                 {% else %}
-                                     <a href="{% url 'edit_assign_address' id=order.address_pk date=order.date %}"
+                                     <a href="{% if user.role != 'mentor' %}{% url 'edit_assign_address_by_branch' request.session.branch_id order.address_pk order.date%}{% else %}{% url 'edit_assign_address' id=order.address_pk date=order.date %}{% endif %}"
                                        class="text-primary px-4 py-2 rounded text-md">Edit</a>
                                 {% endif %}
                             </td>
