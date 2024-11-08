@@ -36,6 +36,8 @@ from itertools import chain
 from datetime import date
 from django.contrib.auth import logout
 from django.shortcuts import redirect
+# from django.shortcuts import get_list_or_40    
+
 # Define the Indian timezone
 india_tz = pytz.timezone('Asia/Kolkata')
 
@@ -832,13 +834,12 @@ def meal_plan_list(request, branch_id=None):
         'branch_id': branch_id,
         'orders_data': orders_data,
     })
-    
 @login_required
 def meal_plan_detail(request, id, branch_id=None):
     # branch_id = request.session.get('branch_id')
     if branch_id:
-        branch=Branch.objects.get(id=branch_id)
-        company=branch.company
+        branch=Branch.objects.get(id=branch_id) if branch_id else request.branch
+        company=request.company
     else:
         branch = request.branch
         company = request.company
@@ -849,13 +850,16 @@ def meal_plan_detail(request, id, branch_id=None):
     else:
         notifications = get_notifications(request)  # Fetch notifications
   # Fetch notifications
+    print(branch_id)
     mealplan = get_object_or_404(MealPlan, pk=id)
-    order= get_object_or_404(BulkOrders, MealPlan=mealplan, branch=branch_id)
+    # print(mealplan)
+    order = BulkOrders.objects.filter(MealPlan=mealplan, branch=branch).first()
+    print(order)
     status = 1 if order.bulk_order_end_date > now().date() else 0
     sum = order.breakfast + order.lunch + order.snack + order.dinner
     days = [ 'sunday','monday', 'tuesday', 'wednesday', 'thursday', 
             'friday', 'saturday']
-    
+    print(sum)
     # print(order)
     # for day in days :
     #     print(day)
