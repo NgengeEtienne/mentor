@@ -65,7 +65,7 @@
                     <td class="border-b border-[#eee] py-4 px-4 dark:border-strokedark">
                         <div class="flex items-center space-x-3.5">
                             {% for meal_plan in item.mealplans %}
-                                <a href="{% if user.role != 'MENTOR' %}{% url 'meal_plan_detail_by_branch' item.order.pk meal_plan.pk %}{% else %}{% url 'meal_plan_detail' meal_plan.pk %}{% endif %}" class="hover:text-primary text-primary">
+                                <a href="{% if user.role != 'MENTOR' %}{% url 'meal_plan_detail_by_branch' item.order.pk meal_plan.pk %}{% else %}{% url 'meal_plan_detail' id=meal_plan.pk %}{% endif %}" class="hover:text-primary text-primary">
                                     View
                                 </a>
                             {% endfor %}
