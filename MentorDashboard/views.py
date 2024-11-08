@@ -229,7 +229,8 @@ def dashboard_overview(request):
     
     # Sort the addresses by name and dates within each address
     sorted_data = {addr: dict(sorted(data.items())) for addr, data in sorted(data_by_address.items())}
-
+    
+    notifications = get_notifications(request)  # Fetch notifications
     # print(week_days)  # Debug print to verify output
 
     context = {
@@ -242,7 +243,7 @@ def dashboard_overview(request):
         "deliveredcount": deliveredcount,
         "canceled": canceled,
         "addresses": addresses,
-        # "notifications": notifications,
+        "notifications": notifications,
         'data_by_address': sorted_data,
     }
 
@@ -476,12 +477,12 @@ def orders_list(request, branch_id=None):
     if request.user.role != "MENTOR":
         branch=request.branch
         # company=branch.company
-        all_deliveries = MealDelivery.objects.filter(branch__in=branch).exclude(status=0)
+        all_deliveries = MealDelivery.objects.filter(branch__in=branch).exclude(status=0,quantity=0)
 
     else:
         branch = request.branch
         company = request.company
-        all_deliveries = MealDelivery.objects.filter(branch=branch,company=company).exclude(status=0)
+        all_deliveries = MealDelivery.objects.filter(branch=branch,company=company).exclude(status=0,quantity=0)
 
     
     # Fetch all deliveries for the branch
@@ -519,18 +520,22 @@ def orders_today(request, branch_id=None):
     if request.user.role != "MENTOR":
         branch=request.branch
         # company=branch.company
-        todays_deliveries = MealDelivery.objects.filter(branch__in=branch, date=today).exclude(status=0)
-
+        todays_deliveries = MealDelivery.objects.filter(branch__in=branch, date=today).exclude(status=0,quantity=0)
+        branches=request.branch
     else:
         branch = request.branch
         company = request.company
-        todays_deliveries = MealDelivery.objects.filter(branch=branch, date=today).exclude(status=0)
+        todays_deliveries = MealDelivery.objects.filter(branch=branch, date=today).exclude(status=0,quantity=0)
 
-    
+    if branch_id:
+        notifications = get_notifications(request)
+    else:
+        notifications = get_notifications(request)  # Fetch notifications
+
     # Fetch today's deliveries for the branch
     # print("Today's deliveries:", todays_deliveries)
 
-    return render(request, 'mentor/order/today.html', {'branch_id': branch_id,'todays_deliveries': todays_deliveries})
+    return render(request, 'mentor/order/today.html', {'branches': branches,'branch_id': branch_id,'todays_deliveries': todays_deliveries, 'notifications': notifications})
 
 @login_required
 def assign_meal(request, date, branch_id=None):

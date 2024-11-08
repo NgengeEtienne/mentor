@@ -11,14 +11,16 @@
             <ol class="flex items-center gap-2">
                 <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
                 {% if user.role != 'MENTOR' %}
-              <li><a class="font-medium" href="{% url 'orders_today_branches' %}"> Branches /</a></li>
-              {% endif %}
+                  <li><a class="font-medium" href="{% url 'orders_today_branches' %}"> Branches /</a></li>
+                {% endif %}
                 <li class="font-medium text-success">Today's Delivery</li>
             </ol>
         </nav>
     </div>
-    {% comment %} {% for order in orders %} {% endcomment %}
+
+    <!-- Dropdown for filtering by branch, visible only to company_admin -->
     
+
     <div class="pb-2 mt-4">
         <div class="flex justify-start p-3 container bg-black rounded-lg  mb-2">
             <div class="button flex items-center">
@@ -30,6 +32,19 @@
 
         <div class="rounded-lg border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
             <div class="max-w-full overflow-x-auto">
+                {% if user.role != 'MENTOR' %}
+                    <div class="mb-4">
+                        <label for="branchFilter" class="block text-sm font-medium text-gray-700">Filter by Branch:</label>
+                        <select id="branchFilter" name="branchFilter" 
+                        class="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 pl-5 pr-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                        >
+                            <option value="all">All</option>
+                            {% for branch in branches %}
+                                <option value="{{ branch.id }}">{{ branch.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
                 <table class="w-full table-auto border-collapse border border-gray-300 mb-4">
                     <thead>
                         <tr class="bg-[#F9FAFB] text-left dark:bg-meta-4">
@@ -40,52 +55,28 @@
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">LOCATION</th>
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">QUANTITY</th>
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">STATUS</th>
-                            {% if user.role != 'MENTOR' %}
-                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">ACTION</th>
-                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
                         {% for order in todays_deliveries %}
-                        <tr>
+                        <tr data-branch="{{ order.branch.id }}">
                             <td class="border border-gray-300 px-4 py-2">#{{ order.id }}</td>
-                            <td class="border border-gray-300 px-4 py-2">
-                                {{ order.branch  }}
-                            </td>
+                            <td class="border border-gray-300 px-4 py-2">{{ order.branch }}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ order.date }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-center">
                                 {% if order.meal_type == 'snack' %}
                                     TEA & SNACK
                                 {% else %}
-                                    {{ order.meal_type|upper  }}
+                                    {{ order.meal_type|upper }}
                                 {% endif %}
                             </td>
-                           
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                {{ order.delivery_address  }}
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                {{ order.quantity  }}
-                            </td>
-                                {% if  order.status == 'DELIVERED' %}
-                                <td class="border border-gray-300 px-4 py-2 text-center text-success">{{  order.status }}</td>
-                                {% elif  order.status == 'CANCELED' %}
-                                <td class="border border-gray-300 px-4 py-2 text-center text-danger">{{  order.status }}</td>
-                                {% elif  order.status == 'DISPATCHED' %}
-                                <td class="border border-gray-300 px-4 py-2 text-center text-warning">{{  order.status }}</td>
-                                {% else %}
-                                <td class="border border-gray-300 px-4 py-2 text-center text-primary">{{  order.status }}</td>
-                                {% endif %}
-                                {%if user.role != 'MENTOR' %}
-                                <td class="border border-gray-300 px-4 py-2 text-center text-primary">
-                                    <a href="{% url 'edit_status' order.pk %}" >Edit
-                                    </a>
-                                </td>
-                                {% endif %}
+                            <td class="border border-gray-300 px-4 py-2 text-center">{{ order.delivery_address }}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">{{ order.quantity }}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-center {{ order.status|lower }}">{{ order.status }}</td>
                         </tr>
-                        {%empty%}
+                        {% empty %}
                         <tr>
-                            <td colspan=7 class="border border-gray-300 px-4 py-2 text-center">No Meals Delivered today!</td>
+                            <td colspan="7" class="border border-gray-300 px-4 py-2 text-center">No Meals Delivered today!</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -94,10 +85,26 @@
         </div>
     </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const branchFilter = document.getElementById("branchFilter");
+        const rows = document.querySelectorAll("tbody tr[data-branch]");
+
+        if (branchFilter) {
+            branchFilter.addEventListener("change", function () {
+                const selectedBranch = this.value;
+                
+                rows.forEach(row => {
+                    const branchId = row.getAttribute("data-branch");
+                    if (selectedBranch === "all" || selectedBranch === branchId) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            });
+        }
+    });
+</script>
 
 {% endblock content %}
-
-    
-
-    
-      
