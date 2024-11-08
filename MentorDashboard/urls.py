@@ -54,6 +54,7 @@ urlpatterns = [
     path('meal-deliveries/assign-address/<int:branch_id>/post/', views.assign_meal_post, name='assign_address_ajax_by_branch'),
     path('meal-deliveries/assign-address/<int:branch_id>/<str:date>/', views.assign_meal, name='assign_address_by_branch'),
     path('meal-deliveries/edit-assigned-address/<int:branch_id>/<int:id>/<str:date>/', views.edit_assign_meal, name='edit_assign_address_by_branch'),
+    path('meal-deliveries/status/<int:id>/', views.meal_delivery_edit, name='edit_status'),
 
     # Meals ordered with optional branch_id
     path('meals_ordered/branches/', views.meal_ordered_branches, name='meal_ordered_branches'),

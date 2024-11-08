@@ -433,7 +433,7 @@ def meal_delivery_edit(request, id, branch_id=None):
                     company=company
                 )
 
-            return redirect('orders_list')
+            return redirect('orders_today_branches')
     else:
         form = MealDeliveryForm(instance=delivery)
 

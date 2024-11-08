@@ -40,6 +40,9 @@
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">LOCATION</th>
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">QUANTITY</th>
                             <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">STATUS</th>
+                            {% if user.role != 'MENTOR' %}
+                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">ACTION</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -72,6 +75,12 @@
                                 <td class="border border-gray-300 px-4 py-2 text-center text-warning">{{  order.status }}</td>
                                 {% else %}
                                 <td class="border border-gray-300 px-4 py-2 text-center text-primary">{{  order.status }}</td>
+                                {% endif %}
+                                {%if user.role != 'MENTOR' %}
+                                <td class="border border-gray-300 px-4 py-2 text-center text-primary">
+                                    <a href="{% url 'edit_status' order.pk %}" >Edit
+                                    </a>
+                                </td>
                                 {% endif %}
                         </tr>
                         {%empty%}
