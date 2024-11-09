@@ -253,12 +253,11 @@ def dashboard_overview(request):
 def delivery_address_list(request, branch_id=None):
     if request.user.role != 'MENTOR':
         # Get all branches managed by the Branch Manager
-        branch_id = request.session.get('branch_id')
+        branches = request.branch
 
         # Filter by specific branch if branch_id is provided
-        if branch_id:
             # branches = branches.filter(id=branch_id)
-            addresses = DeliveryAddress.objects.filter(branch=branch_id)
+        addresses = DeliveryAddress.objects.filter(branch__in=branches)
     else:
         # Get all branches
         # Filter addresses for the selected branches
@@ -269,7 +268,7 @@ def delivery_address_list(request, branch_id=None):
     else:
         notifications = get_notifications(request)  # Fetch notifications
   # Fetch notifications
-    return render(request, 'mentor/delivery/list.html', {'addresses': addresses, 'notifications': notifications})
+    return render(request, 'mentor/delivery/list.html', {'branches': branches, 'addresses': addresses, 'notifications': notifications})
 
 @login_required
 def delivery_address_create(request, branch_id=None):

@@ -1,160 +1,169 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %} Delivery Addresses {% endblock title %}
+{% block title %} Delivery Address List {% endblock title %}
 
 {% block content %}
 
 <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
-  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <h2 class="text-title-md2 font-semibold text-black dark:text-white">Delivery Addresses</h2>
-      <nav>
-          <ol class="flex items-center gap-2">
-              <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
-              {% if user.role != 'MENTOR' %}
-              <li><a class="font-medium" href="{% url 'delivery_address_branches' %}">Branches /</a></li>
-              {% endif %}
-              <li class="font-medium text-success">Delivery Addresses</li>
-          </ol>
-      </nav>
-  </div>
-  <div class="pb-5"><div class="flex justify-end p-3 container bg-white rounded-lg">
-      <div class="button flex items-center">
-          <a href="{% url 'delivery_address_create' %}" class="inline-flex items-center gap-2 rounded-md bg-black my-1 px-6 py-3 font-medium text-white hover:bg-opacity-90"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" focusable="false" class="chakra-icon css-1q0mvrt" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-              <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm90.5 224H272v74.5c0 8.8-7.2 16-16 16-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3V272h-74.5c-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3 0-8.8 7.2-16 16-16H240v-74.5c0-8.8 7.2-16 16-16s16 7.2 16 16V240h74.5c8.8 0 16 7.2 16 16s-7.2 16-16 16z"></path>
-              </svg>
-              <span>Add Delivery Addresses</span>
-          </a>
-      </div>
-  </div>
-</div>
-<div class="rounded-sm border border-stroke bg-white p-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:py-20">
-  <table class="w-full border-collapse">
-    <thead>
-      <tr class="bg-gray-2 dark:bg-meta-4">
-        <th scope="col" class="px-6 py-3">#</th>
-        <th scope="col" class="px-6 py-3">Name</th>
-        <th scope="col" class="px-6 py-3">Address 1</th>
-        {% comment %} <th scope="col" class="px-6 py-3">Address 2</th> {% endcomment %}
-        <th scope="col" class="px-6 py-3">City</th>
-        <th scope="col" class="px-6 py-3">State</th>
-        <th scope="col" class="px-6 py-3">Postal Code</th>
-        {% comment %} <th scope="col" class="px-6 py-3">Geo Location</th> {% endcomment %}
-        <th scope="col" class="px-6 py-3">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for address in addresses %}
-      <tr class="border-b border-stroke dark:border-strokedark">
-        <td class="mr-2 px-6 py-4">{{ address.id }}</td>
-        <td class="mr-2 px-6 py-4 inline-flex items-center justify-center">
-          {{ address.name }}
-          {% if address.default_address == True %}
-          <span class="text-primary ">
-            <svg
-              class="fill-current"
-              width="21"
-              height="21"
-              viewBox="0 0 21 21"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g clip-path="url(#clip0_1890_16515)">
-                <path
-                  d="M10.8672 0.949463C5.64844 0.949463 1.42969 5.16821 1.42969 10.387C1.42969 15.6057 5.64844 19.8557 10.8672 19.8557C16.0859 19.8557 20.3359 15.6057 20.3359 10.387C20.3359 5.16821 16.0859 0.949463 10.8672 0.949463ZM10.8672 18.4495C6.42969 18.4495 2.83594 14.8245 2.83594 10.387C2.83594 5.94946 6.42969 2.35571 10.8672 2.35571C15.3047 2.35571 18.9297 5.98071 18.9297 10.4182C18.9297 14.8245 15.3047 18.4495 10.8672 18.4495Z"
-                  fill=""
-                />
-                <path
-                  d="M13.5549 7.48076L9.83611 11.1058L8.14861 9.44951C7.86736 9.16826 7.42986 9.19951 7.14861 9.44951C6.86736 9.73076 6.89861 10.1683 7.14861 10.4495L9.14861 12.387C9.33611 12.5745 9.58611 12.6683 9.83611 12.6683C10.0861 12.6683 10.3361 12.5745 10.5236 12.387L14.5549 8.51201C14.8361 8.23076 14.8361 7.79326 14.5549 7.51201C14.2736 7.23076 13.8361 7.23076 13.5549 7.48076Z"
-                  fill=""
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_1890_16515">
-                  <rect
-                    width="20"
-                    height="20"
-                    fill="white"
-                    transform="translate(0.867188 0.386963)"
-                  />
-                </clipPath>
-              </defs>
-            </svg>
-          </span>
-          {%endif%}</td>
-        <td class="mr-2 px-6 py-4">{{ address.address_line_1 }}</td>
-        {% comment %} <td class="px-6 py-4">{{ address.address_line_2 }}</td> {% endcomment %}
-        <td class="mr-2 px-6 py-4">{{ address.city }}</td>
-        <td class="mr-2 px-6 py-4">{{ address.state }}</td>
-        <td class="mr-2 px-6 py-4">{{ address.pin_code }}</td>
-        {% comment %} <td class="px-6 py-1"></td> {% endcomment %}
-        <td class="mr-2 px-6 py-4 flex items-center space-x-3.5 ">
-          {% if user.role != 'MENTOR' %}
-          <a href="{% url 'delivery_address_edit_by_branch' request.session.branch_id  address.id %}" class="hover:text-primary"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" focusable="false" class="chakra-icon css-1gm3tio" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-          {% else %}
-          <a href="{% url 'delivery_address_edit' address.id %}" class="hover:text-primary"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" focusable="false" class="chakra-icon css-1gm3tio" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-          {% endif %}
-            <path d="m7 17.013 4.413-.015 9.632-9.54c.378-.378.586-.88.586-1.414s-.208-1.036-.586-1.414l-1.586-1.586c-.756-.756-2.075-.752-2.825-.003L7 12.583v4.43zM18.045 4.458l1.589 1.583-1.597 1.582-1.586-1.585 1.594-1.58zM9 13.417l6.03-5.973 1.586 1.586-6.029 5.971L9 15.006v-1.589z"></path>
-            <path d="M5 21h14c1.103 0 2-.897 2-2v-8.668l-2 2V19H8.158c-.026 0-.053.01-.079.01-.033 0-.066-.009-.1-.01H5V5h6.847l2-2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2z"></path></svg>
-        
-          </a>
-          <form action="{% url 'delivery_address_delete' address.id %}" method="post" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" class="hover:text-primary"><svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M13.7535 2.47502H11.5879V1.9969C11.5879 1.15315 10.9129 0.478149 10.0691 0.478149H7.90352C7.05977 0.478149 6.38477 1.15315 6.38477 1.9969V2.47502H4.21914C3.40352 2.47502 2.72852 3.15002 2.72852 3.96565V4.8094C2.72852 5.42815 3.09414 5.9344 3.62852 6.1594L4.07852 15.4688C4.13477 16.6219 5.09102 17.5219 6.24414 17.5219H11.7004C12.8535 17.5219 13.8098 16.6219 13.866 15.4688L14.3441 6.13127C14.8785 5.90627 15.2441 5.3719 15.2441 4.78127V3.93752C15.2441 3.15002 14.5691 2.47502 13.7535 2.47502ZM7.67852 1.9969C7.67852 1.85627 7.79102 1.74377 7.93164 1.74377H10.0973C10.2379 1.74377 10.3504 1.85627 10.3504 1.9969V2.47502H7.70664V1.9969H7.67852ZM4.02227 3.96565C4.02227 3.85315 4.10664 3.74065 4.24727 3.74065H13.7535C13.866 3.74065 13.9785 3.82502 13.9785 3.96565V4.8094C13.9785 4.9219 13.8941 5.0344 13.7535 5.0344H4.24727C4.13477 5.0344 4.02227 4.95002 4.02227 4.8094V3.96565ZM11.7285 16.2563H6.27227C5.79414 16.2563 5.40039 15.8906 5.37227 15.3844L4.95039 6.2719H13.0785L12.6566 15.3844C12.6004 15.8625 12.2066 16.2563 11.7285 16.2563Z" fill=""></path>
-              <path d="M9.00039 9.11255C8.66289 9.11255 8.35352 9.3938 8.35352 9.75942V13.3313C8.35352 13.6688 8.63477 13.9782 9.00039 13.9782C9.33789 13.9782 9.64727 13.6969 9.64727 13.3313V9.75942C9.64727 9.3938 9.33789 9.11255 9.00039 9.11255Z" fill=""></path>
-              <path d="M11.2502 9.67504C10.8846 9.64692 10.6033 9.90004 10.5752 10.2657L10.4064 12.7407C10.3783 13.0782 10.6314 13.3875 10.9971 13.4157C11.0252 13.4157 11.0252 13.4157 11.0533 13.4157C11.3908 13.4157 11.6721 13.1625 11.6721 12.825L11.8408 10.35C11.8408 9.98442 11.5877 9.70317 11.2502 9.67504Z" fill=""></path>
-              <path d="M6.72245 9.67504C6.38495 9.70317 6.1037 10.0125 6.13182 10.35L6.3287 12.825C6.35683 13.1625 6.63808 13.4157 6.94745 13.4157C6.97558 13.4157 6.97558 13.4157 7.0037 13.4157C7.3412 13.3875 7.62245 13.0782 7.59433 12.7407L7.39745 10.2657C7.39745 9.90004 7.08808 9.64692 6.72245 9.67504Z" fill=""></path>
-          </svg>
-        </button>
-        </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% comment %} <div
-                    class="min-w-[370px] max-w-max rounded-md mt-10 border border-stroke py-1 dark:border-strokedark"
-                  >
-                    <ul class="flex flex-col">
-                      <li
-                        class="flex items-center gap-2.5 border-b border-stroke px-5 py-3 last:border-b-0 dark:border-strokedark"
-                      >
-                        <span class="text-primary">
-                          <svg
-                            class="fill-current"
-                            width="21"
-                            height="21"
-                            viewBox="0 0 21 21"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <g clip-path="url(#clip0_1890_16515)">
-                              <path
-                                d="M10.8672 0.949463C5.64844 0.949463 1.42969 5.16821 1.42969 10.387C1.42969 15.6057 5.64844 19.8557 10.8672 19.8557C16.0859 19.8557 20.3359 15.6057 20.3359 10.387C20.3359 5.16821 16.0859 0.949463 10.8672 0.949463ZM10.8672 18.4495C6.42969 18.4495 2.83594 14.8245 2.83594 10.387C2.83594 5.94946 6.42969 2.35571 10.8672 2.35571C15.3047 2.35571 18.9297 5.98071 18.9297 10.4182C18.9297 14.8245 15.3047 18.4495 10.8672 18.4495Z"
-                                fill=""
-                              />
-                              <path
-                                d="M13.5549 7.48076L9.83611 11.1058L8.14861 9.44951C7.86736 9.16826 7.42986 9.19951 7.14861 9.44951C6.86736 9.73076 6.89861 10.1683 7.14861 10.4495L9.14861 12.387C9.33611 12.5745 9.58611 12.6683 9.83611 12.6683C10.0861 12.6683 10.3361 12.5745 10.5236 12.387L14.5549 8.51201C14.8361 8.23076 14.8361 7.79326 14.5549 7.51201C14.2736 7.23076 13.8361 7.23076 13.5549 7.48076Z"
-                                fill=""
-                              />
-                            </g>
-                            <defs>
-                              <clipPath id="clip0_1890_16515">
-                                <rect
-                                  width="20"
-                                  height="20"
-                                  fill="white"
-                                  transform="translate(0.867188 0.386963)"
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-title-md2 font-semibold text-black dark:text-white">Today's Delivery</h2>
+         <nav>
+            <ol class="flex items-center gap-2">
+                <li><a class="font-medium" href="{% url 'dashboard' %}">Dashboard /</a></li>
+                {% if user.role != 'MENTOR' %}
+                  <li><a class="font-medium" href="{% url 'orders_today_branches' %}"> Branches /</a></li>
+                {% endif %}
+                <li class="font-medium text-success">Delivery Address List</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Filter for Branch (only for company_admin) -->
+    {% if user.role != 'MENTOR' %}
+    <div class="pb-2 mt-4">
+        <div class="flex justify-start p-3 container bg-black rounded-lg mb-2">
+            <div class="button flex items-center">
+                <p class="inline-flex items-center gap-2 my-1 px-4 py-3 font-medium text-white text-lg hover:bg-opacity-90">
+                    <span>Today's Order</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="rounded-lg border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+            <div class="max-w-full overflow-x-auto">
+                <div class="mb-4">
+                    <label for="branchFilter" class="block text-sm font-medium text-gray-700">Filter by Branch:</label>
+                    <select id="branchFilter" name="branchFilter" 
+                    class="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 pl-5 pr-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input">
+                        <option value="all">All</option>
+                        {% for branch in branches %}
+                            <option value="{{ branch.id }}">{{ branch.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Delivery Address Table -->
+    <div class="rounded-lg border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+        <div class="max-w-full overflow-x-auto">
+            <table class="w-full table-auto border-collapse border border-gray-300 mb-4">
+                <thead>
+                    <tr class="bg-[#F9FAFB] text-left dark:bg-meta-4">
+                        <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">ORDER #</th>
+                        <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">COMPANY</th>
+                        <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">BRANCH</th>
+                        <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">ADDRES NAME</th>
+                        <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">ADDRESS LINE 1</th>
+                        <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in addresses %}
+                    <tr data-branch="{{ order.branch.id }}">
+                        <td class="border border-gray-300 px-4 py-2">#{{ order.id }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ order.company.name }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ order.branch.name }}</td>
+                        <td class="border border-gray-300 px-4 py-2 flex items-center">
+                          <span>{{ order.name }}</span>
+                          {% if order.default_address %}
+                          <span class="text-primary ml-2 flex items-center">
+                            <svg
+                              class="fill-current"
+                              width="21"
+                              height="21"
+                              viewBox="0 0 21 21"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <g clip-path="url(#clip0_1890_16515)">
+                                <path
+                                  d="M10.8672 0.949463C5.64844 0.949463 1.42969 5.16821 1.42969 10.387C1.42969 15.6057 5.64844 19.8557 10.8672 19.8557C16.0859 19.8557 20.3359 15.6057 20.3359 10.387C20.3359 5.16821 16.0859 0.949463 10.8672 0.949463ZM10.8672 18.4495C6.42969 18.4495 2.83594 14.8245 2.83594 10.387C2.83594 5.94946 6.42969 2.35571 10.8672 2.35571C15.3047 2.35571 18.9297 5.98071 18.9297 10.4182C18.9297 14.8245 15.3047 18.4495 10.8672 18.4495Z"
+                                  fill=""
                                 />
-                              </clipPath>
-                            </defs>
-                          </svg>
-                        </span>
-                        <span> Default Address </span>
-                      </li>
-                    </ul>
-                  </div> {% endcomment %}
+                                <path
+                                  d="M13.5549 7.48076L9.83611 11.1058L8.14861 9.44951C7.86736 9.16826 7.42986 9.19951 7.14861 9.44951C6.86736 9.73076 6.89861 10.1683 7.14861 10.4495L9.14861 12.387C9.33611 12.5745 9.58611 12.6683 9.83611 12.6683C10.0861 12.6683 10.3361 12.5745 10.5236 12.387L14.5549 8.51201C14.8361 8.23076 14.8361 7.79326 14.5549 7.51201C14.2736 7.23076 13.8361 7.23076 13.5549 7.48076Z"
+                                  fill=""
+                                />
+                              </g>
+                              <defs>
+                                <clipPath id="clip0_1890_16515">
+                                  <rect
+                                    width="20"
+                                    height="20"
+                                    fill="white"
+                                    transform="translate(0.867188 0.386963)"
+                                  />
+                                </clipPath>
+                              </defs>
+                            </svg>
+                          </span>
+                          {% endif %}
+                        </td>
+                        
+                        <td class="border border-gray-300 px-4 py-2 text-center">
+                                {{ order.address_line_1 }}
+                        </td>
+                        
+                        <td class="border border-gray-300 px-4 py-2 text-center  flex justify-center items-center space-x-2">
+                          {% if user.role != 'MENTOR' %}
+                              <a href="{% url 'delivery_address_edit_by_branch' order.branch.pk order.id %}" class="hover:text-primary">
+                          {% else %}
+                              <a href="{% url 'delivery_address_edit' order.id %}" class="hover:text-primary">
+                          {% endif %}
+                              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" focusable="false" class="chakra-icon css-1gm3tio" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="m7 17.013 4.413-.015 9.632-9.54c.378-.378.586-.88.586-1.414s-.208-1.036-.586-1.414l-1.586-1.586c-.756-.756-2.075-.752-2.825-.003L7 12.583v4.43zM18.045 4.458l1.589 1.583-1.597 1.582-1.586-1.585 1.594-1.58zM9 13.417l6.03-5.973 1.586 1.586-6.029 5.971L9 15.006v-1.589z"></path>
+                                  <path d="M5 21h14c1.103 0 2-.897 2-2v-8.668l-2 2V19H8.158c-.026 0-.053.01-.079.01-.033 0-.066-.009-.1-.01H5V5h6.847l2-2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2z"></path>
+                              </svg>
+                          </a>
+                      
+                          <form action="{% url 'delivery_address_delete' order.id %}" method="post" style="display:inline;">
+                              {% csrf_token %}
+                              <button type="submit" class="hover:text-primary">
+                                  <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M13.7535 2.47502H11.5879V1.9969C11.5879 1.15315 10.9129 0.478149 10.0691 0.478149H7.90352C7.05977 0.478149 6.38477 1.15315 6.38477 1.9969V2.47502H4.21914C3.40352 2.47502 2.72852 3.15002 2.72852 3.96565V4.8094C2.72852 5.42815 3.09414 5.9344 3.62852 6.1594L4.07852 15.4688C4.13477 16.6219 5.09102 17.5219 6.24414 17.5219H11.7004C12.8535 17.5219 13.8098 16.6219 13.866 15.4688L14.3441 6.13127C14.8785 5.90627 15.2441 5.3719 15.2441 4.78127V3.93752C15.2441 3.15002 14.5691 2.47502 13.7535 2.47502ZM7.67852 1.9969C7.67852 1.85627 7.79102 1.74377 7.93164 1.74377H10.0973C10.2379 1.74377 10.3504 1.85627 10.3504 1.9969V2.47502H7.70664V1.9969H7.67852ZM4.02227 3.96565C4.02227 3.85315 4.10664 3.74065 4.24727 3.74065H13.7535C13.866 3.74065 13.9785 3.82502 13.9785 3.96565V4.8094C13.9785 4.9219 13.8941 5.0344 13.7535 5.0344H4.24727C4.13477 5.0344 4.02227 4.95002 4.02227 4.8094V3.96565ZM11.7285 16.2563H6.27227C5.79414 16.2563 5.40039 15.8906 5.37227 15.3844L4.95039 6.2719H13.0785L12.6566 15.3844C12.6004 15.8625 12.2066 16.2563 11.7285 16.2563Z" fill=""></path>
+                                      <path d="M9.00039 9.11255C8.66289 9.11255 8.35352 9.3938 8.35352 9.75942V13.3313C8.35352 13.6688 8.63477 13.9782 9.00039 13.9782C9.33789 13.9782 9.64727 13.6969 9.64727 13.3313V9.75942C9.64727 9.3938 9.33789 9.11255 9.00039 9.11255Z" fill=""></path>
+                                      <path d="M11.2502 9.67504C10.8846 9.64692 10.6033 9.90004 10.5752 10.2657L10.4064 12.7407C10.3783 13.0782 10.6314 13.3875 10.9971 13.4157C11.0252 13.4157 11.0252 13.4157 11.0533 13.4157C11.3908 13.4157 11.6721 13.1625 11.6721 12.825L11.8408 10.35C11.8408 9.98442 11.5877 9.70317 11.2502 9.67504Z" fill=""></path>
+                                      <path d="M6.72245 9.67504C6.38495 9.70317 6.1037 10.0125 6.13182 10.35L6.3287 12.825C6.35683 13.1625 6.63808 13.4157 6.94745 13.4157C6.97558 13.4157 6.97558 13.4157 7.0037 13.4157C7.3412 13.3875 7.62245 13.0782 7.59433 12.7407L7.39745 10.2657C7.39745 9.90004 7.08808 9.64692 6.72245 9.67504Z" fill=""></path>
+                                  </svg>
+                              </button>
+                          </form>
+                      </td>
+                      
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="border border-gray-300 px-4 py-2 text-center">No Meals Delivered today!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const branchFilter = document.getElementById("branchFilter");
+        const rows = document.querySelectorAll("tbody tr[data-branch]");
+
+        if (branchFilter) {
+            branchFilter.addEventListener("change", function () {
+                const selectedBranch = this.value;
+                
+                rows.forEach(row => {
+                    const branchId = row.getAttribute("data-branch");
+                    if (selectedBranch === "all" || selectedBranch === branchId) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            });
+        }
+    });
+</script>
 
 {% endblock content %}

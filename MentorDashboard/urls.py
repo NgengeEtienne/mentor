@@ -42,7 +42,7 @@ urlpatterns = [
     path('menu/<int:branch_id>/<int:id>/', views.meal_plan_detail, name='meal_plan_detail_by_branch'),
 
     # Optional branch_id for delivery address list and actions
-    path('deliver/branches/', views.delivery_address_branches, name='delivery_address_branches'),
+    path('delivery-addresses/', views.delivery_address_list, name='delivery_address_branches'),
     path('deliver/<int:branch_id>/', views.delivery_address_list, name='delivery_address_list_by_branch'),
     path('delivery-address/add/<int:branch_id>/', views.delivery_address_create, name='delivery_address_create_by_branch'),
     path('delivery-address/edit/<int:branch_id>/<int:id>/', views.delivery_address_edit, name='delivery_address_edit_by_branch'),
