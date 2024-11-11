@@ -1,6 +1,21 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, Company, Branch
+from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
+from.models import (
+    Company,
+    Branch,
+    CustomUser,
+    PasswordReset,
+)
+from.resources import (
+    CompanyResource,
+    BranchResource,
+    CustomUserResource,
+    PasswordResetResource,
+)
+
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
 
@@ -73,5 +88,15 @@ class CustomUserAdmin(UserAdmin):
 
 # Register your models with the admin
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(Company)
-admin.site.register(Branch)
+@admin.register(Company)
+class CompanyAdmin(ImportExportModelAdmin):
+    resource_class = CompanyResource
+
+# Admin for Branch
+@admin.register(Branch)
+class BranchAdmin(ImportExportModelAdmin):
+    resource_class = BranchResource
+
+
+# class CustomUserAdmin(ImportExportModelAdmin):
+#     resource_class = CustomUserResource

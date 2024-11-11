@@ -48,6 +48,7 @@ ALLOWED_HOSTS=['localhost','127.0.0.1','159.89.164.235','dashboard.cabriot.com']
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -61,7 +62,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
    'django_rest_passwordreset',
     'corsheaders',
-    # 'django_q',
+    'import_export',
     "django_browser_reload",
 
 ]
@@ -254,3 +255,14 @@ TEMPLATES = [
         },
     },
 ]
+
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Cabriot Dashboard",
+    "site_header": "Cabriot Dashboard",
+    "site_brand": "Cabriot",
+    "site_icon": "fas fa-globe",
+    "welcome_sign": "Welcome to Cabriot Dashboard",
+    "copyright": "Cabriot",
+}
