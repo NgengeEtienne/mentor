@@ -251,6 +251,7 @@ def dashboard_overview(request):
 
 @login_required
 def delivery_address_list(request, branch_id=None):
+    notifications = get_notifications(request)  # Fetch notifications
     if request.user.role != 'MENTOR':
         # Get all branches managed by the Branch Manager
         branches = request.branch
@@ -258,17 +259,14 @@ def delivery_address_list(request, branch_id=None):
         # Filter by specific branch if branch_id is provided
             # branches = branches.filter(id=branch_id)
         addresses = DeliveryAddress.objects.filter(branch__in=branches)
+        return render(request, 'mentor/delivery/list.html', {'branches': branches, 'addresses': addresses, 'notifications': notifications})
+
     else:
         # Get all branches
         # Filter addresses for the selected branches
         addresses = DeliveryAddress.objects.filter(branch=request.branch)
-    
-    if branch_id:
-        notifications = get_notifications(request)
-    else:
-        notifications = get_notifications(request)  # Fetch notifications
-  # Fetch notifications
-    return render(request, 'mentor/delivery/list.html', {'branches': branches, 'addresses': addresses, 'notifications': notifications})
+        return render(request, 'mentor/delivery/list.html', { 'addresses': addresses, 'notifications': notifications})
+
 
 @login_required
 def delivery_address_create(request, branch_id=None):
@@ -513,7 +511,7 @@ def orders_today(request, branch_id=None):
     tz = timezone.get_current_timezone()  # Uses the TIME_ZONE from settings
     today = timezone.localdate()  # Get the server's local date (timezone aware)
     old_date = today - timedelta(days=30)
-
+    notifications = get_notifications(request)  # Fetch notifications
     print("Today's date:", today)
     print("Old date:", old_date)
     if request.user.role != "MENTOR":
@@ -521,20 +519,19 @@ def orders_today(request, branch_id=None):
         # company=branch.company
         todays_deliveries = MealDelivery.objects.filter(branch__in=branch, date=today).exclude(status=0,quantity=0)
         branches=request.branch
+        return render(request, 'mentor/order/today.html', {'branches': branches,'branch_id': branch_id,'todays_deliveries': todays_deliveries, 'notifications': notifications})
+
     else:
         branch = request.branch
         company = request.company
         todays_deliveries = MealDelivery.objects.filter(branch=branch, date=today).exclude(status=0,quantity=0)
+        return render(request, 'mentor/order/today.html', {'branch_id': branch_id,'todays_deliveries': todays_deliveries, 'notifications': notifications})
 
-    if branch_id:
-        notifications = get_notifications(request)
-    else:
-        notifications = get_notifications(request)  # Fetch notifications
+
 
     # Fetch today's deliveries for the branch
     # print("Today's deliveries:", todays_deliveries)
 
-    return render(request, 'mentor/order/today.html', {'branches': branches,'branch_id': branch_id,'todays_deliveries': todays_deliveries, 'notifications': notifications})
 
 @login_required
 def assign_meal(request, date, branch_id=None):
