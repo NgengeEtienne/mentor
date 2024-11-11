@@ -73,13 +73,16 @@
       <tbody>
         <!-- Each Meal Row -->
         {% for meal, quantity in meal_quantities.items %}
-        <tr class="border border-gray-300 px-2 py-2 text-left">
-          <td class="border text-lg border-gray-300 px-2 sm:px-4 py-2 border-t" style="width: 50%;">{{ meal|title }}</td>
-          <td class="border border-gray-300 px-2 sm:px-4 py-2 border-t" style="width: 50%;">
-            <input type="number" value='{{ quantity }}' class="w-full rounded-lg border-[1.5px] border-stroke bg-transparent text-lg px-3 py-2 sm:px-5 sm:py-3 font-normal text-black outline-none transition focus:border-success active:border-success dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-success">
-          </td>
-        </tr>
-        {% endfor %}
+  <tr class="border border-gray-300 px-4 py-2 text-left">
+    <td class="border border-gray-300 px-4 py-2 border-t" style="width: 50%;">{{ meal|title }}</td>
+    <input type="hidden" id="meal-plan" value="{{ meal }}">
+    <td class="border border-gray-300 px-4 py-2 border-t" style="width: 50%;">
+      <input type="number" value="{{ quantity }}" id="quantity"
+      class="W-50 rounded-lg border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-success active:border-success disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-success" />
+    </td>
+  </tr>
+{% endfor %}
+
       </tbody>
     </table>
     <div class="flex justify-center">

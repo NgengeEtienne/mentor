@@ -42,7 +42,7 @@ DEBUG = "true"#os.environ.get('DEBUG', "False").lower() == "true"
 #ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 # ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(" ")
 
-ALLOWED_HOSTS=['localhost','127.0.0.1','159.89.164.235']
+ALLOWED_HOSTS=['localhost','127.0.0.1','159.89.164.235','dashboard.cabriot.com']
 
 
 # Application definition
@@ -213,6 +213,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://159.89.164.235:8001',
     'http://localhost:8001',
     'http://127.0.0.1:8001',
+    'http://dashboard.cabriot.com',
 ]
 
 # Optional: Allow all methods and headers
@@ -224,7 +225,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8001',
     'http://127.0.0.1:8001',
     'http://159.89.164.235:8000'
-    'http://159.89.164.235:8001'  # Add other domains you need
+    'http://159.89.164.235:8001',  # Add other domains you need
+    'https://dashboard.cabriot.com'
 ]
 
 # CSRF_TRUSTED_ORIGINS=True

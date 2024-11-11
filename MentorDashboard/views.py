@@ -991,6 +991,7 @@ def meal_ordered(request, branch_id=None):
 @login_required
 def assign_meal_post(request, branch_id=None):
     branch_id = request.session.get('branch_id')
+    
     order = BulkOrders.objects.first()
     if branch_id:
         branch=Branch.objects.get(id=branch_id)
