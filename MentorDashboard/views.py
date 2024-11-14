@@ -115,17 +115,21 @@ def dashboard_overview(request):
 
     # Query all orders within the week, grouped by address and date
         orders = (
-            MealDelivery.objects.filter(branch__in=branch, date__range=[start_of_week, end_of_week])
-            .values('date', 'delivery_address__name', 'delivery_address__pk')
-            .annotate(
-                total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
-                total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
-                total_snack=Sum(Case(When(meal_type='snack', then='quantity'), output_field=IntegerField())),
-                total_dinner=Sum(Case(When(meal_type='dinner', then='quantity'), output_field=IntegerField())),
-                total_dinner2=Sum(Case(When(meal_type='dinner2', then='quantity'), output_field=IntegerField())),
+        MealDelivery.objects.filter(branch__in=branch, date__range=[start_of_week, end_of_week])
+        .values('date','branch', 'delivery_address__name', 'delivery_address__pk')
+        .annotate(
+            total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),   
+            total_breakfast2=Sum(Case(When(meal_type='breakfast2', then='quantity'), output_field=IntegerField())),
+            total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
+            total_lunch2=Sum(Case(When(meal_type='lunch2', then='quantity'), output_field=IntegerField())),
+            total_snack=Sum(Case(When(meal_type='snack', then='quantity'), output_field=IntegerField())),
+            total_snack2=Sum(Case(When(meal_type='snack2', then='quantity'), output_field=IntegerField())),
+            total_dinner=Sum(Case(When(meal_type='dinner', then='quantity'), output_field=IntegerField())),
+            total_dinner2=Sum(Case(When(meal_type='dinner2', then='quantity'), output_field=IntegerField())),
             )
             .order_by('date', 'delivery_address__name')
         )
+        branches=request.branch
 
     else:
         branch = request.branch  
@@ -160,24 +164,28 @@ def dashboard_overview(request):
 
         # Query all orders within the week, grouped by address and date
         orders = (
-            MealDelivery.objects.filter(branch=branch, date__range=[start_of_week, end_of_week])
-            .values('date', 'delivery_address__name', 'delivery_address__pk')
-            .annotate(
-                total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
-                total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
-                total_snack=Sum(Case(When(meal_type='snack', then='quantity'), output_field=IntegerField())),
-                total_dinner=Sum(Case(When(meal_type='dinner', then='quantity'), output_field=IntegerField())),
-                total_dinner2=Sum(Case(When(meal_type='dinner2', then='quantity'), output_field=IntegerField())),
+        MealDelivery.objects.filter(branch=branch, date__range=[start_of_week, end_of_week])
+        .values('date','branch', 'delivery_address__name', 'delivery_address__pk')
+        .annotate(
+            total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
+            total_breakfast2=Sum(Case(When(meal_type='breakfast2', then='quantity'), output_field=IntegerField())),
+            total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
+            total_lunch2=Sum(Case(When(meal_type='lunch2', then='quantity'), output_field=IntegerField())),
+            total_snack=Sum(Case(When(meal_type='snack', then='quantity'), output_field=IntegerField())),
+            total_snack2=Sum(Case(When(meal_type='snack2', then='quantity'), output_field=IntegerField())),
+            total_dinner=Sum(Case(When(meal_type='dinner', then='quantity'), output_field=IntegerField())),
+            total_dinner2=Sum(Case(When(meal_type='dinner2', then='quantity'), output_field=IntegerField())),
             )
             .order_by('date', 'delivery_address__name')
         )
+        branches=request.branch
 
     date_format = "%Y-%m-%d"
    
     # Organize orders by address and date
     data_by_address = {}
     for order in orders:
-        address = order['delivery_address__name']
+        address = DeliveryAddress.objects.get(pk=order['delivery_address__pk'])
         address_pk = order['delivery_address__pk']
         date_str = str(order['date'])
 
@@ -195,19 +203,23 @@ def dashboard_overview(request):
             'day_name': datetime.strptime(date_str, date_format).strftime("%A"),
             'date': order_date,
             'total_breakfast': order.get('total_breakfast', '-'),
+            'total_breakfast2': order.get('total_breakfast2', '-'),
             'total_lunch': order.get('total_lunch', '-'),
+            'total_lunch2': order.get('total_lunch2', '-'),
             'total_snack': order.get('total_snack', '-'),
+            'total_snack2': order.get('total_snack2', '-'),
             'total_dinner': order.get('total_dinner', '-'),
             'total_dinner2': order.get('total_dinner2', '-'),
             'is_future': "True" if datetime.strptime(date_str, date_format).date() > today or (order_date != today and current_time < six_pm) else "False",
-            'address_pk': address_pk,
+            'address_pk': address,
+            'branch': order.get('branch', None),
         }
 
     print(f'Data by address: {data_by_address}')
     
     # Fill missing dates with default data for all addresses
     for address in addresses:  # Loop through all addresses instead of data_by_address keys
-        address_name = address.name
+        address_name = address
         address_pk = address.pk
         
         for i in range(7):
@@ -219,17 +231,21 @@ def dashboard_overview(request):
                     'day_name': day.strftime("%A"),
                     'date': day,
                     'total_breakfast': '-',
+                    'total_breakfast2': '-',
                     'total_lunch': '-',
+                    'total_lunch2': '-',
                     'total_snack': '-',
+                    'total_snack2': '-',
                     'total_dinner': '-',
                     'total_dinner2': '-',
                     'is_future': "True" if day > today or (day != today and current_time < six_pm) else "False",
                     'address_pk': address_pk,
+                    'branch': order.get('branch', None),
                 }
     
     # Sort the addresses by name and dates within each address
-    sorted_data = {addr: dict(sorted(data.items())) for addr, data in sorted(data_by_address.items())}
-    
+    sorted_data = data_by_address
+
     notifications = get_notifications(request)  # Fetch notifications
     # print(week_days)  # Debug print to verify output
 
@@ -245,6 +261,7 @@ def dashboard_overview(request):
         "addresses": addresses,
         "notifications": notifications,
         'data_by_address': sorted_data,
+        'branches': branches
     }
 
     return render(request, 'mentor/home.html', context)
@@ -609,43 +626,7 @@ def assign_meal(request, date, branch_id=None):
                 day_meals[meal_type] |= dishes  # Merge QuerySets
             print(day_meals)
     # Handle POST request for meal assignments
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            meal_assignments = data.get('mealData', [])
-            print
-            for assignment in meal_assignments:
-                meal_type = assignment.get('meal_plan')
-                address_id = assignment.get('address')
-                delivery_date = assignment.get('date')
-                quantity = int(assignment.get('quantity', 0))
-                
-                delivery_address = get_object_or_404(DeliveryAddress, pk=address_id)
-
-                # Save the meal assignment
-                deliver = MealDelivery.objects.create(
-                    bulk_order=order,
-                    meal_type=meal_type,
-                    quantity=quantity,
-                    date=delivery_date,
-                    delivery_address=delivery_address,
-                    branch=branch,
-                    company=company
-                )
-                message = f"{quantity} {meal_type} assigned to {delivery_address} by {branch}"
-                Notification.objects.create(
-                    delivery=deliver,
-                    message=message,
-                    branch=branch,
-                    company=company
-                )
-
-            return JsonResponse({'success': True, 'message': 'Meal assigned successfully.'})
-        except json.JSONDecodeError as e:
-            return JsonResponse({'success': False, 'error': f'JSON decode error: {str(e)}'}, status=400)
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
-
+   
     # Render the template with context data
     return render(request, 'mentor/meal/assign.html', {
         'order': order,
@@ -663,20 +644,17 @@ def assign_meal(request, date, branch_id=None):
 @login_required
 def edit_assign_meal(request,id, date, branch_id=None):
     # Fetch the bulk order for the current branch
-    branch_id = request.session.get('branch_id')
+    # branch_id = request.session.get('branch_id')
     if branch_id:
         branch=Branch.objects.get(id=branch_id)
         company=branch.company
     else:
         branch = request.branch
         company = request.company
-    
-    address = DeliveryAddress.objects.filter(branch=branch, company=company,pk=id).first()
-    
-    if branch_id:
-        notifications = get_notifications(request)
-    else:
-        notifications = get_notifications(request)  # Fetch notifications
+    print(branch)
+    address = DeliveryAddress.objects.filter(pk=id).first()
+    print(address)
+    notifications = get_notifications(request)  # Fetch notifications
 
     delivery=MealDelivery.objects.filter(delivery_address=id,date=date)
     print(delivery)
@@ -684,8 +662,11 @@ def edit_assign_meal(request,id, date, branch_id=None):
     
     meal_quantities = {
         'breakfast': 0,
+        'breakfast2': 0,
         'lunch': 0,
+        'lunch2': 0,
         'snack': 0,
+        'snack2': 0,
         'dinner': 0,
         'dinner2': 0
         
@@ -696,109 +677,25 @@ def edit_assign_meal(request,id, date, branch_id=None):
         meal_type_lower = meal.meal_type.lower()  # Convert to lowercase
         if meal_type_lower in meal_quantities:  # Ensure meal_type exists in our dictionary
             meal_quantities[meal_type_lower] = meal_quantities.get(meal_type_lower, 0) + (meal.quantity if meal.quantity else 0)
-
-    print(f'Address: {address.name}')
-    print(f'Meal Quantities: {meal_quantities}')
-    return render(request, 'mentor/meal/edit_assign.html', {
-        'address': address,
-        'meal_quantities': meal_quantities, 
-        'notifications': notifications,
-        'date': date
-   })
-
-
+            print(meal_quantities)
+        print(f'Address: {address.name}')
+        print(f'Meal Quantities: {meal_quantities}')
+        
     # Fetch the bulk order for the current branch
     order = get_object_or_404(BulkOrders, branch=request.branch)
     addresses = DeliveryAddress.objects.filter(branch=request.branch, company=request.company)
     
-    if branch_id:
-        notifications = get_notifications(request)
-    else:
-        notifications = get_notifications(request)  # Fetch notifications
+    notifications = get_notifications(request)  # Fetch notifications
 
-    date = make_aware(datetime.now().date().isoformat())
-    # Parse the date to get the day of the week
-    try:
-        date_obj = make_aware(datetime.strptime(date, '%Y-%m-%d'))
-        day_name = date_obj.strftime('%A').lower()  # e.g., 'monday'
-    except ValueError:
-        return render(request, 'your_template.html', {'error': 'Invalid date format'})
-
-    # Get all MealPlans related to the order
-    meal_plans = order.MealPlan.all()
-    
-    # Prepare a dictionary to store dishes for the selected day
-    dishes_for_day = {}
-    
-    # Meal types for iteration (e.g., breakfast, lunch, etc.)
-    meals = ['breakfast', 'lunch', 'snack', 'dinner', 'dinner2']
-    
-    # Loop through each meal type and get the related dishes for the specific day
-    for meal in meals:
-        if meal == 'dinner2':
-            field_name = f"{day_name}_dinner_meal_option"
-            meal_field = f"{day_name}_dinner_meal_option"  # Optional meal field for dinner2
-        else:
-            field_name = f"{day_name}_{meal}_meal"
-            meal_field = f"{day_name}_{meal}_meal"  # Optional meal field for other meals
-
-        # Get dishes for the current meal type and day
-        dishes = []
-        for meal_plan in meal_plans:
-            selected_meals = getattr(meal_plan, meal_field).all()
-            for meal in selected_meals:
-                dishes += list(meal.selected_dishes.all())
-
-        dishes_for_day[meal] = list(set(dishes))  # Remove duplicates
-
-    # Prepare data for rendering
-    day_meals = {}
-    
-    for meal_plan in meal_plans:
-        for meal_type in meals:
-            if meal_type == 'dinner2':
-                dish_attr = f"{day_name}_dinner_meal_option"
-            else:
-                dish_attr = f"{day_name}_{meal_type}_meal"
-
-            dishes = getattr(meal_plan, dish_attr).all()
-            
-            if meal_type not in day_meals:
-                day_meals[meal_type] = dishes
-            else:
-                day_meals[meal_type] |= dishes
-
-    # Prepare meal delivery data
-    meal_delivery_data = {}
-    for address in addresses:
-        meal_delivery_data[address] = {}
-        for meal_type in meals:
-            # Fetch the quantity for this address, meal type, and date
-            meal_delivery = MealDelivery.objects.filter(
-                delivery_address=address,
-                date=date,
-                meal_type=meal_type,
-                branch=request.branch,
-                company=request.company,
-                bulk_order=order
-            ).first()
-            meal_delivery_data[address][meal_type] = meal_delivery.quantity if meal_delivery else 0
-    print(meal_delivery_data)
-
-    return render(request, 'mentor/meal/edit_assign1.html', {
+    return render(request, 'mentor/meal/edit_assign.html', {
         'order': order,
         'addresses': addresses,
         'notifications': notifications,
         'selected_date': date,
-        'dishes_for_day': dishes_for_day,
-        'day_name': day_name.capitalize(),
-        'day_meals': day_meals, 
-        'meals': meals,
+        'address':address, 
+         'meal_quantities': meal_quantities,
         'date': date,
-        'dinner': sum((order.dinner or 0, order.dinner2 or 0)),
-        'selected_dishes': dishes_for_day,
-        'total_sum': sum((order.breakfast or 0, order.lunch or 0, order.snack or 0, order.dinner or 0, order.dinner2 or 0)),
-        'meal_delivery_data': meal_delivery_data  # Pass the meal delivery data to the template
+        'branch_id': branch
     })
 @login_required
 def meal_plan_list(request, branch_id=None):
@@ -902,30 +799,53 @@ def meal_ordered(request, branch_id=None):
     # Start and end of the current week in IST
     start_of_week = make_aware(datetime.combine(today, time.min), india_tz)
     end_of_week = make_aware(datetime.combine(today + timedelta(days=6), time.max), india_tz)
-
+    print(branch)
     # Query all addresses for the given branch and company
-    addresses = DeliveryAddress.objects.filter(branch=branch, company=company)
-
+    if request.user.role == 'MENTOR':
+        addresses = DeliveryAddress.objects.filter(branch=branch, company=company)
+        branches=request.branch
+        company=request.company
     # Query all orders within the week, grouped by address and date
-    orders = (
-        MealDelivery.objects.filter(branch=branch, date__range=[start_of_week, end_of_week])
-        .values('date', 'delivery_address__name', 'delivery_address__pk')
-        .annotate(
-            total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
-            total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
-            total_snack=Sum(Case(When(meal_type='snack', then='quantity'), output_field=IntegerField())),
-            total_dinner=Sum(Case(When(meal_type='dinner', then='quantity'), output_field=IntegerField())),
-            total_dinner2=Sum(Case(When(meal_type='dinner2', then='quantity'), output_field=IntegerField())),
+        orders = (
+            MealDelivery.objects.filter(branch=branch, date__range=[start_of_week, end_of_week])
+            .values('date','branch', 'delivery_address__name', 'delivery_address__pk')
+            .annotate(
+                total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
+                total_breakfast2=Sum(Case(When(meal_type='breakfast2', then='quantity'), output_field=IntegerField())),
+                total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
+                total_lunch2=Sum(Case(When(meal_type='lunch2', then='quantity'), output_field=IntegerField())),
+                total_snack=Sum(Case(When(meal_type='snack', then='quantity'), output_field=IntegerField())),
+                total_snack2=Sum(Case(When(meal_type='snack2', then='quantity'), output_field=IntegerField())),
+                total_dinner=Sum(Case(When(meal_type='dinner', then='quantity'), output_field=IntegerField())),
+                total_dinner2=Sum(Case(When(meal_type='dinner2', then='quantity'), output_field=IntegerField())),
+            )
+            .order_by('date', 'delivery_address__name')
         )
-        .order_by('date', 'delivery_address__name')
-    )
+    else:
+        addresses = DeliveryAddress.objects.filter(branch__in=branch, company=company)
+        # Query all orders within the week, grouped by address and date
+        orders = (
+            MealDelivery.objects.filter(branch__in=branch, date__range=[start_of_week, end_of_week])
+            .values('date','branch', 'delivery_address__name', 'delivery_address__pk')
+            .annotate(
+                total_breakfast=Sum(Case(When(meal_type='breakfast', then='quantity'), output_field=IntegerField())),
+                total_breakfast2=Sum(Case(When(meal_type='breakfast2', then='quantity'), output_field=IntegerField())),
+                total_lunch=Sum(Case(When(meal_type='lunch', then='quantity'), output_field=IntegerField())),
+                total_lunch2=Sum(Case(When(meal_type='lunch2', then='quantity'), output_field=IntegerField())),
+                total_snack=Sum(Case(When(meal_type='snack', then='quantity'), output_field=IntegerField())),
+                total_snack2=Sum(Case(When(meal_type='snack2', then='quantity'), output_field=IntegerField())),
+                total_dinner=Sum(Case(When(meal_type='dinner', then='quantity'), output_field=IntegerField())),
+                )
+            .order_by('date', 'delivery_address__name')
+        )
+        branches=request.branch
 
     date_format = "%Y-%m-%d"
    
     # Organize orders by address and date
     data_by_address = {}
     for order in orders:
-        address = order['delivery_address__name']
+        address = DeliveryAddress.objects.get(pk=order['delivery_address__pk'])
         address_pk = order['delivery_address__pk']
         date_str = str(order['date'])
 
@@ -943,19 +863,23 @@ def meal_ordered(request, branch_id=None):
             'day_name': datetime.strptime(date_str, date_format).strftime("%A"),
             'date': order_date,
             'total_breakfast': order.get('total_breakfast', '-'),
+            'total_breakfast2': order.get('total_breakfast2', '-'),
             'total_lunch': order.get('total_lunch', '-'),
+            'total_lunch2': order.get('total_lunch2', '-'),
             'total_snack': order.get('total_snack', '-'),
+            'total_snack2': order.get('total_snack2', '-'),
             'total_dinner': order.get('total_dinner', '-'),
             'total_dinner2': order.get('total_dinner2', '-'),
             'is_future': "True" if datetime.strptime(date_str, date_format).date() > today or (order_date != today and current_time < six_pm) else "False",
-            'address_pk': address_pk,
+            'address_pk': address,
+            'branch': order.get('branch', None),
         }
 
     print(f'Data by address: {data_by_address}')
     
     # Fill missing dates with default data for all addresses
     for address in addresses:  # Loop through all addresses instead of data_by_address keys
-        address_name = address.name
+        address_name = address
         address_pk = address.pk
         
         for i in range(7):
@@ -967,55 +891,55 @@ def meal_ordered(request, branch_id=None):
                     'day_name': day.strftime("%A"),
                     'date': day,
                     'total_breakfast': '-',
+                    'total_breakfast2': '-',
                     'total_lunch': '-',
+                    'total_lunch2': '-',
                     'total_snack': '-',
+                    'total_snack2': '-',
                     'total_dinner': '-',
                     'total_dinner2': '-',
                     'is_future': "True" if day > today or (day != today and current_time < six_pm) else "False",
                     'address_pk': address_pk,
+                    'branch': order.get('branch', None),
                 }
     
     # Sort the addresses by name and dates within each address
-    sorted_data = {addr: dict(sorted(data.items())) for addr, data in sorted(data_by_address.items())}
+    sorted_data = data_by_address
 
     # Render the template
     return render(request, 'mentor/meal/meals.html', {
         'notifications': notifications,
         'data_by_address': sorted_data,
         'branch_id': branch_id,
+        'branches': branches,
     })
 
 @login_required
 def assign_meal_post(request, branch_id=None):
-    branch_id = request.session.get('branch_id')
-    
     order = BulkOrders.objects.first()
-    if branch_id:
-        branch=Branch.objects.get(id=branch_id)
-        company=branch.company
-    else:
-        branch = request.branch
-        company = request.company
-    
+        
     if request.method == "POST":
         try:
             data = json.loads(request.body)
             meal_assignments = data.get('mealData', [])
             meal_data = [item for item in meal_assignments if 'meal_plan' in item]
-            print("in post")
+            print("in post", meal_data)
             for assignment in meal_data:
                 print("in for loop")
                 meal_type = assignment.get('meal_plan')
                 address_id = assignment.get('address')
                 date = assignment.get('date')
                 quantity = int(assignment.get('quantity', 0))
+                branch_id = assignment.get('branch')
                 print(meal_type, address_id, date, quantity)
-
-                # if quantity == 0:
-                #     continue
-
+                branch=Branch.objects.get(id=branch_id)
+                company=branch.company
+    
                 delivery_address = get_object_or_404(DeliveryAddress, pk=address_id)
-
+                if quantity == 0:
+                    print("Skipping quantity 0")
+                    continue
+                
                 # Check for existing MealDelivery entry
                 existing_delivery = MealDelivery.objects.filter(
                     bulk_order=order,
@@ -1055,13 +979,14 @@ def assign_meal_post(request, branch_id=None):
                 )
                 print(message)
 
-            return JsonResponse({'success': True, 'message': 'Meal assigned successfully.'})
+            print("Meal assignments processed successfully.")
+            return JsonResponse({'success': True, 'message': 'Meal assigned successfully.', 'debug': 'All meal assignments were processed without errors.'})
         except json.JSONDecodeError as e:
+            print(f"JSON decode error: {str(e)}")
             return JsonResponse({'success': False, 'error': f'JSON decode error: {str(e)}'}, status=400)
         except Exception as e:
+            print(f"Unexpected error: {str(e)}")
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
-
-
 
 
 

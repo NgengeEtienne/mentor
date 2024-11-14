@@ -18,8 +18,27 @@
         </nav>
     </div>
     {% comment %} {% for order in orders %} {% endcomment %}
+    {% if user.role != 'MENTOR' %}
+                    <div class="mb-4 ">
+                        <label for="branchFilter" class="block text-sm font-medium text-gray-700 ">Filter by Branch:</label>
+                        <select id="branchFilter" name="branchFilter" 
+                        class="relative z-20 w-full bg-white appearance-none rounded border border-stroke bg-transparent py-3 pl-5 pr-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                        >
+                            <option value="all">All</option>
+                            {% for branch in branches %}
+                                <option value="{{ branch.id }}">{{ branch.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
     {% for address, orders in data_by_address.items %}
-    <div class="pb-2 mt-4">
+    {% comment %} {% with first_order=orders.values|first %} {% endcomment %}
+
+    
+        <div class="branch-section pb-2 mt-4" data-branch="{{ address.branch.pk }}">
+            {% comment %} {% break %} {% endcomment %}
+        {% comment %} </div> {% endcomment %}
+    
         <div class="flex justify-start p-3 container bg-black rounded-lg  mb-2">
             <div class="button flex items-center">
                 <p class="inline-flex items-center gap-2 my-1 px-4 py-3 font-medium text-white text-lg hover:bg-opacity-90">
@@ -48,27 +67,60 @@
                             <td class="border border-gray-300 px-4 py-2">{{ order.day_name }}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ order.date }}</td>
                             <td class="border border-gray-300 px-4 py-2 text-center">
-                                {{ order.total_breakfast|default_if_none:"-"  }}
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                {{ order.total_lunch|default_if_none:"-"  }}
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                {{ order.total_snack|default_if_none:"-"  }}
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                {% with order.total_breakfast|default_if_none:0 as breakfast %}
+                                {% with order.total_breakfast2|default_if_none:0 as breakfast2 %}
+                                  {% if breakfast|add:breakfast2 == 0 %}
+                                    --
+                                  {% else %}
+                                    {{ breakfast|add:breakfast2 }}
+                                  {% endif %}
+                                {% endwith %}
+                                {% endwith %}
+                              </td>
+                              
+                              <td class="border border-gray-300 px-4 py-2 text-center">
+                                {% with order.total_lunch|default_if_none:0 as lunch %}
+                                {% with order.total_lunch2|default_if_none:0 as lunch2 %}
+                                  {% if lunch|add:lunch2 == 0 %}
+                                    --
+                                  {% else %}
+                                    {{ lunch|add:lunch2 }}
+                                  {% endif %}
+                                {% endwith %}
+                                {% endwith %}
+                              </td>
+                              
+                              <td class="border border-gray-300 px-4 py-2 text-center">
+                                {% with order.total_snack|default_if_none:0 as snack %}
+                                {% with order.total_snack2|default_if_none:0 as snack2 %}
+                                  {% if snack|add:snack2 == 0 %}
+                                    --
+                                  {% else %}
+                                    {{ snack|add:snack2 }}
+                                  {% endif %}
+                                {% endwith %}
+                                {% endwith %}
+                              </td>
+                              
+                              <td class="border border-gray-300 px-4 py-2 text-center">
                                 {% with order.total_dinner|default_if_none:0 as dinner %}
                                 {% with order.total_dinner2|default_if_none:0 as dinner2 %}
-                                {{ dinner|add:dinner2 }}
+                                  {% if dinner|add:dinner2 == 0 %}
+                                    --
+                                  {% else %}
+                                    {{ dinner|add:dinner2 }}
+                                  {% endif %}
                                 {% endwith %}
-                                {% endwith %}                            </td>
+                                {% endwith %}
+                              </td>
+                              
                             <td class="border border-gray-300 px-4 py-2 text-center">
                                 {% if order.is_future == "False" %}
                                 <a class="bg-gray-300 text-black px-4 py-2 rounded text-sm"
                                 style=" cursor: not-allowed;">Edit</a>
 
                                 {% else %}
-                                     <a href="{% if user.role != 'MENTOR' %}{% url 'edit_assign_address_by_branch' request.session.branch_id order.address_pk order.date%}{% else %}{% url 'edit_assign_address' id=order.address_pk date=order.date %}{% endif %}"
+                                     <a href="{% if user.role != 'MENTOR' %}{% url 'edit_assign_address_by_branch' order.branch address.pk order.date%}{% else %}{% url 'edit_assign_address' id=address.pk date=order.date %}{% endif %}"
                                        class="text-primary px-4 py-2 rounded text-md">Edit</a>
                                 {% endif %}
                             </td>
@@ -80,7 +132,18 @@
         </div>
     </div>
 {% endfor %}
-
+<script>
+    document.getElementById('branchFilter').addEventListener('change', function () {
+      const selectedBranch = this.value;
+      document.querySelectorAll('.branch-section').forEach(section => {
+        if (selectedBranch === 'all' || section.dataset.branch === selectedBranch) {
+          section.style.display = 'block';
+        } else {
+          section.style.display = 'none';
+        }
+      });
+    });
+  </script>
 {% endblock content %}
 
     

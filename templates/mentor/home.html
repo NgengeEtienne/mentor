@@ -200,77 +200,134 @@
               <!-- Card Item End -->
             </div>
 
-   
-              <!-- ====== Table One Start -->
-              <div class="mt-4 col-span-12 xl:col-span-8">
-                <div class="rounded-sm border border-stroke  px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-                  <h4 class="mb-6 text-xl font-bold text-black dark:text-white">
-                    Upcoming Deliveries
-                  </h4>
-                  {% for address, orders in data_by_address.items %}
-    <div class="pb-2 mt-4">
-        <div class="flex justify-start p-3 container bg-black rounded-lg  mb-2">
-            <div class="button flex items-center">
-                <p class="inline-flex items-center gap-2 my-1 px-4 py-3 font-medium text-white text-lg hover:bg-opacity-90">
-                    <span>{{ address }}</span>
-                </p>
+            {% if user.role != 'MENTOR' %}
+            <div class="mb-4 ">
+                <label for="branchFilter" class="block text-sm font-medium text-gray-700 ">Filter by Branch:</label>
+                <select id="branchFilter" name="branchFilter" 
+                class="relative z-20 w-full bg-white appearance-none rounded border border-stroke bg-transparent py-3 pl-5 pr-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                >
+                    <option value="all">All</option>
+                    {% for branch in branches %}
+                        <option value="{{ branch.id }}">{{ branch.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
-        </div>
+            {% endif %}
+{% for address, orders in data_by_address.items %}
 
-        <div class="rounded-lg border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-            <div class="max-w-full overflow-x-auto">
-                <table class="w-full table-auto border-collapse border border-gray-300 mb-4">
-                    <thead>
-                        <tr class="bg-[#F9FAFB] text-left dark:bg-meta-4">
-                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Day</th>
-                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Date</th>
-                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Breakfast</th>
-                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Lunch</th>
-                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Snacks</th>
-                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Dinner</th>
-                            <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in orders.values %}
-                        <tr>
-                            <td class="border border-gray-300 px-4 py-2">{{ order.day_name }}</td>
-                            <td class="border border-gray-300 px-4 py-2">{{ order.date }}</td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                {{ order.total_breakfast|default_if_none:"-"  }}
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                {{ order.total_lunch|default_if_none:"-"  }}
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                {{ order.total_snack|default_if_none:"-"  }}
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                {{ order.total_dinner|default_if_none:"-"  }}
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                {% if order.is_future == "False" %}
-                                <a class="bg-gray-300 text-black px-4 py-2 rounded text-sm"
-                                style=" cursor: not-allowed;">Edit</a>
-                                   
-                                {% else %}
-                                     <a href="{% url 'edit_assign_address' id=order.address_pk date=order.date %}"
-                                       class="text-primary px-4 py-2 rounded text-md">Edit</a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+
+<div class="branch-section pb-2 mt-4" data-branch="{{ address.branch.pk }}">
+   
+<div class="flex justify-start p-3 container bg-black rounded-lg  mb-2">
+    <div class="button flex items-center">
+        <p class="inline-flex items-center gap-2 my-1 px-4 py-3 font-medium text-white text-lg hover:bg-opacity-90">
+            <span>{{ address }}</span>
+        </p>
     </div>
+</div>
+
+<div class="rounded-lg border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+    <div class="max-w-full overflow-x-auto">
+        <table class="w-full table-auto border-collapse border border-gray-300 mb-4">
+            <thead>
+                <tr class="bg-[#F9FAFB] text-left dark:bg-meta-4">
+                    <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Day</th>
+                    <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Date</th>
+                    <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Breakfast</th>
+                    <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Lunch</th>
+                    <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Snacks</th>
+                    <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Dinner</th>
+                    <th class="border border-gray-300 py-4 px-4 font-medium text-black dark:text-white bg-gray-200">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders.values %}
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">{{ order.day_name }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ order.date }}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center">
+                        {% with order.total_breakfast|default_if_none:0 as breakfast %}
+                        {% with order.total_breakfast2|default_if_none:0 as breakfast2 %}
+                          {% if breakfast|add:breakfast2 == 0 %}
+                            --
+                          {% else %}
+                            {{ breakfast|add:breakfast2 }}
+                          {% endif %}
+                        {% endwith %}
+                        {% endwith %}
+                      </td>
+                      
+                      <td class="border border-gray-300 px-4 py-2 text-center">
+                        {% with order.total_lunch|default_if_none:0 as lunch %}
+                        {% with order.total_lunch2|default_if_none:0 as lunch2 %}
+                          {% if lunch|add:lunch2 == 0 %}
+                            --
+                          {% else %}
+                            {{ lunch|add:lunch2 }}
+                          {% endif %}
+                        {% endwith %}
+                        {% endwith %}
+                      </td>
+                      
+                      <td class="border border-gray-300 px-4 py-2 text-center">
+                        {% with order.total_snack|default_if_none:0 as snack %}
+                        {% with order.total_snack2|default_if_none:0 as snack2 %}
+                          {% if snack|add:snack2 == 0 %}
+                            --
+                          {% else %}
+                            {{ snack|add:snack2 }}
+                          {% endif %}
+                        {% endwith %}
+                        {% endwith %}
+                      </td>
+                      
+                      <td class="border border-gray-300 px-4 py-2 text-center">
+                        {% with order.total_dinner|default_if_none:0 as dinner %}
+                        {% with order.total_dinner2|default_if_none:0 as dinner2 %}
+                          {% if dinner|add:dinner2 == 0 %}
+                            --
+                          {% else %}
+                            {{ dinner|add:dinner2 }}
+                          {% endif %}
+                        {% endwith %}
+                        {% endwith %}
+                      </td>
+                      
+                    <td class="border border-gray-300 px-4 py-2 text-center">
+                        {% if order.is_future == "False" %}
+                        <a class="bg-gray-300 text-black px-4 py-2 rounded text-sm"
+                        style=" cursor: not-allowed;">Edit</a>
+
+                        {% else %}
+                             <a href="{% if user.role != 'MENTOR' %}{% url 'edit_assign_address_by_branch' order.branch address.pk order.date%}{% else %}{% url 'edit_assign_address' id=address.pk date=order.date %}{% endif %}"
+                               class="text-primary px-4 py-2 rounded text-md">Edit</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
 {% endfor %}
+
                 </div>
 
               
             </div>
-
+            <script>
+              document.getElementById('branchFilter').addEventListener('change', function () {
+              const selectedBranch = this.value;
+              document.querySelectorAll('.branch-section').forEach(section => {
+              if (selectedBranch === 'all' || section.dataset.branch === selectedBranch) {
+                section.style.display = 'block';
+              } else {
+                section.style.display = 'none';
+              }
+              });
+              });
+              </script>
 {% endblock content %}
 
     

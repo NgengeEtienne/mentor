@@ -57,7 +57,7 @@ urlpatterns = [
     path('meal-deliveries/status/<int:id>/', views.meal_delivery_edit, name='edit_status'),
 
     # Meals ordered with optional branch_id
-    path('meals_ordered/branches/', views.meal_ordered_branches, name='meal_ordered_branches'),
+    path('meals_ordered/branches/', views.meal_ordered, name='meal_ordered_branches'),
     path('meals_ordered/<int:branch_id>/', views.meal_ordered, name='meal_ordered_by_branch'),
 
     # Orders list and today's orders with optional branch_id

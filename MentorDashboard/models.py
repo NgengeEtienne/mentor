@@ -28,8 +28,11 @@ class MealDelivery(models.Model):
     delivery_address = models.ForeignKey(DeliveryAddress, on_delete=models.CASCADE)
     meal_type = models.CharField(max_length=50, choices=[
         ('breakfast', 'Breakfast'),
+        ('breakfast2', 'Breakfast2'),
         ('lunch', 'Lunch'),
+        ('lunch2', 'Lunch2'),
         ('snack', 'Snack'),
+        ('snack2', 'Snack2'),
         ('dinner', 'Dinner'),
         ('dinner2', 'Dinner2')
     ])
