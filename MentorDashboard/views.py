@@ -215,33 +215,33 @@ def dashboard_overview(request):
             'branch': order.get('branch', None),
         }
 
-    print(f'Data by address: {data_by_address}')
+        print(f'Data by address: {data_by_address}')
     
     # Fill missing dates with default data for all addresses
-    for address in addresses:  # Loop through all addresses instead of data_by_address keys
-        address_name = address
-        address_pk = address.pk
-        
-        for i in range(7):
-            day = today + timedelta(days=i)
-            date_str = str(day)
+        for address in addresses:  # Loop through all addresses instead of data_by_address keys
+            address_name = address
+            address_pk = address.pk
+            
+            for i in range(7):
+                day = today + timedelta(days=i)
+                date_str = str(day)
 
-            if date_str not in data_by_address.get(address_name, {}):
-                data_by_address.setdefault(address_name, {})[date_str] = {
-                    'day_name': day.strftime("%A"),
-                    'date': day,
-                    'total_breakfast': '-',
-                    'total_breakfast2': '-',
-                    'total_lunch': '-',
-                    'total_lunch2': '-',
-                    'total_snack': '-',
-                    'total_snack2': '-',
-                    'total_dinner': '-',
-                    'total_dinner2': '-',
-                    'is_future': "True" if day > today or (day != today and current_time < six_pm) else "False",
-                    'address_pk': address_pk,
-                    'branch': order.get('branch', None),
-                }
+                if date_str not in data_by_address.get(address_name, {}):
+                    data_by_address.setdefault(address_name, {})[date_str] = {
+                        'day_name': day.strftime("%A"),
+                        'date': day,
+                        'total_breakfast': '-',
+                        'total_breakfast2': '-',
+                        'total_lunch': '-',
+                        'total_lunch2': '-',
+                        'total_snack': '-',
+                        'total_snack2': '-',
+                        'total_dinner': '-',
+                        'total_dinner2': '-',
+                        'is_future': "True" if day > today or (day != today and current_time < six_pm) else "False",
+                        'address_pk': address_pk,
+                        'branch': order.get('branch', None),
+                    }
     
     # Sort the addresses by name and dates within each address
     sorted_data = data_by_address
@@ -875,34 +875,34 @@ def meal_ordered(request, branch_id=None):
             'branch': order.get('branch', None),
         }
 
-    print(f'Data by address: {data_by_address}')
-    
-    # Fill missing dates with default data for all addresses
-    for address in addresses:  # Loop through all addresses instead of data_by_address keys
-        address_name = address
-        address_pk = address.pk
+        print(f'Data by address: {data_by_address}')
         
-        for i in range(7):
-            day = today + timedelta(days=i)
-            date_str = str(day)
+        # Fill missing dates with default data for all addresses
+        for address in addresses:  # Loop through all addresses instead of data_by_address keys
+            address_name = address
+            address_pk = address.pk
+            
+            for i in range(7):
+                day = today + timedelta(days=i)
+                date_str = str(day)
 
-            if date_str not in data_by_address.get(address_name, {}):
-                data_by_address.setdefault(address_name, {})[date_str] = {
-                    'day_name': day.strftime("%A"),
-                    'date': day,
-                    'total_breakfast': '-',
-                    'total_breakfast2': '-',
-                    'total_lunch': '-',
-                    'total_lunch2': '-',
-                    'total_snack': '-',
-                    'total_snack2': '-',
-                    'total_dinner': '-',
-                    'total_dinner2': '-',
-                    'is_future': "True" if day > today or (day != today and current_time < six_pm) else "False",
-                    'address_pk': address_pk,
-                    'branch': order.get('branch', None),
-                }
-    
+                if date_str not in data_by_address.get(address_name, {}):
+                    data_by_address.setdefault(address_name, {})[date_str] = {
+                        'day_name': day.strftime("%A"),
+                        'date': day,
+                        'total_breakfast': '-',
+                        'total_breakfast2': '-',
+                        'total_lunch': '-',
+                        'total_lunch2': '-',
+                        'total_snack': '-',
+                        'total_snack2': '-',
+                        'total_dinner': '-',
+                        'total_dinner2': '-',
+                        'is_future': "True" if day > today or (day != today and current_time < six_pm) else "False",
+                        'address_pk': address_pk,
+                        'branch': order.get('branch', None),
+                    }
+        
     # Sort the addresses by name and dates within each address
     sorted_data = data_by_address
 
